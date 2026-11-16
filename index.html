@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VinFast O2O Advisor — Hệ thống Tư vấn Chọn xe & Dự toán Chi phí Trực tuyến</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              blue: '#0F4C81',
+              accent: '#1464F4',
+              surface: '#F8FAFC',
+              border: '#E2E8F0',
+              text: '#0F172A',
+              muted: '#64748B'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #F8FAFC;
+      color: #0F172A;
+      -webkit-font-smoothing: antialiased;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+    .app-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 14px;
+      box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+    }
+    .app-card-elevated {
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      border-radius: 14px;
+      box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+    }
+    .fade-enter {
+      animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    input[type=range] {
+      accent-color: #1464F4;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-900">
+
+  <!-- TOP HEADER & WORKSPACE PORTAL SWITCHER -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 lg:px-8 h-16 flex items-center justify-between gap-4">
+      
+      <!-- Brand & Official Catalog Badge -->
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-brand-blue flex items-center justify-center text-white font-black text-lg shadow-sm">
+          <span class="material-symbols-outlined text-[20px]">electric_bolt</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-base tracking-tight text-slate-900">VinFast O2O Advisor</span>
+            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-brand-blue border border-blue-200">Hà Nội</span>
+          </div>
+          <p class="text-[11px] text-slate-500 flex items-center gap-1.5 mt-0.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500" id="header-version-dot"></span>
+            <span>Biểu giá Niêm yết Chính hãng · Áp dụng Tháng 11/2026 · Xe kèm pin</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- WORKSPACE SELECTOR (KHÁCH HÀNG / TƯ VẤN VIÊN) -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200" role="tablist" aria-label="Phân hệ làm việc">
+          <button 
+            id="btn-role-customer" 
+            onclick="switchRoleView('customer')" 
+            class="px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all bg-white text-brand-blue shadow-xs"
+            role="tab"
+            aria-selected="true"
+          >
+            <span class="material-symbols-outlined text-[16px]">person</span>
+            <span>Khách hàng tìm xe</span>
+          </button>
+          
+          <button 
+            id="btn-role-advisor" 
+            onclick="switchRoleView('advisor')" 
+            class="px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all text-slate-600 hover:text-slate-900"
+            role="tab"
+            aria-selected="false"
+          >
+            <span class="material-symbols-outlined text-[16px]">support_agent</span>
+            <span>Showroom Cầu Giấy</span>
+            <span id="advisor-badge-count" class="w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] flex items-center justify-center font-bold">1</span>
+          </button>
+        </div>
+
+        <!-- Session Reset Button -->
+        <button 
+          onclick="resetFullApplication()" 
+          title="Làm mới phiên tư vấn" 
+          class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-all"
+        >
+          <span class="material-symbols-outlined text-[19px]">restart_alt</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ======================================================== -->
+  <!-- 1. KHÔNG GIAN KHÁCH HÀNG (CUSTOMER WORKSPACE)            -->
+  <!-- ======================================================== -->
+  <main id="view-customer" class="flex-1 w-full max-w-7xl mx-auto px-4 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    
+    <!-- LEFT COLUMN: AI CHAT ASSISTANT (5 COLS) -->
+    <div class="lg:col-span-5 flex flex-col h-[750px] app-card overflow-hidden">
+      
+      <!-- Chat Header -->
+      <div class="p-4 border-b border-slate-200 bg-slate-50/70 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-full bg-brand-accent text-white flex items-center justify-center">
+            <span class="material-symbols-outlined text-[18px]">smart_toy</span>
+          </div>
+          <div>
+            <h2 class="text-xs font-bold text-slate-900">Trợ lý AI Tư vấn Chọn xe</h2>
+            <p class="text-[11px] text-slate-500">Tư vấn chuyên sâu VF 5, VF 6, VF 7 tại Hà Nội</p>
+          </div>
+        </div>
+        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          Trực tuyến
+        </span>
+      </div>
+
+      <!-- Chat Messages Container -->
+      <div id="customer-chat-stream" class="flex-1 overflow-y-auto p-4 space-y-4 text-xs" aria-live="polite">
+        
+        <!-- Welcome message -->
+        <div class="flex items-start gap-2.5 max-w-[90%] fade-enter">
+          <div class="w-6 h-6 rounded-full bg-brand-blue text-white shrink-0 flex items-center justify-center text-[11px] font-bold mt-0.5">V</div>
+          <div class="flex flex-col gap-1">
+            <div class="p-3.5 bg-slate-100 rounded-2xl rounded-tl-xs text-slate-800 leading-relaxed">
+              Chào anh/chị! Em là trợ lý số VinFast. Để tìm chiếc ô tô điện phù hợp nhất cho gia đình tại Hà Nội, anh/chị dự kiến <strong>ngân sách lăn bánh</strong> khoảng bao nhiêu và <strong>chỗ đỗ xe hàng ngày</strong> thế nào ạ?
+            </div>
+            <span class="text-[10px] text-slate-400 pl-1">Vừa xong</span>
+          </div>
+        </div>
+
+        <!-- Quick Needs Scenario Chips -->
+        <div id="quick-selection-group" class="pl-8 space-y-2 fade-enter">
+          <p class="text-[11px] font-semibold text-slate-500">Chọn nhanh theo mức ngân sách & điều kiện:</p>
+          
+          <button onclick="selectQuickNeed('vf6')" class="w-full text-left p-2.5 rounded-xl border border-blue-200 bg-blue-50/60 hover:bg-blue-100/70 text-slate-800 transition flex items-center justify-between group">
+            <span class="font-medium text-xs">Phân khúc ~700 triệu lăn bánh · Đô thị (VF 6)</span>
+            <span class="material-symbols-outlined text-[15px] text-brand-blue group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+          </button>
+
+          <button onclick="selectQuickNeed('vf5')" class="w-full text-left p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-800 transition flex items-center justify-between group">
+            <span class="font-medium text-xs">Ngân sách dưới 600 triệu · Kinh tế (VF 5)</span>
+            <span class="material-symbols-outlined text-[15px] text-slate-400 group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+          </button>
+
+          <button onclick="selectQuickNeed('vf7')" class="w-full text-left p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-800 transition flex items-center justify-between group">
+            <span class="font-medium text-xs">Phân khúc 800 triệu - 1 tỷ · Hạng C cao cấp (VF 7)</span>
+            <span class="material-symbols-outlined text-[15px] text-slate-400 group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Preset Question Pills -->
+      <div class="px-4 py-2 border-t border-slate-100 flex items-center gap-1.5 overflow-x-auto no-scrollbar text-[11px]">
+        <span class="text-slate-400 font-medium shrink-0">Gợi ý hỏi:</span>
+        <button onclick="askPresetQuestion('Ở chung cư sạc thế nào?')" class="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 shrink-0 transition">Ở chung cư sạc thế nào?</button>
+        <button onclick="askPresetQuestion('Trả góp 10tr/tháng lấy được xe gì?')" class="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 shrink-0 transition">Trả góp 10tr/tháng lấy được xe gì?</button>
+        <button onclick="askPresetQuestion('So sánh VF 6 và VF 5?')" class="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 shrink-0 transition">So sánh VF 6 và VF 5?</button>
+      </div>
+
+      <!-- Chat Input Form -->
+      <form onsubmit="handleChatSubmit(event)" class="p-3 border-t border-slate-200 bg-white flex flex-col gap-2">
+        <div class="relative flex items-center">
+          <input 
+            type="text" 
+            id="chat-input-text" 
+            placeholder="Nhập nhu cầu di chuyển, ngân sách hoặc câu hỏi của bạn..." 
+            class="w-full pl-3.5 pr-10 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent text-xs placeholder:text-slate-400"
+            aria-label="Nội dung câu hỏi"
+          />
+          <button 
+            type="submit" 
+            class="absolute right-1.5 w-7 h-7 rounded-lg bg-brand-accent text-white flex items-center justify-center hover:bg-blue-600 transition disabled:opacity-50"
+            title="Gửi câu hỏi"
+          >
+            <span class="material-symbols-outlined text-[16px]">arrow_upward</span>
+          </button>
+        </div>
+        <p class="text-[10px] text-slate-400 text-center">Trợ lý AI tự động phân tích nhu cầu và đề xuất dòng xe tối ưu theo biểu giá chính hãng.</p>
+      </form>
+
+    </div>
+
+    <!-- RIGHT COLUMN: PROGRESSIVE WORKSPACE (CAR CARD + 5-YEAR ESTIMATE) (7 COLS) -->
+    <div class="lg:col-span-7 flex flex-col gap-5">
+      
+      <!-- STAGE 0: EMPTY PLACEHOLDER (BEFORE USER SELECTS) -->
+      <div id="stage-empty-workspace" class="app-card p-10 flex flex-col items-center justify-center text-center gap-3 text-slate-500 py-24">
+        <div class="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-1">
+          <span class="material-symbols-outlined text-[36px]">directions_car</span>
+        </div>
+        <h3 class="text-sm font-bold text-slate-800">Chưa có đề xuất xe nào được mở</h3>
+        <p class="text-xs text-slate-500 max-w-md leading-relaxed">
+          Hãy chọn một kịch bản nhanh bên trái hoặc gửi tin nhắn chia sẻ về nhu cầu của bạn. Trợ lý AI sẽ gợi ý phiên bản xe vừa vặn nhất và lập dự toán chi phí chi tiết.
+        </p>
+        <button onclick="selectQuickNeed('vf6')" class="mt-2 px-4 py-2 rounded-xl bg-brand-blue text-white text-xs font-semibold hover:bg-slate-800 transition">
+          Xem gợi ý mẫu: Ngân sách ~700 triệu lăn bánh (VF 6 Comfort)
+        </button>
+      </div>
+
+      <!-- STAGE 1: DYNAMIC VEHICLE CARD (REVEALED ON SELECT) -->
+      <div id="stage-car-card" class="hidden app-card overflow-hidden fade-enter">
+        <div class="p-5 flex flex-col md:flex-row gap-5 items-start">
+          
+          <!-- Car Image Container -->
+          <div class="w-full md:w-56 h-36 rounded-xl bg-slate-100 overflow-hidden shrink-0 flex items-center justify-center border border-slate-200">
+            <img 
+              id="car-display-image" 
+              src="https://static-cms-prod.vinfastauto.com/2023-09/VF6-Plus-Brahminy-White_1.png" 
+              alt="VinFast EV" 
+              class="w-full h-full object-contain p-2"
+            />
+          </div>
+
+          <!-- Car Basic Specs & Pricing -->
+          <div class="flex-1 flex flex-col justify-between h-full">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-1">
+                <span id="car-display-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-brand-blue border border-blue-200">
+                  B-SUV Đô thị
+                </span>
+                <span id="car-display-source" class="text-[10px] text-slate-400">
+                  Nguồn: Biểu giá & Thông số Niêm yết VinFast Auto · Tháng 11/2026
+                </span>
+              </div>
+              <h3 id="car-display-title" class="text-lg font-extrabold text-slate-900 tracking-tight">
+                VinFast VF 6 Comfort
+              </h3>
+              <div class="mt-1 flex items-baseline gap-2">
+                <span class="text-xs text-slate-500">Giá niêm yết:</span>
+                <span id="car-display-price" class="text-base font-extrabold text-brand-blue">
+                  646.000.000 VNĐ
+                </span>
+                <span class="text-[11px] text-slate-500">(Đã gồm Pin & Bộ sạc chính hãng)</span>
+              </div>
+            </div>
+
+            <!-- Key Quick Spec Grid -->
+            <div class="grid grid-cols-3 gap-2 mt-3.5 pt-3 border-t border-slate-100 text-center">
+              <div class="p-2 rounded-lg bg-slate-50">
+                <span class="text-[10px] text-slate-400 block">Số chỗ ngồi</span>
+                <span id="car-display-seats" class="text-xs font-bold text-slate-800">5 chỗ</span>
+              </div>
+              <div class="p-2 rounded-lg bg-slate-50">
+                <span class="text-[10px] text-slate-400 block">Tầm hoạt động</span>
+                <span id="car-display-range" class="text-xs font-bold text-slate-800">510 km / sạc</span>
+              </div>
+              <div class="p-2 rounded-lg bg-slate-50">
+                <span class="text-[10px] text-slate-400 block">Bảo hành xe</span>
+                <span id="car-display-warranty" class="text-xs font-bold text-slate-800">7 năm</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Why This Car Fits You (2 Reasons from AI) -->
+        <div class="px-5 py-3 bg-blue-50/50 border-t border-slate-100 space-y-1.5 text-xs text-slate-700">
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-[16px] text-emerald-600 mt-0.5 shrink-0">check_circle</span>
+            <p id="car-display-reason-budget"><strong>Vừa vặn ngân sách:</strong> Giá lăn bánh Hà Nội ~665 triệu (Hưởng ưu đãi 100% lệ phí trước bạ xe điện — tiết kiệm ngay ~65 triệu đồng).</p>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-[16px] text-blue-600 mt-0.5 shrink-0">ev_station</span>
+            <p id="car-display-reason-charging"><strong>Chu kỳ sạc tiện lợi:</strong> Đi 30km/ngày thì khoảng 10 - 12 ngày mới cần sạc 1 lần.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAGE 2: 5-YEAR ESTIMATE & INTERACTIVE ADJUSTMENT -->
+      <div id="stage-tco-card" class="hidden app-card overflow-hidden fade-enter">
+        
+        <!-- Header -->
+        <div class="p-4 border-b border-slate-200 bg-slate-50/70 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[19px] text-brand-blue">account_balance_wallet</span>
+            <h3 class="text-xs font-bold text-slate-900">Tổng chi phí sở hữu 5 năm — ước tính</h3>
+          </div>
+          <span class="text-[11px] font-semibold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">
+            Dự toán dự kiến · Đang chờ xác nhận từ Showroom
+          </span>
+        </div>
+
+        <!-- 3 Big Numbers (No information overload) -->
+        <div class="p-5 grid grid-cols-1 md:grid-cols-3 gap-4 border-b border-slate-100">
+          
+          <!-- Big Number 1: 5-Year Total Estimate -->
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+            <span class="text-[11px] font-semibold text-slate-500 block mb-1">Tổng chi phí sở hữu 5 năm</span>
+            <div id="ui-tco-total" class="text-xl font-extrabold text-slate-900 tracking-tight">742.500.000 đ</div>
+            <p class="text-[10px] text-slate-400 mt-1">Xe + lăn bánh + điện + bảo dưỡng - bán lại</p>
+          </div>
+
+          <!-- Big Number 2: First Month Installment -->
+          <div class="p-3.5 rounded-xl bg-blue-50/60 border border-blue-200/80">
+            <span class="text-[11px] font-semibold text-brand-blue block mb-1">Dự tính trả góp tháng đầu</span>
+            <div id="ui-tco-monthly" class="text-xl font-extrabold text-brand-blue tracking-tight">12.086.667 đ</div>
+            <p class="text-[10px] text-slate-500 mt-1">Gốc đều, lãi trên dư nợ giảm dần (60 tháng)</p>
+          </div>
+
+          <!-- Big Number 3: Monthly Electricity & Charge Frequency -->
+          <div class="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200/80">
+            <span class="text-[11px] font-semibold text-emerald-800 block mb-1">Chi phí sạc điện ước tính</span>
+            <div id="ui-tco-energy" class="text-xl font-extrabold text-emerald-700 tracking-tight">~820.000 đ / tháng</div>
+            <p id="ui-tco-frequency" class="text-[10px] text-emerald-600 mt-1 font-medium">~11 ngày mới cần sạc 1 lần</p>
+          </div>
+
+        </div>
+
+        <!-- COLLAPSIBLE ACCORDION FOR INPUT ADJUSTMENTS -->
+        <div class="border-b border-slate-200">
+          <button 
+            type="button" 
+            onclick="toggleSlidersAccordion()" 
+            class="w-full px-5 py-3 flex items-center justify-between text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
+          >
+            <span class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[17px] text-brand-blue">tune</span>
+              <span>Tùy chỉnh Thông số Vay & Nhu cầu Di chuyển thực tế</span>
+            </span>
+            <span id="accordion-icon" class="material-symbols-outlined text-[18px] text-slate-400 transition-transform">expand_more</span>
+          </button>
+
+          <!-- Accordion Body -->
+          <div id="accordion-content" class="hidden px-5 pb-5 pt-1 space-y-4 bg-slate-50/50">
+            
+            <!-- Slider 1: Daily Distance -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs">
+                <label for="slider-daily-km" class="font-medium text-slate-700">Quãng đường di chuyển hàng ngày:</label>
+                <span id="label-daily-km" class="font-bold text-brand-blue">30 km/ngày</span>
+              </div>
+              <input 
+                type="range" 
+                id="slider-daily-km" 
+                min="10" 
+                max="120" 
+                step="5" 
+                value="30" 
+                oninput="handleCustomerInputsChange()"
+                class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+              />
+              <div class="flex justify-between text-[10px] text-slate-400">
+                <span>10 km</span>
+                <span>50 km</span>
+                <span>100 km</span>
+              </div>
+            </div>
+
+            <!-- Slider 2: Loan Ratio -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs">
+                <label for="slider-loan-pct" class="font-medium text-slate-700">Tỷ lệ vay ngân hàng:</label>
+                <span id="label-loan-pct" class="font-bold text-brand-blue">70% (Vốn tự có 30%)</span>
+              </div>
+              <input 
+                type="range" 
+                id="slider-loan-pct" 
+                min="0" 
+                max="0.8" 
+                step="0.1" 
+                value="0.7" 
+                oninput="handleCustomerInputsChange()"
+                class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+              />
+              <div class="flex justify-between text-[10px] text-slate-400">
+                <span>Mua thẳng 0%</span>
+                <span>50%</span>
+                <span>Tối đa 80%</span>
+              </div>
+            </div>
+
+            <!-- Loan Method & Charging Facility Options -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 text-xs">
+              <div>
+                <span class="block text-[11px] font-medium text-slate-600 mb-1">Phương thức trả nợ ngân hàng:</span>
+                <select id="select-loan-method" onchange="handleCustomerInputsChange()" class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs">
+                  <option value="decreasing">Gốc đều, lãi trên dư nợ giảm dần</option>
+                  <option value="annuity">Niên kim cố định (PMT)</option>
+                </select>
+              </div>
+
+              <div>
+                <span class="block text-[11px] font-medium text-slate-600 mb-1">Điểm sạc pin chính hàng ngày:</span>
+                <select id="select-charging-fac" onchange="handleCustomerInputsChange()" class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs">
+                  <option value="vgreen">Trụ sạc công cộng V-GREEN (3.858 đ/kWh)</option>
+                  <option value="home">Sạc tại nhà riêng / Gara gia đình (~3.200 đ/kWh)</option>
+                </select>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ACTIONS & NOTICES AREA -->
+        <div class="p-5 flex flex-col gap-3">
+          
+          <!-- CTA Action Row -->
+          <div class="flex flex-col sm:flex-row items-center gap-3">
+            <button 
+              type="button" 
+              onclick="openTestDriveModal()" 
+              class="w-full sm:w-1/2 py-2.5 px-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold flex items-center justify-center gap-1.5 transition"
+            >
+              <span class="material-symbols-outlined text-[17px] text-brand-blue">event</span>
+              <span>Đăng ký Lái thử Trải nghiệm</span>
+            </button>
+
+            <button 
+              type="button" 
+              id="btn-customer-submit" 
+              onclick="submitEstimateToAdvisor()" 
+              class="w-full sm:w-1/2 py-2.5 px-4 rounded-xl bg-brand-blue hover:bg-slate-800 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition shadow-xs"
+            >
+              <span class="material-symbols-outlined text-[17px]">send</span>
+              <span>Gửi dự toán đến Showroom Cầu Giấy</span>
+            </button>
+          </div>
+
+          <!-- STATUS 1: PENDING ADVISOR APPROVAL -->
+          <div id="status-ticket-sent" class="hidden p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5 fade-enter">
+            <span class="material-symbols-outlined text-[18px] text-amber-600 mt-0.5 shrink-0">schedule</span>
+            <div class="flex-1">
+              <span class="font-bold">Đang chờ chuyên viên Showroom thẩm định (Hồ sơ #HS-1089)</span>
+              <p class="text-[11px] text-amber-800 mt-0.5">Dự toán của bạn đã được chuyển tới chuyên viên tư vấn phụ trách tại Showroom VinFast Cầu Giấy. Chuyên viên sẽ đối chiếu chính sách giá và phản hồi sớm nhất.</p>
+            </div>
+            <button onclick="switchRoleView('advisor')" class="px-2.5 py-1 rounded bg-amber-200/60 hover:bg-amber-200 text-amber-900 text-[11px] font-bold shrink-0 transition">
+              Xem tiến độ tại Showroom →
+            </button>
+          </div>
+
+          <!-- STATUS 2: DATA CHANGED -> NEEDS RECALCULATION & RE-APPROVAL -->
+          <div id="status-ticket-recalc-needed" class="hidden p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs flex items-start gap-2.5 fade-enter">
+            <span class="material-symbols-outlined text-[18px] text-rose-600 mt-0.5 shrink-0">sync_problem</span>
+            <div class="flex-1">
+              <span class="font-bold">Dữ liệu đã thay đổi — Cần cập nhật lại dự toán</span>
+              <p class="text-[11px] text-rose-800 mt-0.5">Bạn vừa điều chỉnh thông số di chuyển hoặc phương án vay. Báo giá đã duyệt trước đó không còn hiệu lực. Vui lòng bấm "Gửi lại dự toán" để chuyên viên xác nhận lại phương án mới.</p>
+            </div>
+            <button onclick="submitEstimateToAdvisor()" class="px-2.5 py-1 rounded bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold shrink-0 transition">
+              Gửi lại dự toán đã điều chỉnh
+            </button>
+          </div>
+
+          <!-- STATUS 3: APPROVED BY SHOWROOM ADVISOR -->
+          <div id="status-ticket-approved" class="hidden p-4 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs space-y-2 fade-enter">
+            <div class="flex items-center justify-between">
+              <span class="font-bold flex items-center gap-1.5 text-emerald-800">
+                <span class="material-symbols-outlined text-[18px] text-emerald-600">verified</span>
+                Dự toán chính thức đã được Showroom Cầu Giấy phê duyệt
+              </span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold border border-emerald-200">
+                Đã ký điện tử
+              </span>
+            </div>
+            
+            <p class="text-[11px] text-emerald-800">
+              Chuyên viên phê duyệt: <strong id="ui-approved-by">Lê Văn B (Showroom Cầu Giấy)</strong> lúc <span id="ui-approved-time">10:45</span> · Biểu giá áp dụng: <span id="ui-approved-ver">Tháng 11/2026</span>
+            </p>
+
+            <div class="p-2.5 rounded-lg bg-white/80 border border-emerald-200 text-emerald-900 text-[11px]">
+              <span class="font-semibold block text-slate-700 mb-0.5">Ghi chú từ chuyên viên tư vấn:</span>
+              <span id="ui-advisor-reply-note">Đại lý Cầu Giấy đang có sẵn xe VF 6 giao ngay trong tuần, hỗ trợ làm thủ tục vay Techcombank trong 24h và tặng gói thảm sàn chính hãng.</span>
+            </div>
+
+            <button onclick="openTestDriveModal()" class="w-full mt-1 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs flex items-center justify-center gap-1 transition">
+              <span class="material-symbols-outlined text-[16px]">directions_car</span>
+              <span>Đăng ký lái thử mẫu xe này</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- 2. KHÔNG GIAN SHOWROOM CẦU GIẤY (ADVISOR WORKSPACE)      -->
+  <!-- ======================================================== -->
+  <main id="view-advisor" class="hidden flex-1 w-full max-w-7xl mx-auto px-4 lg:px-8 py-6 flex-col gap-6" aria-label="Bàn làm việc tư vấn viên">
+    
+    <!-- Advisor Workspace Top Banner -->
+    <div class="app-card p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 border-l-brand-blue">
+      <div>
+        <h2 class="text-base font-bold text-slate-900">Hàng đợi Yêu cầu Tư vấn & Dự toán</h2>
+        <p class="text-xs text-slate-500 mt-0.5">
+          Chuyên viên tư vấn phụ trách: <strong class="text-slate-800">Lê Văn B (Showroom VinFast Cầu Giấy)</strong>
+        </p>
+      </div>
+
+      <!-- Queue Metrics Cards -->
+      <div class="flex items-center gap-3">
+        <div class="px-3.5 py-2 rounded-xl bg-amber-50 border border-amber-200 text-center min-w-[90px]">
+          <span class="text-[10px] text-amber-700 font-semibold block">Chờ thẩm định</span>
+          <span id="stat-pending-count" class="text-base font-extrabold text-amber-900">1</span>
+        </div>
+        <div class="px-3.5 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-center min-w-[90px]">
+          <span class="text-[10px] text-emerald-700 font-semibold block">Đã gửi hôm nay</span>
+          <span class="text-base font-extrabold text-emerald-900">12</span>
+        </div>
+        <div class="px-3.5 py-2 rounded-xl bg-rose-50 border border-rose-200 text-center min-w-[90px]">
+          <span class="text-[10px] text-rose-700 font-semibold block">Cần cập nhật</span>
+          <span class="text-base font-extrabold text-rose-900">1</span>
+        </div>
+        <div class="px-3.5 py-2 rounded-xl bg-blue-50 border border-blue-200 text-center min-w-[110px]">
+          <span class="text-[10px] text-brand-blue font-semibold block">Thời gian phản hồi</span>
+          <span class="text-base font-extrabold text-brand-blue">~15 phút</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUEUE TABLE SECTION -->
+    <div id="advisor-queue-table-section" class="app-card overflow-hidden">
+      <div class="p-4 border-b border-slate-200 bg-slate-50/70 flex items-center justify-between">
+        <div>
+          <h3 class="text-xs font-bold text-slate-900">Danh sách Hồ sơ Khách hàng tiếp nhận</h3>
+          <p class="text-[11px] text-slate-500">Chuyên viên kiểm tra thông số, đối chiếu biểu giá và gửi dự toán chính thức cho khách hàng</p>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-slate-200 bg-slate-100/70 text-slate-600 font-semibold text-[11px]">
+              <th class="p-3.5">Mã hồ sơ</th>
+              <th class="p-3.5">Khách hàng</th>
+              <th class="p-3.5">Mẫu xe & Nhu cầu</th>
+              <th class="p-3.5">Dự toán Chi phí 5 năm</th>
+              <th class="p-3.5">Biểu giá áp dụng</th>
+              <th class="p-3.5">Trạng thái xử lý</th>
+              <th class="p-3.5 text-right">Hành động</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            
+            <!-- Row 1: The Active User's Ticket (#HS-1089) -->
+            <tr class="hover:bg-slate-50 transition">
+              <td class="p-3.5 font-bold text-slate-900">#HS-1089</td>
+              <td class="p-3.5">
+                <span class="font-semibold text-slate-800 block">Nguyễn Văn A</span>
+                <span class="text-[11px] text-slate-400">Cầu Giấy · 30km/ngày · Ở chung cư</span>
+              </td>
+              <td class="p-3.5">
+                <span id="table-ticket-car-name" class="font-bold text-brand-blue">VinFast VF 6 Comfort</span>
+              </td>
+              <td class="p-3.5 font-bold text-slate-800" id="table-ticket-tco-val">742.500.000 đ</td>
+              <td class="p-3.5">
+                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200" id="table-ticket-catalog-ver">
+                  Tháng 11/2026
+                </span>
+              </td>
+              <td class="p-3.5">
+                <span id="ticket-badge-1089" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                  Chờ thẩm định
+                </span>
+              </td>
+              <td class="p-3.5 text-right">
+                <button 
+                  onclick="openHITLScreen()" 
+                  class="px-3 py-1.5 rounded-lg bg-brand-blue hover:bg-slate-800 text-white font-semibold text-xs shadow-xs transition"
+                >
+                  Thẩm định & Phản hồi →
+                </button>
+              </td>
+            </tr>
+
+            <!-- Row 2: Expired Catalog Ticket for demonstration -->
+            <tr class="hover:bg-slate-50 transition opacity-80">
+              <td class="p-3.5 font-bold text-slate-500">#HS-1084</td>
+              <td class="p-3.5">
+                <span class="font-semibold text-slate-700 block">Trần Thị C</span>
+                <span class="text-[11px] text-slate-400">Hà Đông, Hà Nội</span>
+              </td>
+              <td class="p-3.5 font-medium text-slate-600">VinFast VF 5 Plus</td>
+              <td class="p-3.5 text-slate-600">558.000.000 đ</td>
+              <td class="p-3.5">
+                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                  Biểu giá cũ (Hết hạn)
+                </span>
+              </td>
+              <td class="p-3.5">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300">
+                  Cần cập nhật giá mới
+                </span>
+              </td>
+              <td class="p-3.5 text-right">
+                <span class="text-[11px] text-slate-400 italic">Đã thông báo khách</span>
+              </td>
+            </tr>
+
+            <!-- Row 3: Completed Ticket -->
+            <tr class="hover:bg-slate-50 transition opacity-70">
+              <td class="p-3.5 font-bold text-slate-500">#HS-1075</td>
+              <td class="p-3.5">
+                <span class="font-semibold text-slate-700 block">Hoàng Minh D</span>
+                <span class="text-[11px] text-slate-400">Tây Hồ, Hà Nội</span>
+              </td>
+              <td class="p-3.5 font-medium text-slate-600">VinFast VF 7 Eco</td>
+              <td class="p-3.5 text-slate-600">890.000.000 đ</td>
+              <td class="p-3.5">
+                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                  Tháng 11/2026
+                </span>
+              </td>
+              <td class="p-3.5">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  Đã gửi dự toán
+                </span>
+              </td>
+              <td class="p-3.5 text-right text-slate-400 text-xs">
+                Hoàn tất
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- HITL FULL INSPECTION & AUDIT SCREEN -->
+    <div id="advisor-hitl-screen" class="hidden flex-col gap-5">
+      
+      <!-- Back Navigation Header -->
+      <div class="flex items-center justify-between">
+        <button 
+          onclick="closeHITLScreen()" 
+          class="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition"
+        >
+          <span class="material-symbols-outlined text-[17px]">arrow_back</span>
+          <span>Quay lại Danh sách Hồ sơ</span>
+        </button>
+        <span class="text-xs text-slate-500">Mã phiên làm việc: <strong class="text-slate-800">#HS-1089</strong></span>
+      </div>
+
+      <!-- HITL Main Card -->
+      <div class="app-card overflow-hidden">
+        
+        <!-- Header Bar -->
+        <div class="p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-sm font-extrabold text-slate-900">Thẩm định Hồ sơ Dự toán #HS-1089</h3>
+              <span id="advisor-snapshot-flag" class="text-[11px] font-medium text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded">
+                Trích xuất dữ liệu: Khớp nhu cầu khách hàng gửi
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Khách hàng: <strong>Nguyễn Văn A</strong> · Cầu Giấy, Hà Nội · Tiếp nhận từ Cổng tư vấn trực tuyến</p>
+          </div>
+        </div>
+
+        <!-- Two Column HITL Workspace -->
+        <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          <!-- LEFT COL: Customer Input Snapshot & Verification Checklist (5 Cols) -->
+          <div class="lg:col-span-5 space-y-5">
+            <div>
+              <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2">1. Thông tin Nhu cầu & Dự toán của Khách hàng</h4>
+              <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
+                <div class="flex justify-between">
+                  <span class="text-slate-500">Ngân sách dự kiến:</span>
+                  <span class="font-bold text-slate-900" id="hitl-customer-budget-text">700.000.000 đ</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-500">Thói quen di chuyển:</span>
+                  <span class="font-bold text-slate-900" id="hitl-customer-km-text">30 km/ngày</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-500">Điểm sạc pin:</span>
+                  <span class="font-bold text-slate-900" id="hitl-customer-fac-text">Trạm sạc V-GREEN (Chung cư)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Proposed Vehicle Specs -->
+            <div class="p-3.5 rounded-xl bg-blue-50/50 border border-blue-200 text-xs">
+              <span class="text-[11px] font-semibold text-brand-blue block mb-1">Mẫu xe khách chọn:</span>
+              <div class="font-bold text-slate-900 text-sm" id="hitl-car-name">VinFast VF 6 Comfort (Kèm Pin)</div>
+              <p class="text-slate-600 mt-1 leading-relaxed" id="hitl-car-reason">
+                Khớp ngân sách trần và cự ly di chuyển đô thị.
+              </p>
+            </div>
+
+            <!-- MANDATORY CHECKLIST -->
+            <div class="space-y-3 pt-2">
+              <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Quy trình Kiểm định Nghiệp vụ (Bắt buộc xác nhận trước khi phê duyệt):</h4>
+              
+              <label class="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer transition">
+                <input type="checkbox" id="chk-verify-price" onchange="validateChecklistState()" class="mt-0.5 rounded text-brand-accent focus:ring-brand-accent" />
+                <span class="text-xs text-slate-700 leading-snug">
+                  <strong>Giá niêm yết & Gói pin:</strong> Xác nhận giá xuất hóa đơn đã bao gồm pin và thuế VAT theo đúng biểu giá chính hãng đang có hiệu lực.
+                </span>
+              </label>
+
+              <label class="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer transition">
+                <input type="checkbox" id="chk-verify-fees" onchange="validateChecklistState()" class="mt-0.5 rounded text-brand-accent focus:ring-brand-accent" />
+                <span class="text-xs text-slate-700 leading-snug">
+                  <strong>Chi phí lăn bánh Hà Nội:</strong> Đã áp dụng ưu đãi 100% lệ phí trước bạ ô tô điện và dự toán đầy đủ chi phí đăng ký biển số, đăng kiểm, bảo trì đường bộ.
+                </span>
+              </label>
+
+              <label class="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer transition">
+                <input type="checkbox" id="chk-verify-bank" onchange="validateChecklistState()" class="mt-0.5 rounded text-brand-accent focus:ring-brand-accent" />
+                <span class="text-xs text-slate-700 leading-snug">
+                  <strong>Phương án Vay trả góp:</strong> Khách hàng đáp ứng điều kiện hạn mức vay ngân hàng đối tác và phù hợp điều kiện tín dụng CIC sơ bộ.
+                </span>
+              </label>
+            </div>
+
+          </div>
+
+          <!-- RIGHT COL: Advisor Financial Optimization (7 Cols) -->
+          <div class="lg:col-span-7 space-y-5">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider">2. Thẩm định & Tối ưu Phương án Tài chính</h4>
+                <button 
+                  type="button" 
+                  onclick="applyBankPresetAdvisor()" 
+                  class="text-[11px] font-semibold text-brand-accent hover:underline"
+                >
+                  + Gợi ý gói vay Techcombank: Lãi suất 8.5%/năm
+                </button>
+              </div>
+              <p class="text-[11px] text-slate-500">Hệ thống tự động tính toán lại tức thì theo công thức tài chính ngân hàng chuẩn</p>
+            </div>
+
+            <!-- Advisor Adjustment Inputs -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div>
+                <label class="block font-medium text-slate-700 mb-1">Giá xuất hóa đơn (VNĐ)</label>
+                <input type="text" id="adv-input-price" value="646.000.000" disabled class="w-full p-2.5 bg-slate-100 border border-slate-200 rounded-lg text-slate-600 font-bold" />
+              </div>
+
+              <div>
+                <label class="block font-medium text-slate-700 mb-1">Tỷ lệ vốn tự có (%)</label>
+                <select id="adv-input-downpay" onchange="markAdvisorNeedsRecalc()" class="w-full p-2.5 bg-white border border-slate-300 rounded-lg">
+                  <option value="0.2">20% (Khách trả trước 20%)</option>
+                  <option value="0.3" selected>30% (Khách trả trước 30%)</option>
+                  <option value="0.5">50% (Khách trả trước 50%)</option>
+                  <option value="1.0">100% (Mua thẳng không vay)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block font-medium text-slate-700 mb-1">Lãi suất vay ngân hàng (%/năm)</label>
+                <input type="number" id="adv-input-rate" value="8.0" step="0.1" onchange="markAdvisorNeedsRecalc()" class="w-full p-2.5 bg-white border border-slate-300 rounded-lg font-bold" />
+              </div>
+
+              <div>
+                <label class="block font-medium text-slate-700 mb-1">Tỷ lệ thu hồi sau 5 năm (%)</label>
+                <input type="number" id="adv-input-resale" value="50" step="5" onchange="markAdvisorNeedsRecalc()" class="w-full p-2.5 bg-white border border-slate-300 rounded-lg font-bold" />
+              </div>
+            </div>
+
+            <!-- Recalculate Button -->
+            <div class="flex items-center gap-3">
+              <button 
+                type="button" 
+                onclick="executeAdvisorRecalc()" 
+                class="px-4 py-2.5 rounded-xl bg-brand-blue hover:bg-slate-800 text-white font-semibold text-xs flex items-center gap-1.5 transition shadow-xs"
+              >
+                <span class="material-symbols-outlined text-[17px]">refresh</span>
+                <span>Tính toán lại Dự toán</span>
+              </button>
+              <span id="adv-recalc-status-badge" class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-200 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[15px]">check</span>
+                Số liệu đã khớp mới nhất
+              </span>
+            </div>
+
+            <!-- Real-time Verification Output Display -->
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 grid grid-cols-3 gap-3 text-center">
+              <div>
+                <span class="text-[10px] text-slate-500 block mb-0.5">Tiền trả tháng đầu:</span>
+                <span id="adv-res-monthly" class="text-sm font-extrabold text-slate-900 block">10.743.083 đ</span>
+                <span class="text-[9px] text-slate-400">Gốc đều + lãi dư nợ</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-500 block mb-0.5">Tổng lãi vay 5 năm:</span>
+                <span id="adv-res-interest" class="text-sm font-extrabold text-slate-900 block">98.163.667 đ</span>
+                <span class="text-[9px] text-slate-400">Kỳ hạn 60 tháng</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-500 block mb-0.5">Tổng chi phí sở hữu 5 năm:</span>
+                <span id="adv-res-tco" class="text-sm font-extrabold text-brand-blue block">742.450.000 đ</span>
+                <span class="text-[9px] text-slate-400">Đã trừ giá trị bán lại</span>
+              </div>
+            </div>
+
+            <!-- Advisor Special Notes for Customer -->
+            <div>
+              <label class="block text-xs font-bold text-slate-900 mb-1">Lời nhắn & Ưu đãi đặc biệt gửi kèm cho Khách hàng:</label>
+              <textarea 
+                id="adv-input-note" 
+                rows="2" 
+                class="w-full p-2.5 border border-slate-300 rounded-xl text-xs focus:ring-1 focus:ring-brand-accent focus:outline-none"
+              >Showroom VinFast Cầu Giấy đang có sẵn xe VF 6 giao ngay trong tuần, hỗ trợ làm thủ tục vay Techcombank trong 24h và tặng kèm gói thảm sàn chính hãng.</textarea>
+            </div>
+
+            <!-- Final Approval Action Buttons -->
+            <div class="pt-2 flex items-center justify-end gap-3 border-t border-slate-200">
+              <button 
+                type="button" 
+                onclick="rejectCustomerTicket()" 
+                class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-100 font-semibold text-xs transition"
+              >
+                Từ chối & Yêu cầu bổ sung thông tin
+              </button>
+
+              <button 
+                type="button" 
+                id="btn-advisor-approve" 
+                onclick="approveCustomerTicket()" 
+                disabled 
+                class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-xs flex items-center gap-1.5 transition shadow-sm"
+              >
+                <span class="material-symbols-outlined text-[17px]">check_circle</span>
+                <span>Phê duyệt & Gửi dự toán chính thức</span>
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- 3. DIALOG ĐĂNG KÝ LÁI THỬ TRẢI NGHIỆM                    -->
+  <!-- ======================================================== -->
+  <div id="modal-testdrive" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4 fade-enter">
+      
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-brand-blue text-[22px]">directions_car</span>
+          <h3 class="text-sm font-bold text-slate-900">Đăng ký Lái thử Trải nghiệm Xe VinFast</h3>
+        </div>
+        <button onclick="closeTestDriveModal()" class="text-slate-400 hover:text-slate-600">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <form onsubmit="submitTestDriveForm(event)" class="space-y-3.5 text-xs">
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">Showroom tiếp nhận yêu cầu</label>
+          <select id="td-select-showroom" class="w-full p-2.5 border border-slate-300 rounded-lg font-medium">
+            <option value="Showroom VinFast Cầu Giấy (Hà Nội)">Showroom VinFast Cầu Giấy (Hà Nội)</option>
+            <option value="Showroom VinFast Phạm Văn Đồng (Hà Nội)">Showroom VinFast Phạm Văn Đồng (Hà Nội)</option>
+            <option value="Showroom VinFast Smart City (Nam Từ Liêm)">Showroom VinFast Smart City (Nam Từ Liêm)</option>
+            <option value="Showroom VinFast Long Biên (Hà Nội)">Showroom VinFast Long Biên (Hà Nội)</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-medium text-slate-700 mb-1">Ngày mong muốn lái thử</label>
+            <input type="date" id="td-input-date" value="2026-11-21" class="w-full p-2 border border-slate-300 rounded-lg text-xs" required />
+          </div>
+          <div>
+            <label class="block font-medium text-slate-700 mb-1">Khung giờ thuận tiện</label>
+            <select class="w-full p-2 border border-slate-300 rounded-lg text-xs">
+              <option>Sáng (09:00 - 11:30)</option>
+              <option selected>Chiều (14:00 - 17:00)</option>
+              <option>Cuối tuần (Thỏa thuận)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">Họ và tên người đăng ký</label>
+          <input type="text" id="td-input-name" value="Nguyễn Văn A" class="w-full p-2 border border-slate-300 rounded-lg text-xs" required />
+        </div>
+
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">Số điện thoại liên hệ</label>
+          <input type="tel" id="td-input-phone" value="0912 345 678" class="w-full p-2 border border-slate-300 rounded-lg text-xs" required />
+        </div>
+
+        <!-- Decree 13 Personal Data Protection Compliance: Un-checked by default -->
+        <label class="flex items-start gap-2 pt-1 text-slate-600 cursor-pointer">
+          <input 
+            type="checkbox" 
+            id="td-consent-check" 
+            class="mt-0.5 rounded text-brand-accent focus:ring-brand-accent" 
+            required 
+          />
+          <span class="text-[11px] leading-relaxed">
+            Tôi đồng ý chia sẻ thông tin liên hệ và nhu cầu xe để Chuyên viên Showroom liên hệ xếp lịch và chuẩn bị xe lái thử (Tuân thủ Nghị định 13/2023/NĐ-CP về Bảo vệ dữ liệu cá nhân).
+          </span>
+        </label>
+
+        <div class="pt-3 flex items-center justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeTestDriveModal()" class="px-4 py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold text-xs">
+            Đóng
+          </button>
+          <button type="submit" id="btn-td-submit" class="px-4 py-2 rounded-lg bg-brand-accent hover:bg-blue-600 text-white font-semibold text-xs shadow-xs">
+            Xác nhận gửi yêu cầu
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT APPLICATION CORE LOGIC -->
+  <script>
+    // 1. DATA CATALOG (OFFICIAL VINFAST PRICING T11/2026)
+    const Catalog = {
+      version: 'v1.0.2',
+      effectiveDate: '01/11/2026',
+      models: {
+        'VF5': {
+          model_id: 'VF5',
+          generation_id: '2024',
+          variant_id: 'plus',
+          display_name: 'VinFast VF 5 Plus',
+          badge: 'A-SUV Đô thị',
+          price: 496000000,
+          seats: '5 chỗ ngồi',
+          range_nedc: 326,
+          range_real: 250,
+          battery_kwh: 37.23,
+          consumption_kwh_100km: 13.5,
+          warranty_years: '7 năm / 160.000 km',
+          source: 'Biểu giá Niêm yết VinFast Auto',
+          image: 'https://static-cms-prod.vinfastauto.com/2023-04/VF5-Plus-VinFast-Chinh-Thuc-Nhan-Dat-Coc.jpg',
+          reason_budget: 'Giá lăn bánh Hà Nội ~515 triệu (tiết kiệm ~50 triệu trước bạ). Lựa chọn kinh tế nhất phân khúc.',
+          reason_charging: 'Pin 37.23kWh, sạc tại nhà qua đêm chỉ mất ~500.000 đ/tháng tiền điện.'
+        },
+        'VF6': {
+          model_id: 'VF6',
+          generation_id: '2024',
+          variant_id: 'comfort',
+          display_name: 'VinFast VF 6 Comfort',
+          badge: 'B-SUV Đô thị',
+          price: 646000000,
+          seats: '5 chỗ ngồi',
+          range_nedc: 510,
+          range_real: 420,
+          battery_kwh: 59.6,
+          consumption_kwh_100km: 14.5,
+          warranty_years: '7 năm / 160.000 km',
+          source: 'Biểu giá Niêm yết VinFast Auto',
+          image: 'https://static-cms-prod.vinfastauto.com/2023-09/VF6-Plus-Brahminy-White_1.png',
+          reason_budget: 'Giá lăn bánh Hà Nội ~665 triệu (Hưởng ưu đãi 100% lệ phí trước bạ xe điện — tiết kiệm ~65 triệu đồng).',
+          reason_charging: 'Tầm chạy 510km thực tế, đi 30km/ngày thì 10-12 ngày mới cần cắm sạc 1 lần.'
+        },
+        'VF7': {
+          model_id: 'VF7',
+          generation_id: '2024',
+          variant_id: 'eco',
+          display_name: 'VinFast VF 7 Eco',
+          badge: 'C-SUV Hiện đại',
+          price: 740000000,
+          seats: '5 chỗ ngồi',
+          range_nedc: 450,
+          range_real: 380,
+          battery_kwh: 75.3,
+          consumption_kwh_100km: 17.0,
+          warranty_years: '10 năm / 200.000 km',
+          source: 'Biểu giá Niêm yết VinFast Auto',
+          image: 'https://static-cms-prod.vinfastauto.com/2023-11/VF7-Design-Story-1.jpg',
+          reason_budget: 'Phân khúc hạng C rộng rãi, sang trọng cho gia đình và công việc, lăn bánh chỉ từ ~760 triệu.',
+          reason_charging: 'Pin lớn 75.3kWh, sạc nhanh 10-70% chỉ trong 24 phút tại trạm V-GREEN cao tốc.'
+        }
+      }
+    };
+
+    // 2. UNIFIED DETERMINISTIC ESTIMATE ENGINE (CALC01 - CALC06)
+    const EstimateEngine = {
+      REGISTRATION_FEES_HANOI: 24540000,
+      VGREEN_RATE_PER_KWH: 3858,
+      HOME_RATE_PER_KWH: 3200,
+
+      compute: function(inputs) {
+        const car = inputs.car;
+        const dailyKm = inputs.daily_km;
+        const loanRatio = inputs.loan_ratio;
+        const loanRate = inputs.loan_rate;
+        const resaleRatio = inputs.resale_ratio || 0.50;
+        const loanMonths = 60;
+
+        const carPrice = car.price;
+        const onTheRoad = carPrice + this.REGISTRATION_FEES_HANOI;
+
+        const monthlyKm = dailyKm * 30;
+        const monthlyKwh = (monthlyKm * car.consumption_kwh_100km) / 100;
+        const unitRate = inputs.charging_facility === 'home' ? this.HOME_RATE_PER_KWH : this.VGREEN_RATE_PER_KWH;
+        const monthlyEnergy = Math.round(monthlyKwh * unitRate);
+        const energy5y = monthlyEnergy * 60;
+        
+        const safeUsableRange = car.range_real * 0.85;
+        const chargeFreqDays = Math.max(1, Math.round(safeUsableRange / dailyKm));
+
+        const maintenance5y = 15000000;
+
+        const loanAmount = Math.round(carPrice * loanRatio);
+        const downPayment = carPrice - loanAmount;
+        
+        let firstMonthPayment = 0;
+        let totalInterest = 0;
+        let monthlyPrincipal = 0;
+
+        if (loanRatio > 0) {
+          if (inputs.loan_method === 'annuity') {
+            const rMonth = loanRate / 12;
+            const pmt = Math.round(loanAmount * rMonth / (1 - Math.pow(1 + rMonth, -loanMonths)));
+            firstMonthPayment = pmt;
+            totalInterest = Math.round((pmt * loanMonths) - loanAmount);
+          } else {
+            monthlyPrincipal = loanAmount / loanMonths;
+            const firstMonthInterest = loanAmount * (loanRate / 12);
+            firstMonthPayment = Math.round(monthlyPrincipal + firstMonthInterest);
+            totalInterest = Math.round(loanAmount * (loanRate / 12) * (loanMonths + 1) / 2);
+          }
+        }
+
+        const resaleValue = Math.round(carPrice * resaleRatio);
+        const tco5y = Math.round(carPrice + this.REGISTRATION_FEES_HANOI + energy5y + maintenance5y + totalInterest - resaleValue);
+
+        return {
+          car_price: carPrice,
+          registration_fees: this.REGISTRATION_FEES_HANOI,
+          on_the_road: onTheRoad,
+          monthly_km: monthlyKm,
+          monthly_energy: monthlyEnergy,
+          energy_5y: energy5y,
+          charge_freq_days: chargeFreqDays,
+          maintenance_5y: maintenance5y,
+          loan_amount: loanAmount,
+          down_payment: downPayment,
+          first_month_payment: firstMonthPayment,
+          total_interest: totalInterest,
+          resale_value: resaleValue,
+          tco_5y: tco5y,
+          catalog_version: Catalog.version
+        };
+      }
+    };
+
+    // 3. APPLICATION STATE STORE
+    const AppState = {
+      currentRole: 'customer',
+      selectedModelId: null,
+      customerInputs: {
+        daily_km: 30,
+        loan_ratio: 0.7,
+        loan_rate: 0.08,
+        loan_method: 'decreasing',
+        charging_facility: 'vgreen',
+        resale_ratio: 0.50
+      },
+      ticket: {
+        id: 'HS-1089',
+        model_id: 'VF6',
+        catalog_version: 'v1.0.2',
+        status: 'draft',
+        input_snapshot: null,
+        computed_snapshot: null,
+        approved_by: null,
+        approved_at: null,
+        advisor_notes: null
+      }
+    };
+
+    // 4. SANITIZATION HELPER (PREVENT XSS)
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // 5. ROLE VIEW CONTROLLER
+    function switchRoleView(role) {
+      AppState.currentRole = role;
+      const btnCust = document.getElementById('btn-role-customer');
+      const btnAdv = document.getElementById('btn-role-advisor');
+      const viewCust = document.getElementById('view-customer');
+      const viewAdv = document.getElementById('view-advisor');
+
+      if (role === 'customer') {
+        btnCust.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all bg-white text-brand-blue shadow-xs';
+        btnAdv.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all text-slate-600 hover:text-slate-900';
+        viewCust.classList.remove('hidden');
+        viewAdv.classList.add('hidden');
+      } else {
+        btnAdv.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all bg-white text-brand-blue shadow-xs';
+        btnCust.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all text-slate-600 hover:text-slate-900';
+        viewAdv.classList.remove('hidden');
+        viewCust.classList.add('hidden');
+      }
+    }
+
+    // 6. CHAT & VEHICLE SELECTION CONTROLLER
+    function selectQuickNeed(modelId) {
+      document.getElementById('quick-selection-group').style.display = 'none';
+
+      if (modelId === 'vf5') {
+        appendChatMessage('user', 'Ngân sách dưới 600 triệu lăn bánh, có gara nhà riêng sạc qua đêm.');
+        setTimeout(() => {
+          appendChatMessage('ai', 'Dạ với ngân sách dưới 600 triệu và có chỗ sạc tại nhà, chiếc <strong>VinFast VF 5 Plus</strong> là lựa chọn tiết kiệm nhất phân khúc. Xe nhỏ gọn, sạc tại nhà chỉ khoảng ~500.000 đ/tháng tiền điện!');
+          applyCarSelection('VF5');
+        }, 400);
+      } else if (modelId === 'vf7') {
+        appendChatMessage('user', 'Ngân sách 800 triệu đến 1 tỷ, cần xe hạng C rộng rãi đi công tác nhiều.');
+        setTimeout(() => {
+          appendChatMessage('ai', 'Dạ phân khúc này <strong>VinFast VF 7 Eco</strong> là lựa chọn lý tưởng với không gian rộng rãi, pin 75.3kWh lớn và thiết kế hiện đại!');
+          applyCarSelection('VF7');
+        }, 400);
+      } else {
+        appendChatMessage('user', 'Tôi có ngân sách khoảng 700 triệu lăn bánh, nhà ở chung cư mạn Cầu Giấy, đi làm 30km/ngày.');
+        setTimeout(() => {
+          appendChatMessage('ai', 'Dạ với 700 triệu lăn bánh tại Hà Nội và ở chung cư, chiếc <strong>VinFast VF 6 Comfort (Kèm Pin)</strong> là tối ưu nhất! Xe được <strong>miễn 100% lệ phí trước bạ</strong> (tiết kiệm ~65 triệu), tầm chạy 510km nên 10-12 ngày mới cần sạc 1 lần.');
+          applyCarSelection('VF6');
+        }, 400);
+      }
+    }
+
+    function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-input-text');
+      const rawText = input.value.trim();
+      if (!rawText) return;
+
+      appendChatMessage('user', rawText);
+      input.value = '';
+
+      const lower = rawText.toLowerCase();
+      setTimeout(() => {
+        if (lower.includes('vf5') || lower.includes('vf 5') || lower.includes('500') || lower.includes('dưới 600')) {
+          appendChatMessage('ai', 'Dạ em hiểu anh/chị đang quan tâm phân khúc ngân sách tiết kiệm dưới 600 triệu. Em đề xuất ngay chiếc <strong>VinFast VF 5 Plus</strong>!');
+          applyCarSelection('VF5');
+        } else if (lower.includes('vf7') || lower.includes('vf 7') || lower.includes('800') || lower.includes('1 tỷ') || lower.includes('tỷ')) {
+          appendChatMessage('ai', 'Dạ em nhận diện anh/chị cần mẫu xe hạng C rộng rãi trên 800 triệu. Em đề xuất dòng xe <strong>VinFast VF 7 Eco</strong>!');
+          applyCarSelection('VF7');
+        } else {
+          appendChatMessage('ai', 'Dạ em ghi nhận nhu cầu của anh/chị. Dựa trên trần ngân sách phổ biến và điều kiện đô thị Hà Nội, em mở đề xuất chiếc <strong>VinFast VF 6 Comfort</strong>!');
+          applyCarSelection('VF6');
+        }
+      }, 500);
+    }
+
+    function applyCarSelection(modelId) {
+      AppState.selectedModelId = modelId;
+      AppState.ticket.model_id = modelId;
+
+      const car = Catalog.models[modelId];
+
+      document.getElementById('car-display-title').innerText = car.display_name;
+      document.getElementById('car-display-price').innerText = `${car.price.toLocaleString('vi-VN')} VNĐ`;
+      document.getElementById('car-display-badge').innerText = car.badge;
+      document.getElementById('car-display-seats').innerText = car.seats;
+      document.getElementById('car-display-range').innerText = `${car.range_nedc} km / sạc`;
+      document.getElementById('car-display-warranty').innerText = car.warranty_years;
+      document.getElementById('car-display-image').src = car.image;
+      document.getElementById('car-display-source').innerText = `Nguồn: ${car.source} · ${Catalog.effectiveDate}`;
+      document.getElementById('car-display-reason-budget').innerHTML = `<strong>Vừa vặn ngân sách:</strong> ${car.reason_budget}`;
+      document.getElementById('car-display-reason-charging').innerHTML = `<strong>Chu kỳ sạc tiện lợi:</strong> ${car.reason_charging}`;
+
+      document.getElementById('hitl-car-name').innerText = car.display_name;
+      document.getElementById('table-ticket-car-name').innerText = car.display_name;
+      document.getElementById('adv-input-price').value = car.price.toLocaleString('vi-VN');
+
+      document.getElementById('stage-empty-workspace').classList.add('hidden');
+      document.getElementById('stage-car-card').classList.remove('hidden');
+      document.getElementById('stage-tco-card').classList.remove('hidden');
+
+      recomputeCustomerEstimate();
+      markTicketNeedsRecalc('Khách hàng đổi mẫu xe lựa chọn');
+    }
+
+    // 7. CALCULATION CONTROLLER
+    function recomputeCustomerEstimate() {
+      if (!AppState.selectedModelId) return;
+      const car = Catalog.models[AppState.selectedModelId];
+      
+      const computeInputs = {
+        car: car,
+        daily_km: AppState.customerInputs.daily_km,
+        loan_ratio: AppState.customerInputs.loan_ratio,
+        loan_rate: AppState.customerInputs.loan_rate,
+        loan_method: AppState.customerInputs.loan_method,
+        charging_facility: AppState.customerInputs.charging_facility,
+        resale_ratio: AppState.customerInputs.resale_ratio
+      };
+
+      const result = EstimateEngine.compute(computeInputs);
+
+      document.getElementById('ui-tco-total').innerText = `${result.tco_5y.toLocaleString('vi-VN')} đ`;
+      document.getElementById('ui-tco-monthly').innerText = result.loan_amount > 0 ? `${result.first_month_payment.toLocaleString('vi-VN')} đ` : '0 đ / tháng';
+      document.getElementById('ui-tco-energy').innerText = `~${result.monthly_energy.toLocaleString('vi-VN')} đ / tháng`;
+      document.getElementById('ui-tco-frequency').innerText = `~${result.charge_freq_days} ngày mới cần sạc 1 lần`;
+      
+      document.getElementById('table-ticket-tco-val').innerText = `${result.tco_5y.toLocaleString('vi-VN')} đ`;
+    }
+
+    function handleCustomerInputsChange() {
+      const km = parseInt(document.getElementById('slider-daily-km').value);
+      const loanRatio = parseFloat(document.getElementById('slider-loan-pct').value);
+      const method = document.getElementById('select-loan-method').value;
+      const fac = document.getElementById('select-charging-fac').value;
+
+      document.getElementById('label-daily-km').innerText = `${km} km/ngày`;
+      document.getElementById('label-loan-pct').innerText = loanRatio === 0 ? 'Mua thẳng 0%' : `${Math.round(loanRatio * 100)}% (Vốn tự có ${Math.round((1 - loanRatio) * 100)}%)`;
+
+      AppState.customerInputs.daily_km = km;
+      AppState.customerInputs.loan_ratio = loanRatio;
+      AppState.customerInputs.loan_method = method;
+      AppState.customerInputs.charging_facility = fac;
+
+      document.getElementById('hitl-customer-km-text').innerText = `${km} km/ngày`;
+      document.getElementById('hitl-customer-fac-text').innerText = fac === 'home' ? 'Sạc tại nhà riêng' : 'Trạm sạc V-GREEN';
+
+      recomputeCustomerEstimate();
+      markTicketNeedsRecalc('Khách hàng điều chỉnh thông số di chuyển hoặc phương án vay');
+    }
+
+    function toggleSlidersAccordion() {
+      const content = document.getElementById('accordion-content');
+      const icon = document.getElementById('accordion-icon');
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.style.transform = 'rotate(180deg)';
+      } else {
+        content.classList.add('hidden');
+        icon.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    function appendChatMessage(sender, rawHtmlOrText) {
+      const stream = document.getElementById('customer-chat-stream');
+      const div = document.createElement('div');
+      
+      const safeContent = sender === 'user' ? escapeHTML(rawHtmlOrText) : rawHtmlOrText;
+
+      if (sender === 'user') {
+        div.className = 'flex items-end justify-end gap-2 self-end max-w-[88%] fade-enter';
+        div.innerHTML = `
+          <div class="flex flex-col items-end gap-0.5">
+            <div class="p-3 bg-brand-accent text-white rounded-2xl rounded-tr-xs text-xs leading-relaxed">
+              ${safeContent}
+            </div>
+            <span class="text-[10px] text-slate-400 pr-1">Đã gửi</span>
+          </div>
+        `;
+      } else {
+        div.className = 'flex items-start gap-2.5 max-w-[92%] fade-enter';
+        div.innerHTML = `
+          <div class="w-6 h-6 rounded-full bg-brand-blue text-white shrink-0 flex items-center justify-center text-[11px] font-bold mt-0.5">V</div>
+          <div class="flex flex-col gap-1">
+            <div class="p-3.5 bg-slate-100 rounded-2xl rounded-tl-xs text-slate-800 text-xs leading-relaxed">
+              ${safeContent}
+            </div>
+            <span class="text-[10px] text-slate-400 pl-1">Vừa xong</span>
+          </div>
+        `;
+      }
+
+      stream.appendChild(div);
+      stream.scrollTop = stream.scrollHeight;
+    }
+
+    function askPresetQuestion(q) {
+      document.getElementById('chat-input-text').value = q;
+      document.querySelector('form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    }
+
+    // 8. TICKET & HITL APPROVAL WORKFLOW
+    function submitEstimateToAdvisor() {
+      const btn = document.getElementById('btn-customer-submit');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="material-symbols-outlined text-[15px] animate-spin">progress_activity</span><span>Đang chuyển showroom...</span>';
+
+      setTimeout(() => {
+        btn.classList.add('hidden');
+        
+        const car = Catalog.models[AppState.selectedModelId];
+        AppState.ticket.model_id = car.model_id;
+        AppState.ticket.catalog_version = Catalog.version;
+        AppState.ticket.input_snapshot = JSON.parse(JSON.stringify(AppState.customerInputs));
+        AppState.ticket.computed_snapshot = EstimateEngine.compute({
+          car: car,
+          daily_km: AppState.customerInputs.daily_km,
+          loan_ratio: AppState.customerInputs.loan_ratio,
+          loan_rate: AppState.customerInputs.loan_rate,
+          loan_method: AppState.customerInputs.loan_method,
+          charging_facility: AppState.customerInputs.charging_facility,
+          resale_ratio: AppState.customerInputs.resale_ratio
+        });
+        AppState.ticket.status = 'pending_approval';
+
+        document.getElementById('status-ticket-sent').classList.remove('hidden');
+        document.getElementById('status-ticket-recalc-needed').classList.add('hidden');
+        document.getElementById('status-ticket-approved').classList.add('hidden');
+        document.getElementById('advisor-badge-count').classList.remove('hidden');
+
+        const badge = document.getElementById('ticket-badge-1089');
+        badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300';
+        badge.innerText = 'Chờ thẩm định';
+        document.getElementById('stat-pending-count').innerText = '1';
+
+        appendChatMessage('ai', 'Dạ em đã tạo <strong>Hồ sơ #HS-1089</strong> và gửi sang Showroom Cầu Giấy. Trong lúc chuyên viên kiểm tra, anh/chị có muốn gửi yêu cầu lái thử xe thực tế cuối tuần này không ạ?');
+      }, 500);
+    }
+
+    function markTicketNeedsRecalc(reason) {
+      if (AppState.ticket.status === 'pending_approval' || AppState.ticket.status === 'approved') {
+        AppState.ticket.status = 'needs_recalculation';
+
+        document.getElementById('status-ticket-approved').classList.add('hidden');
+        document.getElementById('status-ticket-sent').classList.add('hidden');
+        document.getElementById('status-ticket-recalc-needed').classList.remove('hidden');
+
+        const badge = document.getElementById('ticket-badge-1089');
+        badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300';
+        badge.innerText = 'Cần tính lại';
+
+        const flag = document.getElementById('advisor-snapshot-flag');
+        flag.className = 'text-[11px] font-medium text-rose-800 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded';
+        flag.innerText = `Cảnh báo: ${reason} — Cần tính lại`;
+
+        document.getElementById('adv-recalc-status-badge').classList.add('hidden');
+        validateChecklistState();
+      }
+    }
+
+    function openHITLScreen() {
+      document.getElementById('advisor-queue-table-section').classList.add('hidden');
+      document.getElementById('advisor-hitl-screen').classList.remove('hidden');
+      document.getElementById('advisor-hitl-screen').classList.add('flex');
+      executeAdvisorRecalc();
+    }
+
+    function closeHITLScreen() {
+      document.getElementById('advisor-hitl-screen').classList.add('hidden');
+      document.getElementById('advisor-hitl-screen').classList.remove('flex');
+      document.getElementById('advisor-queue-table-section').classList.remove('hidden');
+    }
+
+    function markAdvisorNeedsRecalc() {
+      document.getElementById('adv-recalc-status-badge').classList.add('hidden');
+      validateChecklistState();
+    }
+
+    function applyBankPresetAdvisor() {
+      document.getElementById('adv-input-rate').value = '8.5';
+      document.getElementById('adv-input-downpay').value = '0.3';
+      executeAdvisorRecalc();
+      alert('Đã áp dụng gói vay ưu đãi Techcombank: Lãi suất 8.5%/năm, vốn tự có 30%. Số liệu báo giá đã được tính lại.');
+    }
+
+    function executeAdvisorRecalc() {
+      const car = Catalog.models[AppState.selectedModelId || 'VF6'];
+      const downpayRatio = parseFloat(document.getElementById('adv-input-downpay').value);
+      const rate = parseFloat(document.getElementById('adv-input-rate').value) / 100;
+      const resale = parseFloat(document.getElementById('adv-input-resale').value) / 100;
+
+      const tvvInputs = {
+        car: car,
+        daily_km: AppState.customerInputs.daily_km,
+        loan_ratio: Math.round((1 - downpayRatio) * 10) / 10,
+        loan_rate: rate,
+        loan_method: 'decreasing',
+        charging_facility: AppState.customerInputs.charging_facility,
+        resale_ratio: resale
+      };
+
+      const result = EstimateEngine.compute(tvvInputs);
+
+      document.getElementById('adv-res-monthly').innerText = `${result.first_month_payment.toLocaleString('vi-VN')} đ`;
+      document.getElementById('adv-res-interest').innerText = `${result.total_interest.toLocaleString('vi-VN')} đ`;
+      document.getElementById('adv-res-tco').innerText = `${result.tco_5y.toLocaleString('vi-VN')} đ`;
+
+      AppState.ticket.computed_snapshot = result;
+      document.getElementById('adv-recalc-status-badge').classList.remove('hidden');
+      
+      validateChecklistState();
+    }
+
+    function validateChecklistState() {
+      const c1 = document.getElementById('chk-verify-price').checked;
+      const c2 = document.getElementById('chk-verify-fees').checked;
+      const c3 = document.getElementById('chk-verify-bank').checked;
+      const isRecalcDone = !document.getElementById('adv-recalc-status-badge').classList.contains('hidden');
+      const isCatalogCurrent = (AppState.ticket.catalog_version === Catalog.version);
+
+      const btn = document.getElementById('btn-advisor-approve');
+      btn.disabled = !(c1 && c2 && c3 && isRecalcDone && isCatalogCurrent);
+    }
+
+    function approveCustomerTicket() {
+      const c1 = document.getElementById('chk-verify-price').checked;
+      const c2 = document.getElementById('chk-verify-fees').checked;
+      const c3 = document.getElementById('chk-verify-bank').checked;
+
+      if (!c1 || !c2 || !c3) {
+        alert('Vui lòng kiểm tra và tích xác nhận đủ 3 bước trong Quy trình Kiểm định Nghiệp vụ trước khi phê duyệt dự toán.');
+        return;
+      }
+
+      if (AppState.ticket.catalog_version !== Catalog.version) {
+        alert('Thông báo: Biểu giá áp dụng cho hồ sơ này đã được cập nhật mới. Vui lòng bấm "Tính toán lại Dự toán" theo biểu giá hiện hành trước khi gửi cho khách.');
+        return;
+      }
+
+      const note = document.getElementById('adv-input-note').value.trim();
+      const nowTime = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+
+      AppState.ticket.status = 'approved';
+      AppState.ticket.approved_by = 'Lê Văn B (Showroom Cầu Giấy)';
+      AppState.ticket.approved_at = nowTime;
+      AppState.ticket.advisor_notes = note;
+
+      alert('✓ ĐÃ PHÊ DUYỆT VÀ GỬI DỰ TOÁN CHÍNH THỨC!\n\nDự toán đã được chuyển đến khách hàng kèm đầy đủ cam kết chính sách từ Showroom.');
+
+      const badge = document.getElementById('ticket-badge-1089');
+      badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300';
+      badge.innerText = 'Đã gửi dự toán';
+
+      document.getElementById('stat-pending-count').innerText = '0';
+      document.getElementById('advisor-badge-count').classList.add('hidden');
+
+      document.getElementById('status-ticket-sent').classList.add('hidden');
+      document.getElementById('status-ticket-recalc-needed').classList.add('hidden');
+      document.getElementById('status-ticket-approved').classList.remove('hidden');
+
+      document.getElementById('ui-approved-by').innerText = AppState.ticket.approved_by;
+      document.getElementById('ui-approved-time').innerText = AppState.ticket.approved_at;
+      document.getElementById('ui-approved-ver').innerText = 'Tháng 11/2026';
+      document.getElementById('ui-advisor-reply-note').innerText = note;
+
+      closeHITLScreen();
+      switchRoleView('customer');
+    }
+
+    function rejectCustomerTicket() {
+      const reason = prompt('Nhập lý do từ chối hoặc yêu cầu bổ sung thông tin gửi tới khách hàng:', 'Cần khách hàng bổ sung sao kê thu nhập 3 tháng gần nhất để hoàn thiện hồ sơ vay.');
+      if (reason) {
+        AppState.ticket.status = 'rejected';
+        alert('Đã gửi phản hồi từ chối tới khách hàng: ' + reason);
+        closeHITLScreen();
+      }
+    }
+
+    // 9. TEST DRIVE MODAL CONTROLLER
+    function openTestDriveModal() {
+      document.getElementById('modal-testdrive').classList.remove('hidden');
+    }
+
+    function closeTestDriveModal() {
+      document.getElementById('modal-testdrive').classList.add('hidden');
+    }
+
+    function submitTestDriveForm(e) {
+      e.preventDefault();
+      const showroom = document.getElementById('td-select-showroom').value;
+      const date = document.getElementById('td-input-date').value;
+      const consentCheck = document.getElementById('td-consent-check').checked;
+
+      if (!consentCheck) {
+        alert('Vui lòng tích chọn đồng ý chia sẻ thông tin để Showroom có thể liên hệ xếp lịch lái thử cho bạn.');
+        return;
+      }
+
+      closeTestDriveModal();
+
+      alert(`ĐÃ GỬI YÊU CẦU LÁI THỬ THÀNH CÔNG!\n\nShowroom tiếp nhận: ${showroom}\nNgày mong muốn: ${date}\n\nTrạng thái: Đang chờ Showroom liên hệ xác nhận lịch hẹn.`);
+
+      appendChatMessage('ai', `Dạ em đã gửi yêu cầu lái thử xe của anh/chị tới <strong>${showroom}</strong> (ngày hẹn mong muốn: <strong>${date}</strong>). Chuyên viên tư vấn sẽ liên hệ qua điện thoại để xếp xe và xác nhận lịch trước khi anh/chị đến nhé!`);
+    }
+
+    // 10. SESSION RESET
+    function resetFullApplication() {
+      if (confirm('Bạn có chắc chắn muốn làm mới lại phiên làm việc?')) {
+        window.location.reload();
+      }
+    }
+  </script>
+</body>
+</html>

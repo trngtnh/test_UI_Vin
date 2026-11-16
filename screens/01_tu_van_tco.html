@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>
+@layer base{
+  html,body{margin:0;padding:0;}
+  body{overscroll-behavior:none;}
+  main>:first-child{margin-top:0!important;}
+  main>:last-child{margin-bottom:0!important;}
+}
+::-webkit-scrollbar{display:none;}
+
+/* Micro-interaction & Keyframe Animations */
+@keyframes fadeInUpStagger {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(16, 185, 129, 0);
+  }
+}
+
+@keyframes typingDots {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.92); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.anim-stagger-1 { animation: fadeInUpStagger 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.anim-stagger-2 { animation: fadeInUpStagger 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.08s forwards; opacity: 0; }
+.anim-stagger-3 { animation: fadeInUpStagger 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.16s forwards; opacity: 0; }
+.anim-stagger-4 { animation: fadeInUpStagger 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.24s forwards; opacity: 0; }
+
+.status-beacon-pulse {
+  animation: pulseGlow 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+.typing-dot:nth-child(1) { animation: typingDots 1.4s infinite ease-in-out; }
+.typing-dot:nth-child(2) { animation: typingDots 1.4s infinite ease-in-out 0.2s; }
+.typing-dot:nth-child(3) { animation: typingDots 1.4s infinite ease-in-out 0.4s; }
+
+.vehicle-img-wrapper:hover .vehicle-img {
+  transform: scale(1.045);
+}
+.shimmer-effect::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  transform: translateX(-100%);
+}
+.vehicle-img-wrapper:hover .shimmer-effect::after {
+  animation: shimmer 1.2s ease-in-out;
+}
+
+.num-ticker {
+  transition: transform 0.2s ease, opacity 0.2s ease, color 0.2s ease;
+}
+.num-ticker.updating {
+  transform: translateY(-2px);
+  color: #155eef !important;
+}
+
+/* Accessible prefers-reduced-motion overrides */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "secondary": "#006c49",
+          "surface-container-low": "#f2f3ff",
+          "on-primary": "#ffffff",
+          "outline": "#737687",
+          "on-secondary": "#ffffff",
+          "on-background": "#191b24",
+          "surface-container-lowest": "#ffffff",
+          "slate-200": "#E2E8F0",
+          "on-surface": "#191b24",
+          "surface-container-highest": "#e1e1ee",
+          "on-secondary-fixed": "#002113",
+          "inverse-primary": "#b4c5ff",
+          "tertiary-fixed-dim": "#ffb59b",
+          "tertiary-fixed": "#ffdbcf",
+          "on-secondary-fixed-variant": "#005236",
+          "on-primary-fixed": "#00174b",
+          "rose-600": "#DC2626",
+          "energy-emerald": "#10B981",
+          "on-primary-container": "#e7eaff",
+          "background": "#faf8ff",
+          "on-secondary-container": "#00714d",
+          "tertiary-container": "#bd3f00",
+          "secondary-fixed": "#6ffbbe",
+          "error": "#ba1a1a",
+          "surface-container-high": "#e7e7f3",
+          "inverse-on-surface": "#f0f0fc",
+          "secondary-container": "#6cf8bb",
+          "slate-900": "#0F172A",
+          "error-container": "#ffdad6",
+          "vinfast-blue": "#0F4C81",
+          "primary": "#0047c1",
+          "primary-container": "#155eef",
+          "primary-fixed": "#dbe1ff",
+          "on-tertiary-fixed": "#380d00",
+          "tertiary": "#943000",
+          "on-tertiary-container": "#ffe6de",
+          "surface": "#faf8ff",
+          "surface-container": "#ededf9",
+          "on-error": "#ffffff",
+          "primary-fixed-dim": "#b4c5ff",
+          "on-error-container": "#93000a",
+          "surface-variant": "#e1e1ee",
+          "on-tertiary-fixed-variant": "#812800",
+          "amber-600": "#D97706",
+          "inverse-surface": "#2e3039",
+          "secondary-fixed-dim": "#4edea3",
+          "outline-variant": "#c3c6d8",
+          "surface-dim": "#d9d9e5",
+          "surface-tint": "#0052dc",
+          "on-surface-variant": "#434655",
+          "slate-500": "#64748B",
+          "on-tertiary": "#ffffff",
+          "on-primary-fixed-variant": "#003da9",
+          "slate-50": "#F8FAFC",
+          "surface-bright": "#faf8ff",
+          "slate-700": "#334155",
+          "emerald-600": "#059669"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.125rem",
+          "lg": "0.25rem",
+          "xl": "0.5rem",
+          "full": "0.75rem"
+        },
+        "spacing": {
+          "space-xl": "2.5rem",
+          "gutter": "1.5rem",
+          "space-lg": "1.5rem",
+          "space-xs": "0.25rem",
+          "margin": "2rem",
+          "space-sm": "0.5rem",
+          "space-md": "1rem"
+        },
+        "fontFamily": {
+          "section-title": [
+            "Geist", "sans-serif"
+          ],
+          "financial-metric": [
+            "Geist", "monospace"
+          ],
+          "headline-lg": [
+            "Geist", "sans-serif"
+          ],
+          "body": [
+            "Geist", "sans-serif"
+          ],
+          "section-title-mobile": [
+            "Geist", "sans-serif"
+          ],
+          "citation": [
+            "Geist", "sans-serif"
+          ],
+          "headline-lg-mobile": [
+            "Geist", "sans-serif"
+          ]
+        },
+        "fontSize": {
+          "section-title": [
+            "24px",
+            {
+              "lineHeight": "1.3",
+              "fontWeight": "700"
+            }
+          ],
+          "financial-metric": [
+            "30px",
+            {
+              "lineHeight": "1.2",
+              "fontWeight": "600"
+            }
+          ],
+          "headline-lg": [
+            "32px",
+            {
+              "lineHeight": "1.2",
+              "letterSpacing": "-0.025em",
+              "fontWeight": "600"
+            }
+          ],
+          "body": [
+            "15px",
+            {
+              "lineHeight": "1.5",
+              "fontWeight": "400"
+            }
+          ],
+          "section-title-mobile": [
+            "20px",
+            {
+              "lineHeight": "1.3",
+              "fontWeight": "700"
+            }
+          ],
+          "citation": [
+            "12px",
+            {
+              "lineHeight": "1.4",
+              "fontWeight": "400"
+            }
+          ],
+          "headline-lg-mobile": [
+            "28px",
+            {
+              "lineHeight": "1.2",
+              "letterSpacing": "-0.025em",
+              "fontWeight": "600"
+            }
+          ]
+        }
+      },
+    },
+  }</script></head><body class="bg-slate-50 font-body text-on-surface antialiased selection:bg-primary-container selection:text-white"><header class="fixed top-0 left-0 right-0 h-16 bg-slate-900 text-slate-50 z-50 shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 w-full px-gutter flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-sm"><div class="w-9 h-9 rounded-xl bg-vinfast-blue flex items-center justify-center text-on-primary font-headline-lg font-bold shadow-sm transition-transform hover:scale-105 duration-200 cursor-pointer"><span class="material-symbols-outlined text-[22px] text-energy-emerald">bolt</span></div><div class="flex flex-col"><div class="flex items-center gap-space-xs"><span class="font-headline-lg text-[16px] font-bold tracking-tight text-slate-50">VinFast EV Advisor</span><span class="font-citation text-[11px] px-1.5 py-0.5 rounded bg-slate-700 text-energy-emerald font-semibold uppercase tracking-wider">VFO2O-01</span></div><span class="font-citation text-slate-500 text-[11px]">Catalog v1.0.2 · Hà Nội</span></div></div></div><div class="hidden xl:flex items-center"><div class="flex items-center gap-space-xs px-space-md py-1.5 rounded-full bg-slate-700/60 text-slate-200 shadow-sm border border-slate-600/30 hover:bg-slate-700 transition-colors cursor-default"><span class="material-symbols-outlined text-energy-emerald text-[16px] animate-pulse">verified</span><span class="font-citation text-[12px]">Dữ liệu áp dụng xe mới kèm pin tại Hà Nội · Catalog v1.0.2 (Đã kiểm tra 13/11/2026)</span></div></div><div class="flex items-center gap-space-sm"><div class="flex items-center gap-space-xs px-space-sm py-1 rounded bg-slate-700 text-slate-200"><span class="w-2 h-2 rounded-full bg-energy-emerald status-beacon-pulse"></span><span class="font-citation text-[12px] font-medium">Khách hàng (Phiên tạm thời)</span></div><button onclick="navigateToFlowStep(3, \'03_hang_doi_tvv.html\')" class="flex items-center gap-1.5 px-space-sm py-1 rounded bg-vinfast-blue text-on-primary hover:bg-primary transition-all duration-200 active:scale-95 text-[13px] font-medium shadow-xs"><span class="material-symbols-outlined text-[15px]">lock</span><span>Dành cho Tư vấn viên</span></button><div class="flex items-center gap-1 px-space-sm py-1 rounded bg-slate-700/70 text-slate-200 text-[12px]"><span class="material-symbols-outlined text-[15px] text-slate-500">location_on</span><span class="font-medium">Hà Nội (Cầu Giấy)</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center hover:ring-2 hover:ring-energy-emerald transition-all cursor-pointer"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><aside class="fixed left-0 top-16 bottom-0 w-64 bg-surface-container-lowest z-40 flex flex-col justify-between p-space-md shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex flex-col gap-space-xs"><div class="px-space-sm py-space-xs font-citation text-slate-500 font-semibold uppercase tracking-wider">Phân hệ tư vấn O2O</div><nav class="flex flex-col gap-1" data-active-classes="bg-primary-container text-on-primary-container font-semibold rounded-lg"><a aria-current="page" class="flex items-center gap-space-sm px-space-sm py-2 transition-all bg-primary-container text-on-primary-container font-semibold rounded-lg shadow-sm hover:translate-x-0.5 duration-150" data-path="tong-quan-tu-van" href="#"><span class="material-symbols-outlined text-[20px]">grid_view</span><span class="font-body text-[14px]">Tổng quan tư vấn</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface hover:translate-x-0.5 transition-all duration-150" data-path="so-sanh-dong-xe" href="#"><span class="material-symbols-outlined text-[20px]">directions_car</span><span class="font-body text-[14px]">So sánh dòng xe VF</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface hover:translate-x-0.5 transition-all duration-150" data-path="tinh-toan-chi-phi-tco" href="#"><span class="material-symbols-outlined text-[20px]">calculate</span><span class="font-body text-[14px]">Tính toán chi phí TCO</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface hover:translate-x-0.5 transition-all duration-150" data-path="chinh-sach-pin-va-tram-sac" href="#"><span class="material-symbols-outlined text-[20px]">ev_station</span><span class="font-body text-[14px]">Pin &amp; Trạm sạc Hà Nội</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface hover:translate-x-0.5 transition-all duration-150" data-path="chinh-sach-uu-dai-va-ngan-hang" href="#"><span class="material-symbols-outlined text-[20px]">account_balance</span><span class="font-body text-[14px]">Ưu đãi &amp; Ngân hàng</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface hover:translate-x-0.5 transition-all duration-150" data-path="tao-ho-so-bao-gia" href="#" onclick="navigateToFlowStep(2, '02_lai_thu.html'); return false;"><span class="material-symbols-outlined text-[20px]">description</span><span class="font-body text-[14px]">Hồ sơ báo giá O2O</span></a></nav></div><div class="p-space-sm rounded-lg bg-surface-container-low flex flex-col gap-space-xs border border-slate-200/60"><div class="flex items-center justify-between"><span class="font-citation text-[11px] font-semibold text-slate-700 uppercase">Trạng thái showroom</span><span class="w-2 h-2 rounded-full bg-energy-emerald status-beacon-pulse"></span></div><p class="font-citation text-slate-500 text-[11px]">Đại lý Cầu Giấy · 12 trạm sạc khả dụng trực tiếp trong bán kính 3km.</p></div></aside><div class="pl-64"><main class="relative pt-16 min-h-screen bg-slate-50 w-full px-gutter py-space-md"><div class="flex flex-col w-full">
+<div class="flex items-center justify-between pb-space-sm mb-space-sm border-b border-slate-200 anim-stagger-1">
+<div class="flex items-center gap-space-sm">
+<span class="px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-primary-fixed text-on-primary-fixed font-citation">Không gian làm việc O2O</span>
+<span class="text-slate-400 text-xs">/</span>
+<span class="font-headline-lg text-[18px] text-slate-900 font-semibold tracking-tight">Kịch bản tư vấn người mua cá nhân · Hà Nội</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant text-[11px] font-medium font-citation flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-energy-emerald status-beacon-pulse"></span>
+        Hồ sơ trực tiếp #HN-7492
+      </span>
+</div>
+<div class="flex items-center gap-space-sm">
+<div class="flex items-center gap-1 text-[12px] text-slate-500 font-citation">
+<span class="material-symbols-outlined text-[15px] text-slate-400">schedule</span>
+        Cập nhật: 13/11/2026 10:15
+      </div>
+<button class="flex items-center gap-1 px-space-sm py-1 rounded bg-surface-container-highest hover:bg-slate-200 text-on-surface text-[12px] font-medium transition-all active:scale-95 shadow-sm">
+<span class="material-symbols-outlined text-[15px]">print</span>
+        In dự thảo
+      </button>
+<button class="flex items-center gap-1 px-space-sm py-1 rounded bg-surface-container-highest hover:bg-slate-200 text-on-surface text-[12px] font-medium transition-all active:scale-95 shadow-sm" onclick="showToast('Đã sao chép liên kết hồ sơ #HN-7492 vào bộ nhớ tạm!')">
+<span class="material-symbols-outlined text-[15px]">share</span>
+        Chia sẻ
+      </button>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-space-md items-start w-full">
+<!-- LEFT COLUMN: Conversational AI Advisor -->
+<div class="flex flex-col bg-surface-container-lowest rounded-xl shadow-sm border border-slate-200 overflow-hidden h-[calc(100vh-140px)] min-h-[720px] anim-stagger-2">
+<!-- Sub-header bar -->
+<div class="flex items-center justify-between px-space-md py-space-sm bg-slate-50 border-b border-slate-200">
+<div class="flex items-center gap-space-sm">
+<div class="relative w-8 h-8 rounded-full bg-vinfast-blue flex items-center justify-center text-on-primary shadow-xs">
+<span class="material-symbols-outlined text-[18px]">smart_toy</span>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-energy-emerald border-2 border-surface-container-lowest status-beacon-pulse"></span>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-headline-lg text-[14px] font-semibold text-slate-900">Trợ lý Tư vấn Xe điện AI VinFast</span>
+<span class="font-citation text-[10px] px-1.5 py-0.2 rounded bg-primary-fixed text-primary font-semibold">BOT O2O</span>
+</div>
+<p class="font-citation text-slate-500 text-[11px] flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-energy-emerald animate-pulse"></span>
+              Đang hoạt động (Dữ liệu v1.0.2 - Hà Nội · Áp dụng pin &amp; trước bạ 0%)
+            </p>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors" onclick="resetChat()" title="Làm mới cuộc trò chuyện">
+<span class="material-symbols-outlined text-[18px]">refresh</span>
+</button>
+<button class="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors" onclick="showToast('Chính sách thuế trước bạ 0% và giá V-Green niêm yết tháng 11/2026.')" title="Thông tin chính sách">
+<span class="material-symbols-outlined text-[18px]">info</span>
+</button>
+</div>
+</div>
+<!-- Chat Stream -->
+<div class="flex-1 overflow-y-auto p-space-md flex flex-col gap-space-md bg-slate-50/50 scroll-smooth" id="chat-messages-container">
+<!-- Timeline marker -->
+<div class="flex items-center justify-center my-1">
+<span class="font-citation text-[11px] text-slate-400 bg-surface-container-highest px-2.5 py-0.5 rounded-full">Hôm nay · 13 Tháng 11, 2026</span>
+</div>
+<!-- AI Message 1 -->
+<div class="flex items-start gap-space-sm max-w-[92%] transition-all duration-300">
+<div class="w-7 h-7 rounded-full bg-vinfast-blue shrink-0 flex items-center justify-center text-on-primary shadow-xs mt-0.5">
+<span class="material-symbols-outlined text-[15px] text-energy-emerald">electric_bolt</span>
+</div>
+<div class="flex flex-col gap-1.5">
+<div class="bg-surface-container-lowest p-space-md rounded-2xl rounded-tl-xs shadow-xs border border-slate-200">
+<p class="font-body text-[14px] text-slate-800 leading-relaxed">
+                Chào anh/chị! Em là trợ lý số VinFast. Để tìm chiếc xe tối ưu nhất cho gia đình tại Hà Nội, anh/chị dự kiến ngân sách bao nhiêu và đây là <span class="font-semibold text-slate-900">Tổng lăn bánh</span> hay <span class="font-semibold text-slate-900">Số tiền trả trước</span> ạ?
+              </p>
+</div>
+<div class="flex items-center justify-between px-1">
+<span class="font-citation text-[11px] text-slate-400">10:14 AM</span>
+<span class="font-citation text-[11px] text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-200 cursor-pointer hover:bg-slate-200 transition-colors" onclick="showToast('Tham chiếu: Văn bản chính sách thuế TTĐB &amp; Lệ phí trước bạ xe điện 2026.')">[Nguồn: S01 · Chính sách 2026]</span>
+</div>
+<!-- Choice Pills -->
+<div class="flex flex-wrap gap-1.5 pt-1" id="budget-pills-group">
+<button class="budget-pill font-citation text-[12px] px-2.5 py-1 rounded-full bg-surface-container-lowest border border-slate-300 text-slate-700 hover:border-primary-container hover:text-primary transition-all duration-150 active:scale-95 shadow-xs cursor-pointer" onclick="toggleBudgetPill(this, 'Dưới 600 triệu')">
+                Dưới 600 triệu
+              </button>
+<button class="budget-pill font-citation text-[12px] px-2.5 py-1 rounded-full bg-primary-container text-on-primary font-medium shadow-xs ring-2 ring-primary-container/20 transition-all duration-150 active:scale-95 cursor-pointer" onclick="toggleBudgetPill(this, '600 - 800 triệu')">
+                ✓ 600 - 800 triệu
+              </button>
+<button class="budget-pill font-citation text-[12px] px-2.5 py-1 rounded-full bg-surface-container-lowest border border-slate-300 text-slate-700 hover:border-primary-container hover:text-primary transition-all duration-150 active:scale-95 shadow-xs cursor-pointer" onclick="toggleBudgetPill(this, 'Xác nhận: Tổng lăn bánh')">
+                Xác nhận: Tổng lăn bánh
+              </button>
+<button class="budget-pill font-citation text-[12px] px-2.5 py-1 rounded-full bg-surface-container-lowest border border-slate-300 text-slate-700 hover:border-primary-container hover:text-primary transition-all duration-150 active:scale-95 shadow-xs cursor-pointer" onclick="toggleBudgetPill(this, 'Xác nhận: Tiền sẵn có')">
+                Xác nhận: Tiền sẵn có
+              </button>
+</div>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex items-end justify-end gap-space-sm self-end max-w-[88%] transition-all duration-300">
+<div class="flex flex-col items-end gap-1">
+<div class="bg-primary-container text-on-primary p-space-md rounded-2xl rounded-tr-xs shadow-sm">
+<p class="font-body text-[14px] leading-relaxed text-white">
+                Ngân sách khoảng 700 triệu lăn bánh, nhà ở chung cư mạn Cầu Giấy, mỗi ngày đi làm khoảng 30km, thỉnh thoảng về quê 80km.
+              </p>
+</div>
+<div class="flex items-center gap-1.5 px-1">
+<span class="font-citation text-[11px] text-slate-400">10:15 AM · Đã gửi</span>
+<span class="material-symbols-outlined text-[13px] text-primary">done_all</span>
+</div>
+</div>
+</div>
+<!-- AI Follow-up Message -->
+<div class="flex items-start gap-space-sm max-w-[94%] transition-all duration-300">
+<div class="w-7 h-7 rounded-full bg-vinfast-blue shrink-0 flex items-center justify-center text-on-primary shadow-xs mt-0.5">
+<span class="material-symbols-outlined text-[15px] text-energy-emerald">electric_bolt</span>
+</div>
+<div class="flex flex-col gap-2">
+<div class="bg-surface-container-lowest p-space-md rounded-2xl rounded-tl-xs shadow-xs border border-slate-200">
+<p class="font-body text-[14px] text-slate-800 leading-relaxed">
+                Dạ với <strong class="text-slate-900 font-semibold">700 triệu lăn bánh</strong> và nhu cầu di chuyển <strong class="text-slate-900 font-semibold">30km/ngày tại chung cư Cầu Giấy</strong>, <strong class="text-primary font-semibold">VinFast VF 6 Comfort (Kèm Pin)</strong> là phương án phù hợp nhất cả về tầm giá lẫn chi phí năng lượng.
+              </p>
+<div class="mt-3 pt-3 border-t border-slate-100 flex flex-col gap-2">
+<div class="flex flex-wrap gap-2">
+<div class="inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-100 text-slate-800 text-[12px] font-citation hover:bg-slate-200 transition-colors">
+<span class="text-[13px]">🚗</span>
+<span>Phân khúc: <strong>B-SUV Đô thị (Rộng 2.730mm)</strong></span>
+</div>
+<div class="inline-flex items-center gap-1 px-2 py-1 rounded bg-energy-emerald/10 text-emerald-800 text-[12px] font-citation hover:bg-emerald-100 transition-colors">
+<span class="text-[13px]">🔋</span>
+<span>V-Green Cầu Giấy: <strong>4 trạm (18 cổng sạc nhanh) trong 1.5km</strong></span>
+</div>
+</div>
+<div class="bg-surface-container-low p-2.5 rounded-lg flex items-center justify-between text-[12px] hover:bg-blue-50 transition-colors cursor-pointer" onclick="document.getElementById('slider-distance').focus(); highlightTCO();">
+<span class="text-slate-600 font-body">Khoảng cách sạc: <strong id="chat-charge-freq-highlight">~11 ngày mới cần sạc 1 lần</strong></span>
+<span class="text-primary font-medium flex items-center gap-0.5 group">Đã đồng bộ sang TCO <span class="material-symbols-outlined text-[14px] group-hover:translate-x-1 transition-transform">arrow_forward</span></span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between px-1">
+<span class="font-citation text-[11px] text-slate-400">10:15 AM</span>
+<button class="font-citation text-[11px] text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-300 px-2 py-0.5 rounded flex items-center gap-1 transition-all active:scale-95" onclick="showToast('Nguồn dữ liệu biểu cước điện áp dụng tại trạm V-Green công cộng 3.858đ/kWh.')">
+<span class="material-symbols-outlined text-[12px] text-primary">verified</span>
+                [Nguồn: S02 · Biểu giá &amp; Quy chuẩn V-Green 13/11/2026]
+              </button>
+</div>
+</div>
+</div>
+<!-- Typing Indicator placeholder (hidden by default) -->
+<div class="hidden flex items-start gap-space-sm max-w-[80%]" id="typing-indicator">
+<div class="w-7 h-7 rounded-full bg-vinfast-blue shrink-0 flex items-center justify-center text-on-primary shadow-xs mt-0.5">
+<span class="material-symbols-outlined text-[15px] text-energy-emerald">smart_toy</span>
+</div>
+<div class="bg-surface-container-lowest px-4 py-3 rounded-2xl rounded-tl-xs shadow-xs border border-slate-200 flex items-center gap-1.5">
+<span class="text-[12px] font-citation text-slate-500 mr-1">Trợ lý VinFast đang tính toán</span>
+<div class="w-2 h-2 rounded-full bg-primary typing-dot"></div>
+<div class="w-2 h-2 rounded-full bg-primary typing-dot"></div>
+<div class="w-2 h-2 rounded-full bg-primary typing-dot"></div>
+</div>
+</div>
+</div>
+<!-- Quick Suggested Prompts Pill Row -->
+<div class="px-space-md py-1.5 bg-slate-50 border-t border-slate-100 flex items-center gap-1.5 overflow-x-auto">
+<span class="font-citation text-[11px] text-slate-400 shrink-0">Gợi ý câu hỏi:</span>
+<button class="shrink-0 text-[12px] font-citation px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-slate-700 hover:border-primary-container hover:text-primary transition-all active:scale-95 cursor-pointer" onclick="handleQuickPrompt('Trạm sạc gần chung cư Cầu Giấy có thuận tiện không?')">
+          Trạm sạc gần chung cư Cầu Giấy?
+        </button>
+<button class="shrink-0 text-[12px] font-citation px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-slate-700 hover:border-primary-container hover:text-primary transition-all active:scale-95 cursor-pointer" onclick="handleQuickPrompt('Gói vay mua VF 6 ngân hàng Techcombank / MB lãi suất bao nhiêu?')">
+          Gói vay ngân hàng Techcombank / MB?
+        </button>
+<button class="shrink-0 text-[12px] font-citation px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-slate-700 hover:border-primary-container hover:text-primary transition-all active:scale-95 cursor-pointer" onclick="handleQuickPrompt('So sánh VF 6 và VF e34 về trang bị và tầm hoạt động?')">
+          So sánh VF 6 và VF e34?
+        </button>
+</div>
+<!-- Fixed Bottom Input Area -->
+<div class="p-space-md bg-surface-container-lowest border-t border-slate-200 flex flex-col gap-2">
+<form class="relative flex items-center bg-slate-50 border border-slate-300 rounded-lg focus-within:ring-2 focus-within:ring-primary focus-within:border-primary transition-all duration-200" id="chat-form" onsubmit="event.preventDefault(); sendChatMessage();">
+<div class="flex items-center pl-2 text-slate-400 gap-1">
+<button class="p-1 hover:text-slate-700 rounded transition-colors active:scale-90" onclick="showToast('Đã mở bộ chọn tệp đính kèm thông tin')" title="Đính kèm thông tin" type="button">
+<span class="material-symbols-outlined text-[20px]">attach_file</span>
+</button>
+<button class="p-1 hover:text-slate-700 rounded transition-colors active:scale-90" onclick="showToast('Đang chọn kịch bản khách hàng cá nhân')" title="Chọn kịch bản có sẵn" type="button">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+</button>
+</div>
+<input class="w-full py-2.5 px-2 bg-transparent text-[14px] text-slate-800 placeholder-slate-400 focus:outline-none font-body" id="chat-input" placeholder="Nhập câu hỏi về xe, chỗ sạc hoặc phương án trả góp..." type="text"/>
+<div class="pr-1.5 flex items-center">
+<button class="w-9 h-9 rounded-md bg-primary-container text-on-primary flex items-center justify-center hover:bg-primary transition-all active:scale-90 shadow-xs cursor-pointer group" type="submit">
+<span class="material-symbols-outlined text-[18px] group-hover:translate-x-0.5 transition-transform">send</span>
+</button>
+</div>
+</form>
+<div class="flex items-center justify-between text-[11px] text-slate-400 px-0.5 font-citation">
+<span>Hệ thống phân tích thông số lăn bánh thực tế tại Hà Nội</span>
+<span>Bấm Enter để gửi</span>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: Interactive Vehicle & TCO Workspace -->
+<div class="flex flex-col gap-space-md h-[calc(100vh-140px)] overflow-y-auto pr-1">
+<!-- TOP VEHICLE CARD: VinFast VF 6 Comfort -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm border border-slate-200 overflow-hidden anim-stagger-3 transition-shadow duration-300 hover:shadow-md">
+<!-- Card Header with Verification badge -->
+<div class="p-space-md border-b border-slate-200 flex flex-wrap items-center justify-between gap-space-xs bg-slate-50/60">
+<div class="flex items-center gap-space-xs">
+<span class="px-2 py-0.5 rounded text-[11px] font-bold uppercase bg-energy-emerald text-on-primary shadow-xs">Đề xuất tối ưu</span>
+<h2 class="font-headline-lg text-[20px] font-bold text-slate-900">VinFast VF 6 Comfort (Thế hệ mới 2026)</h2>
+</div>
+<div class="relative group">
+<button class="font-citation text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-300 flex items-center gap-1 transition-colors cursor-pointer" onclick="toggleSourcePopover()">
+<span class="material-symbols-outlined text-[13px] text-energy-emerald">verified</span>
+<span>[Nguồn: vinfastauto.com · Tra cứu 13/11/2026]</span>
+</button>
+<!-- Popover tooltip -->
+<div class="hidden absolute right-0 top-full mt-1.5 w-64 bg-slate-900 text-slate-100 text-[11px] p-2.5 rounded-lg shadow-xl border border-slate-700 z-30 transition-all" id="source-popover">
+<div class="font-semibold text-energy-emerald mb-1">Dữ liệu chính hãng VinFast</div>
+<p class="text-slate-300 leading-snug">Giá niêm yết áp dụng bản kèm pin (mua đứt). Chính sách ưu đãi trước bạ 0% hiệu lực toàn quốc theo quy định hiện hành.</p>
+</div>
+</div>
+</div>
+<div class="p-space-md flex flex-col gap-space-md">
+<!-- Vehicle Showcase Image & Meta overlay -->
+<div class="vehicle-img-wrapper relative w-full rounded-lg overflow-hidden border border-slate-200 bg-slate-900 group cursor-pointer transition-transform">
+<img alt="Front three-quarter view of VinFast VF 6 electric crossover in Hanoi showroom" class="vehicle-img w-full h-56 object-cover object-center transition-transform duration-700 ease-out" src="https://lh3.googleusercontent.com/aida/ALJJyrCmKbOMkz_Fmv1hpew619O2TC2QSo7fP2s1-3BByQD1NuUrSmxvgqOWcMPN8FS1BKoL5LCDCMbe1Lj2wvUGpSF97BLfITrqNpiAeFp8bW2BDEtHiiUWOhTY1T9tSqEHJDheggjca9fWyGYeVJpIYvc-62L1uEa6N2sFeChJfNzHvGo2evjGqZvCtukgMYPFBqVYzygwP9PzoBowGnIlEVgnUyuuSrSjstw6SBVnBuWZ"/>
+<div class="shimmer-effect absolute inset-0 pointer-events-none"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/15 to-transparent pointer-events-none"></div>
+<div class="absolute top-3 left-3 flex gap-1.5">
+<span class="bg-slate-900/80 backdrop-blur text-slate-100 text-[11px] font-citation px-2 py-0.5 rounded border border-white/20 flex items-center gap-1 shadow-sm">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+                Màu xanh ánh kim · Metallic Blue
+              </span>
+<span class="bg-energy-emerald/90 backdrop-blur text-white text-[11px] font-semibold font-citation px-2 py-0.5 rounded shadow-sm">
+                Xe mới kèm pin (Mua đứt pin)
+              </span>
+</div>
+<div class="absolute bottom-3 left-3 right-3 flex items-end justify-between">
+<div class="text-white">
+<span class="text-[11px] font-citation uppercase tracking-wider text-slate-300">Giá niêm yết xuất hóa đơn</span>
+<div class="text-[26px] font-financial-metric font-bold text-white tracking-tight leading-none drop-shadow-sm">
+                  646.000.000 <span class="text-[16px] font-normal text-slate-200">VNĐ</span>
+</div>
+</div>
+<span class="bg-vinfast-blue/90 hover:bg-vinfast-blue text-white text-[12px] font-medium px-2.5 py-1 rounded backdrop-blur border border-white/20 transition-all hover:scale-105 shadow-sm">
+                Giao xe ngay tại Showroom Cầu Giấy
+              </span>
+</div>
+</div>
+<!-- Price & Hanoi On-the-road Rollup -->
+<div class="p-space-sm rounded-lg bg-surface-container-low border border-primary/20 flex items-center justify-between transition-colors hover:bg-blue-50/70">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-primary-container/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">receipt_long</span>
+</div>
+<div>
+<div class="font-headline-lg text-[13px] font-semibold text-slate-900">Dự toán lăn bánh tại TP. Hà Nội (Biển số 20 triệu + Lệ phí)</div>
+<div class="font-citation text-[12px] text-slate-600">Áp dụng chính sách ưu đãi 100% Lệ phí trước bạ xe điện theo Nghị định Chính phủ</div>
+</div>
+</div>
+<div class="text-right">
+<div class="font-financial-metric text-[18px] font-bold text-primary">~665.000.000 VNĐ</div>
+<span class="font-citation text-[11px] text-energy-emerald font-semibold">Tiết kiệm ~65 triệu lệ phí trước bạ</span>
+</div>
+</div>
+<!-- Key Technical Specs Grid -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+<div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex flex-col hover:border-primary/40 hover:bg-white transition-all">
+<span class="font-citation text-[11px] text-slate-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-slate-400">event_seat</span>
+                Không gian
+              </span>
+<span class="font-headline-lg text-[14px] font-bold text-slate-800 mt-1">5 chỗ ngồi</span>
+<span class="font-citation text-[10px] text-slate-500">Trục cơ sở 2.730mm</span>
+</div>
+<div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex flex-col hover:border-energy-emerald/40 hover:bg-white transition-all">
+<span class="font-citation text-[11px] text-slate-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-energy-emerald">battery_charging_full</span>
+                Tầm hoạt động
+              </span>
+<span class="font-headline-lg text-[14px] font-bold text-energy-emerald mt-1">510 km</span>
+<span class="font-citation text-[10px] text-slate-500">Chuẩn NEDC / 1 lần sạc</span>
+</div>
+<div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex flex-col hover:border-primary/40 hover:bg-white transition-all">
+<span class="font-citation text-[11px] text-slate-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-primary">electric_car</span>
+                Dung lượng pin
+              </span>
+<span class="font-headline-lg text-[14px] font-bold text-slate-800 mt-1">59.6 kWh</span>
+<span class="font-citation text-[10px] text-slate-500">Công nghệ pin LFP</span>
+</div>
+<div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex flex-col hover:border-primary/40 hover:bg-white transition-all">
+<span class="font-citation text-[11px] text-slate-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-slate-400">verified_user</span>
+                Bảo hành
+              </span>
+<span class="font-headline-lg text-[14px] font-bold text-slate-800 mt-1">7 năm</span>
+<span class="font-citation text-[10px] text-slate-500">hoặc 160.000 km</span>
+</div>
+</div>
+<!-- Pros & Practical Evaluation Checklist -->
+<div class="bg-slate-50 rounded-lg p-space-sm border border-slate-200 flex flex-col gap-1.5">
+<span class="font-citation text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Đánh giá thực tế theo nhu cầu khách hàng:</span>
+<div class="flex items-start gap-2 text-[13px] text-slate-700">
+<span class="material-symbols-outlined text-energy-emerald text-[16px] shrink-0 mt-0.5">check_circle</span>
+<span><strong class="text-slate-900">Phù hợp ngân sách:</strong> Giá lăn bánh ~665 triệu hoàn toàn nằm trong biên độ 700 triệu (Dư địa ~35 triệu cho bảo hiểm thân vỏ 2 năm &amp; phụ kiện cao cấp).</span>
+</div>
+<div class="flex items-start gap-2 text-[13px] text-slate-700">
+<span class="material-symbols-outlined text-energy-emerald text-[16px] shrink-0 mt-0.5">check_circle</span>
+<span><strong class="text-slate-900">Chu kỳ sạc tiện lợi:</strong> Với <span class="font-semibold text-primary" id="eval-distance-text">30km/ngày</span>, 1 lần sạc đầy (510km danh định, ~380km thực tế đường phố Hà Nội) đủ di chuyển trong <strong class="text-energy-emerald" id="eval-cycle-text">10 - 12 ngày</strong>.</span>
+</div>
+<div class="flex items-start gap-2 text-[13px] text-slate-700">
+<span class="material-symbols-outlined text-amber-600 text-[16px] shrink-0 mt-0.5">warning</span>
+<span><strong class="text-slate-900">Lưu ý hạ tầng chung cư:</strong> Vì chung cư chưa có trụ sạc AC tại hầm, khách hàng sử dụng mạng lưới trạm sạc siêu nhanh V-Green tại Vincom Plaza Bắc Từ Liêm hoặc Trạm sạc Trần Thái Tông (cách 1.2km).</span>
+</div>
+</div>
+</div>
+</div>
+<!-- BOTTOM TCO 5-YEAR CALCULATOR CARD -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm border border-slate-200 overflow-hidden anim-stagger-4 transition-all duration-300" id="tco-container-card">
+<div class="p-space-md border-b border-slate-200 flex items-center justify-between bg-slate-50/60">
+<div class="flex items-center gap-2">
+<span class="w-8 h-8 rounded-lg bg-vinfast-blue/10 flex items-center justify-center text-vinfast-blue">
+<span class="material-symbols-outlined text-[20px]">calculate</span>
+</span>
+<div>
+<h3 class="font-headline-lg text-[16px] font-bold text-slate-900">Dự toán Tổng Chi phí Sở hữu (TCO 5 Năm)</h3>
+<p class="font-citation text-[11px] text-slate-500">Mô hình tính toán độc quyền dành cho xe điện kèm pin VinFast</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-600/10 border border-amber-600/30 text-amber-700 text-[11px] font-medium font-citation">
+<span class="material-symbols-outlined text-[13px]">warning</span>
+            Ước tính sơ bộ (Chưa duyệt)
+          </div>
+</div>
+<div class="p-space-md flex flex-col gap-space-md">
+<!-- Interactive Parameter Sliders -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md p-space-sm rounded-lg bg-slate-50 border border-slate-200">
+<!-- Slider 1 -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-[13px]">
+<span class="font-body font-medium text-slate-700">Quãng đường di chuyển:</span>
+<span class="font-headline-lg font-bold text-primary" id="daily-dist-val">30 km/ngày</span>
+</div>
+<input class="w-full accent-primary h-2 bg-slate-200 rounded-lg cursor-pointer transition-all hover:bg-slate-300" id="slider-distance" max="120" min="10" oninput="updateCalculations()" step="5" type="range" value="30"/>
+<div class="flex justify-between text-[11px] text-slate-400 font-citation">
+<span>10 km (Đi gần)</span>
+<span class="text-slate-600 font-medium" id="monthly-km">~900 km/tháng</span>
+<span>120 km (Dịch vụ)</span>
+</div>
+</div>
+<!-- Slider 2 -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-[13px]">
+<span class="font-body font-medium text-slate-700">Tỷ lệ vay ngân hàng:</span>
+<span class="font-headline-lg font-bold text-primary" id="loan-pct-val">70% (60 tháng)</span>
+</div>
+<input class="w-full accent-primary h-2 bg-slate-200 rounded-lg cursor-pointer transition-all hover:bg-slate-300" id="slider-loan" max="80" min="0" oninput="updateCalculations()" step="10" type="range" value="70"/>
+<div class="flex justify-between text-[11px] text-slate-400 font-citation">
+<span>0% (Trả thẳng 100%)</span>
+<span class="text-emerald-700 font-medium" id="loan-rate-hint">Ưu đãi lãi suất 7.5%</span>
+<span>80% (Vay tối đa)</span>
+</div>
+</div>
+</div>
+<!-- Big Summary Metric Cards -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-space-sm">
+<div class="p-3 rounded-lg bg-surface-container-low border border-primary/20 flex flex-col justify-between transition-transform duration-200 hover:-translate-y-0.5">
+<span class="font-citation text-[11px] font-medium text-slate-600">Tổng TCO 5 năm</span>
+<div class="mt-1 font-financial-metric text-[20px] font-bold text-primary tracking-tight">
+<span class="num-ticker" id="metric-tco">742.5</span> <span class="text-[12px] font-normal text-slate-600">tr VNĐ</span>
+</div>
+<span class="text-[10px] font-citation text-slate-500 mt-1">Gồm xe, điện, bảo dưỡng</span>
+</div>
+<div class="p-3 rounded-lg bg-slate-50 border border-slate-200 flex flex-col justify-between transition-transform duration-200 hover:-translate-y-0.5">
+<span class="font-citation text-[11px] font-medium text-slate-600">Trả góp tháng đầu</span>
+<div class="mt-1 font-financial-metric text-[18px] font-bold text-slate-800 tracking-tight">
+<span class="num-ticker" id="metric-loan-installment">12.08</span> <span class="text-[12px] font-normal text-slate-500">tr/tháng</span>
+</div>
+<span class="text-[10px] font-citation text-slate-500 mt-1" id="metric-loan-breakdown">Gốc: 7.53 tr + Lãi giảm dần</span>
+</div>
+<div class="p-3 rounded-lg bg-energy-emerald/10 border border-energy-emerald/30 flex flex-col justify-between transition-transform duration-200 hover:-translate-y-0.5">
+<span class="font-citation text-[11px] font-medium text-emerald-800">Tiền sạc điện/tháng</span>
+<div class="mt-1 font-financial-metric text-[20px] font-bold text-emerald-700 tracking-tight">
+<span class="num-ticker" id="metric-charging-cost">820.000</span> <span class="text-[12px] font-normal text-emerald-800">VNĐ</span>
+</div>
+<span class="text-[10px] font-citation text-emerald-800 mt-1 font-medium" id="metric-savings-sub">Tiết kiệm ~1.45 tr so với xăng</span>
+</div>
+<div class="p-3 rounded-lg bg-slate-50 border border-slate-200 flex flex-col justify-between transition-transform duration-200 hover:-translate-y-0.5">
+<span class="font-citation text-[11px] font-medium text-slate-600">Tần suất sạc dự kiến</span>
+<div class="mt-1 font-financial-metric text-[18px] font-bold text-slate-800 tracking-tight">
+<span class="num-ticker" id="metric-charging-freq">11</span> <span class="text-[12px] font-normal text-slate-500">ngày /lần</span>
+</div>
+<span class="text-[10px] font-citation text-slate-500 mt-1" id="metric-charging-count">~2.7 lần cắm sạc/tháng</span>
+</div>
+</div>
+<!-- Comparative SVG Chart: Electric vs Gasoline over 5 Years -->
+<div class="p-space-sm rounded-lg bg-surface-container-lowest border border-slate-200 flex flex-col gap-2">
+<div class="flex items-center justify-between text-[12px]">
+<span class="font-semibold text-slate-700">So sánh chi phí năng lượng &amp; bảo dưỡng 5 năm</span>
+<div class="flex items-center gap-3 text-[11px]">
+<span class="flex items-center gap-1 text-energy-emerald font-medium">
+<span class="w-3 h-2 rounded bg-energy-emerald inline-block"></span> <span id="vf6-cost-label">VF 6 Comfort: ~58.2 tr</span>
+</span>
+<span class="flex items-center gap-1 text-slate-500">
+<span class="w-3 h-2 rounded bg-slate-400 inline-block"></span> <span id="gas-cost-label">Xe xăng cỡ B: ~145.6 tr</span>
+</span>
+</div>
+</div>
+<!-- Mini Progress visualization with smooth transition -->
+<div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden flex relative">
+<div class="bg-energy-emerald h-full rounded-l-full transition-all duration-300 ease-out" id="chart-bar-ev" style="width: 28.5%" title="VF 6: Chi phí năng lượng"></div>
+<div class="bg-slate-300 h-full rounded-r-full transition-all duration-300 ease-out" id="chart-bar-gas" style="width: 71.5%" title="Chênh lệch tiết kiệm"></div>
+</div>
+<div class="flex items-center justify-between text-[11px] text-slate-500 font-citation">
+<span>VF 6 tiết kiệm <strong class="text-energy-emerald" id="chart-saving-total">87.400.000 VNĐ</strong> chi phí vận hành sau 5 năm</span>
+<span class="font-medium text-primary" id="chart-saving-monthly">Tương đương 1.450.000 đ/tháng</span>
+</div>
+</div>
+<!-- Bottom Submission Action Box -->
+<div class="pt-1 flex flex-col gap-2">
+<button class="w-full py-3 px-4 rounded-lg bg-primary-container hover:bg-primary text-on-primary font-headline-lg text-[15px] font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-200 active:scale-[0.98] cursor-pointer group" id="btn-submit-proposal" onclick="submitProposal(this)">
+<span class="material-symbols-outlined text-[20px] group-hover:rotate-12 transition-transform">assignment_turned_in</span>
+<span>Xem trước &amp; Gửi Tư vấn viên duyệt dự toán</span>
+<span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<div class="flex items-center justify-center gap-1 text-[11px] text-slate-500 font-citation text-center">
+<span class="material-symbols-outlined text-[14px] text-energy-emerald">timer</span>
+<span>Tư vấn viên showroom Hà Nội sẽ kiểm tra và phản hồi trong 60 giây · Mã hồ sơ: <strong class="text-slate-700">VFO2O-HN-7492</strong></span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></main></div>
+<!-- Dynamic Feedback Toast Modal -->
+<div class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none" id="toast-notification">
+<div class="bg-slate-900 text-slate-50 px-4 py-3 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-3 max-w-md">
+<div class="w-8 h-8 rounded-full bg-energy-emerald/20 flex items-center justify-center text-energy-emerald shrink-0">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-lg text-[13px] font-bold text-slate-100" id="toast-title">Thành công!</span>
+<span class="font-citation text-[12px] text-slate-300" id="toast-message">Đã thực hiện thao tác</span>
+</div>
+</div>
+</div>
+<script>
+// Real-time Reactive TCO Engine
+function updateCalculations() {
+  const dist = parseInt(document.getElementById('slider-distance').value, 10);
+  const loanPct = parseInt(document.getElementById('slider-loan').value, 10);
+
+  // Update Slider 1 Labels
+  document.getElementById('daily-dist-val').innerText = dist + ' km/ngày';
+  const monthlyKm = dist * 30;
+  document.getElementById('monthly-km').innerText = '~' + monthlyKm.toLocaleString('vi-VN') + ' km/tháng';
+
+  // Update Slider 2 Labels
+  document.getElementById('loan-pct-val').innerText = loanPct + '% (60 tháng)';
+  const rateHint = document.getElementById('loan-rate-hint');
+  if (loanPct === 0) {
+    rateHint.innerText = 'Không phát sinh lãi suất';
+    rateHint.className = 'text-slate-500 font-medium';
+  } else {
+    rateHint.innerText = 'Ưu đãi lãi suất 7.5%';
+    rateHint.className = 'text-emerald-700 font-medium';
+  }
+
+  // Energy & Frequency Calculation
+  // VF 6 battery ~59.6 kWh, ~380km practical real-world city range
+  const consumptionPerKm = 59.6 / 380; // ~0.1568 kWh/km
+  const monthlyKwh = monthlyKm * consumptionPerKm;
+  const kwhRate = 3858; // VND per kWh standard V-Green public fast charge
+  const monthlyChargingCost = Math.round(monthlyKwh * kwhRate);
+  
+  // Frequency
+  const daysPerCharge = Math.max(2, Math.round(380 / dist));
+  const chargesPerMonth = (30 / daysPerCharge).toFixed(1);
+
+  // Loan Calculation (Car price ~646 million)
+  const carPrice = 646000000;
+  const loanAmount = (carPrice * (loanPct / 100));
+  let firstMonthPayment = 0;
+  let monthlyPrincipal = 0;
+  let totalLoanInterest5Years = 0;
+
+  if (loanPct > 0) {
+    const loanMonths = 60;
+    monthlyPrincipal = loanAmount / loanMonths;
+    const monthlyRate = 0.075 / 12; // 7.5% per year
+    const firstMonthInterest = loanAmount * monthlyRate;
+    firstMonthPayment = (monthlyPrincipal + firstMonthInterest) / 1000000; // in Millions
+    
+    // Total interest over 60 months with reducing balance
+    totalLoanInterest5Years = ((loanAmount * 0.075) / 2) * 5 / 1000000;
+  }
+
+  // 5-Year Energy & Gasoline Comparison
+  const evEnergy5YMillion = (monthlyChargingCost * 60) / 1000000;
+  const evMaintenance5YMillion = (dist * 30 * 60 * 0.08) / 1000; // ~80 VND/km maintenance
+  const evTotalOperational = evEnergy5YMillion + evMaintenance5YMillion;
+
+  // Gas car comparison (8.2L/100km at 23,500 VND/L + 350 VND/km maintenance)
+  const gasMonthlyLiters = (monthlyKm / 100) * 8.2;
+  const gasMonthlyFuelCost = gasMonthlyLiters * 23500;
+  const gasFuel5YMillion = (gasMonthlyFuelCost * 60) / 1000000;
+  const gasMaint5YMillion = (monthlyKm * 60 * 0.35) / 1000;
+  const gasTotalOperational = gasFuel5YMillion + gasMaint5YMillion;
+  const savings5YMillion = Math.max(0, gasTotalOperational - evTotalOperational);
+  const monthlySavingVnd = Math.round((savings5YMillion * 1000000) / 60);
+
+  // Total TCO 5 Years: On-the-road (665tr) + Loan Interest + Energy & Maint - Residual value buffer
+  const baseOnRoad = 665;
+  const totalTco = (baseOnRoad + totalLoanInterest5Years + (evTotalOperational * 0.85)).toFixed(1);
+
+  // Trigger smooth number animation
+  flashAndSet('metric-tco', totalTco);
+  flashAndSet('metric-loan-installment', firstMonthPayment.toFixed(2));
+  document.getElementById('metric-loan-breakdown').innerText = loanPct > 0 
+    ? `Gốc: ${(monthlyPrincipal / 1000000).toFixed(2)} tr + Lãi giảm dần`
+    : 'Trả 100% · Không chịu lãi vay';
+
+  flashAndSet('metric-charging-cost', monthlyChargingCost.toLocaleString('vi-VN'));
+  document.getElementById('metric-savings-sub').innerText = `Tiết kiệm ~${(monthlySavingVnd / 1000000).toFixed(2)} tr so với xăng`;
+
+  flashAndSet('metric-charging-freq', daysPerCharge.toString());
+  document.getElementById('metric-charging-count').innerText = `~${chargesPerMonth} lần cắm sạc/tháng`;
+
+  // Update checklist & comparison card
+  document.getElementById('eval-distance-text').innerText = `${dist}km/ngày`;
+  document.getElementById('eval-cycle-text').innerText = `${Math.max(1, daysPerCharge - 1)} - ${daysPerCharge + 1} ngày`;
+  document.getElementById('chat-charge-freq-highlight').innerText = `~${daysPerCharge} ngày mới cần sạc 1 lần`;
+
+  // Chart bar update
+  const evRatio = Math.min(65, Math.max(18, (evTotalOperational / (evTotalOperational + gasTotalOperational)) * 100));
+  const gasRatio = 100 - evRatio;
+  document.getElementById('chart-bar-ev').style.width = evRatio.toFixed(1) + '%';
+  document.getElementById('chart-bar-gas').style.width = gasRatio.toFixed(1) + '%';
+
+  document.getElementById('vf6-cost-label').innerText = `VF 6 Comfort: ~${evTotalOperational.toFixed(1)} tr`;
+  document.getElementById('gas-cost-label').innerText = `Xe xăng cỡ B: ~${gasTotalOperational.toFixed(1)} tr`;
+  document.getElementById('chart-saving-total').innerText = Math.round(savings5YMillion * 1000000).toLocaleString('vi-VN') + ' VNĐ';
+  document.getElementById('chart-saving-monthly').innerText = `Tương đương ${monthlySavingVnd.toLocaleString('vi-VN')} đ/tháng`;
+}
+
+function flashAndSet(id, newValue) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (el.innerText !== newValue) {
+    el.classList.add('updating');
+    setTimeout(() => {
+      el.innerText = newValue;
+      el.classList.remove('updating');
+    }, 120);
+  }
+}
+
+// Quick action Budget Pills Toggle
+function toggleBudgetPill(btn, label) {
+  const parent = document.getElementById('budget-pills-group');
+  const pills = parent.querySelectorAll('.budget-pill');
+  pills.forEach(p => {
+    p.className = 'budget-pill font-citation text-[12px] px-2.5 py-1 rounded-full bg-surface-container-lowest border border-slate-300 text-slate-700 hover:border-primary-container hover:text-primary transition-all duration-150 active:scale-95 shadow-xs cursor-pointer';
+    if (p.innerText.startsWith('✓ ')) {
+      p.innerText = p.innerText.replace('✓ ', '');
+    }
+  });
+
+  btn.className = 'budget-pill font-citation text-[12px] px-2.5 py-1 rounded-full bg-primary-container text-on-primary font-medium shadow-xs ring-2 ring-primary-container/20 transition-all duration-150 active:scale-95 cursor-pointer';
+  if (!btn.innerText.startsWith('✓ ')) {
+    btn.innerText = '✓ ' + btn.innerText.trim();
+  }
+  showToast(`Đã áp dụng tiêu chí ngân sách: "${label}"`);
+}
+
+// Chat Send & Responsive Bot Interactions
+function sendChatMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const container = document.getElementById('chat-messages-container');
+  const typingIndicator = document.getElementById('typing-indicator');
+
+  // Create User Message Bubble
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+
+  const userMsgHtml = `
+    <div class="flex items-end justify-end gap-space-sm self-end max-w-[88%] anim-stagger-1">
+      <div class="flex flex-col items-end gap-1">
+        <div class="bg-primary-container text-on-primary p-space-md rounded-2xl rounded-tr-xs shadow-sm">
+          <p class="font-body text-[14px] leading-relaxed text-white">${escapeHtml(text)}</p>
+        </div>
+        <div class="flex items-center gap-1.5 px-1">
+          <span class="font-citation text-[11px] text-slate-400">${timeStr} · Đã gửi</span>
+          <span class="material-symbols-outlined text-[13px] text-primary">done_all</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Insert before typing indicator
+  typingIndicator.insertAdjacentHTML('beforebegin', userMsgHtml);
+  input.value = '';
+  typingIndicator.classList.remove('hidden');
+  container.scrollTop = container.scrollHeight;
+
+  // Bot thinking response
+  setTimeout(() => {
+    typingIndicator.classList.add('hidden');
+    let reply = `Em đã ghi nhận yêu cầu: "${escapeHtml(text)}". `;
+    if (text.toLowerCase().includes('vay') || text.toLowerCase().includes('ngân hàng')) {
+      reply += 'Hiện đối tác MB Bank & Techcombank tài trợ tới 80% giá trị xe VF 6 với lãi suất cố định từ 7.5%/năm trong 2 năm đầu, thủ tục phê duyệt online trong 30 phút.';
+      document.getElementById('slider-loan').value = 80;
+      updateCalculations();
+    } else if (text.toLowerCase().includes('trạm') || text.toLowerCase().includes('sạc')) {
+      reply += 'Tại khu vực Cầu Giấy quanh bán kính 2km từ vị trí của anh/chị có 4 cụm sạc V-Green (18 cổng sạc nhanh DC 60kW - 150kW), sạc từ 20% đến 80% chỉ mất khoảng 24 phút.';
+    } else {
+      reply += 'Dữ liệu thông số và dự toán TCO đã được tự động tối ưu trực tiếp cho phương án VF 6 Comfort tại Hà Nội.';
+    }
+
+    const botMsgHtml = `
+      <div class="flex items-start gap-space-sm max-w-[94%] anim-stagger-1">
+        <div class="w-7 h-7 rounded-full bg-vinfast-blue shrink-0 flex items-center justify-center text-on-primary shadow-xs mt-0.5">
+          <span class="material-symbols-outlined text-[15px] text-energy-emerald">electric_bolt</span>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <div class="bg-surface-container-lowest p-space-md rounded-2xl rounded-tl-xs shadow-xs border border-slate-200">
+            <p class="font-body text-[14px] text-slate-800 leading-relaxed">${reply}</p>
+          </div>
+          <div class="flex items-center justify-between px-1">
+            <span class="font-citation text-[11px] text-slate-400">${timeStr}</span>
+            <span class="font-citation text-[11px] text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-200">[Nguồn: Trợ lý O2O Hà Nội]</span>
+          </div>
+        </div>
+      </div>
+    `;
+    typingIndicator.insertAdjacentHTML('beforebegin', botMsgHtml);
+    container.scrollTop = container.scrollHeight;
+  }, 950);
+}
+
+function handleQuickPrompt(promptText) {
+  document.getElementById('chat-input').value = promptText;
+  sendChatMessage();
+}
+
+function resetChat() {
+  showToast('Đã làm mới cuộc đối thoại tư vấn');
+}
+
+function highlightTCO() {
+  const card = document.getElementById('tco-container-card');
+  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  card.classList.add('ring-2', 'ring-primary');
+  setTimeout(() => {
+    card.classList.remove('ring-2', 'ring-primary');
+  }, 1200);
+}
+
+function toggleSourcePopover() {
+  const pop = document.getElementById('source-popover');
+  pop.classList.toggle('hidden');
+}
+
+// CTA Proposal Submission with Micro-feedback
+function submitProposal(button) {
+  button.disabled = true;
+  const originalHtml = button.innerHTML;
+  button.innerHTML = `
+    <span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+    <span>Đang chuyển thông tin tới showroom...</span>
+  `;
+
+  setTimeout(() => {
+    button.innerHTML = `
+      <span class="material-symbols-outlined text-[20px] text-emerald-300">verified</span>
+      <span>Đã gửi hồ sơ duyệt thành công!</span>
+    `;
+    button.classList.remove('bg-primary-container', 'hover:bg-primary');
+    button.classList.add('bg-emerald-700', 'text-white');
+
+    showToast('Đã chuyển hồ sơ #HN-7492 tới TVV! <div class="mt-2 flex gap-2"><button onclick="navigateToFlowStep(3, \'03_hang_doi_tvv.html\')" class="px-2 py-1 bg-white text-slate-900 rounded font-bold text-xs hover:bg-slate-100">Xem Hàng đợi TVV →</button><button onclick="navigateToFlowStep(2, \'02_lai_thu.html\')" class="px-2 py-1 bg-emerald-600 text-white rounded font-bold text-xs hover:bg-emerald-700">Đăng ký Lái thử →</button></div>');
+
+    setTimeout(() => {
+      button.innerHTML = originalHtml;
+      button.className = 'w-full py-3 px-4 rounded-lg bg-primary-container hover:bg-primary text-on-primary font-headline-lg text-[15px] font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-200 active:scale-[0.98] cursor-pointer group';
+      button.disabled = false;
+    }, 3500);
+  }, 800);
+}
+
+// Reusable Toast Notification
+let toastTimeout;
+function showToast(message, title = 'Thông báo hệ thống') {
+  const toast = document.getElementById('toast-notification');
+  const titleEl = document.getElementById('toast-title');
+  const msgEl = document.getElementById('toast-message');
+
+  titleEl.innerText = title;
+  msgEl.innerText = message;
+
+  clearTimeout(toastTimeout);
+  toast.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+  toast.classList.add('translate-y-0', 'opacity-100');
+
+  toastTimeout = setTimeout(() => {
+    toast.classList.remove('translate-y-0', 'opacity-100');
+    toast.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
+  }, 3200);
+}
+
+function escapeHtml(str) {
+  return str.replace(/[&<>'"]/g, 
+    tag => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;'
+    }[tag] || tag)
+  );
+}
+
+// Initial calculation run
+document.addEventListener('DOMContentLoaded', () => {
+  updateCalculations();
+});
+</script>
+<script>
+// Flow Navigation Bridge for VinFast EV Advisor (VFO2O-01)
+function navigateToFlowStep(step, fallbackUrl) {
+  if (window.parent && window.parent !== window) {
+    window.parent.postMessage({ type: 'NAVIGATE', step: step }, '*');
+  } else if (fallbackUrl) {
+    window.location.href = fallbackUrl;
+  }
+}
+</script>
+
+</body></html>

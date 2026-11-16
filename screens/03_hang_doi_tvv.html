@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_standard" name="shell-type"/>
+<title>VinFast O2O Advisor Portal - Hàng đợi Ticket</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body { margin:0; padding:0; }
+      body { overscroll-behavior:none; }
+      main > :first-child { margin-top:0!important; }
+      main > :last-child { margin-bottom:0!important; }
+    }
+    ::-webkit-scrollbar { display:none; }
+
+    /* Custom subtle keyframe animations for modern CRM dashboard */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+      }
+    }
+
+    @keyframes warningPulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.03);
+        opacity: 0.85;
+      }
+    }
+
+    .animate-fade-in-up {
+      animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .stagger-1 { animation-delay: 40ms; }
+    .stagger-2 { animation-delay: 90ms; }
+    .stagger-3 { animation-delay: 140ms; }
+    .stagger-4 { animation-delay: 190ms; }
+    .stagger-5 { animation-delay: 240ms; }
+    .stagger-6 { animation-delay: 290ms; }
+
+    /* Interactive row styling */
+    .ticket-row {
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+    .ticket-row::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background-color: transparent;
+      transition: background-color 0.2s ease;
+    }
+    .ticket-row:hover::before {
+      background-color: #0047c1;
+    }
+    .ticket-row:hover {
+      background-color: #f8fafc;
+      transform: translateY(-1px);
+      box-shadow: inset 0 -1px 0 rgba(226, 232, 240, 0.8);
+    }
+
+    /* Motion accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "error": "#ba1a1a",
+            "secondary": "#006c49",
+            "on-background": "#191b24",
+            "on-secondary-container": "#00714d",
+            "background": "#faf8ff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-highest": "#e1e1ee",
+            "surface-container-high": "#e7e7f3",
+            "primary-container": "#155eef",
+            "surface-container-low": "#f2f3ff",
+            "emerald-600": "#059669",
+            "on-primary": "#ffffff",
+            "on-secondary": "#ffffff",
+            "slate-50": "#F8FAFC",
+            "outline-variant": "#c3c6d8",
+            "on-secondary-fixed-variant": "#005236",
+            "slate-200": "#E2E8F0",
+            "primary-fixed": "#dbe1ff",
+            "surface-variant": "#e1e1ee",
+            "on-primary-container": "#e7eaff",
+            "surface-dim": "#d9d9e5",
+            "surface-bright": "#faf8ff",
+            "on-secondary-fixed": "#002113",
+            "on-tertiary-fixed-variant": "#812800",
+            "on-primary-fixed": "#00174b",
+            "on-primary-fixed-variant": "#003da9",
+            "on-surface": "#191b24",
+            "on-surface-variant": "#434655",
+            "surface-container": "#ededf9",
+            "rose-600": "#DC2626",
+            "primary-fixed-dim": "#b4c5ff",
+            "tertiary-fixed-dim": "#ffb59b",
+            "slate-500": "#64748B",
+            "amber-600": "#D97706",
+            "primary": "#0047c1",
+            "secondary-fixed-dim": "#4edea3",
+            "on-tertiary-container": "#ffe6de",
+            "slate-900": "#0F172A",
+            "secondary-container": "#6cf8bb",
+            "inverse-on-surface": "#f0f0fc",
+            "on-tertiary-fixed": "#380d00",
+            "slate-700": "#334155",
+            "on-error": "#ffffff",
+            "inverse-surface": "#2e3039",
+            "surface": "#faf8ff",
+            "tertiary-container": "#bd3f00",
+            "error-container": "#ffdad6",
+            "vinfast-blue": "#0F4C81",
+            "outline": "#737687",
+            "on-tertiary": "#ffffff",
+            "on-error-container": "#93000a",
+            "tertiary": "#943000",
+            "inverse-primary": "#b4c5ff",
+            "surface-tint": "#0052dc",
+            "secondary-fixed": "#6ffbbe",
+            "energy-emerald": "#10B981",
+            "tertiary-fixed": "#ffdbcf"
+          },
+          borderRadius: {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          spacing: {
+            "space-lg": "1.5rem",
+            "margin": "2rem",
+            "space-sm": "0.5rem",
+            "space-xs": "0.25rem",
+            "space-xl": "2.5rem",
+            "gutter": "1.5rem",
+            "space-md": "1rem"
+          },
+          fontFamily: {
+            "headline-lg-mobile": ["Geist"],
+            "section-title": ["Geist"],
+            "financial-metric": ["Geist"],
+            "citation": ["Geist"],
+            "body": ["Geist"],
+            "section-title-mobile": ["Geist"],
+            "headline-lg": ["Geist"]
+          },
+          fontSize: {
+            "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+            "section-title": ["24px", { "lineHeight": "1.3", "fontWeight": "700" }],
+            "financial-metric": ["30px", { "lineHeight": "1.2", "fontWeight": "600" }],
+            "citation": ["12px", { "lineHeight": "1.4", "fontWeight": "400" }],
+            "body": ["15px", { "lineHeight": "1.5", "fontWeight": "400" }],
+            "section-title-mobile": ["20px", { "lineHeight": "1.3", "fontWeight": "700" }],
+            "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.025em", "fontWeight": "600" }]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-slate-50 font-body text-body text-on-surface antialiased min-h-screen relative selection:bg-primary-container selection:text-white">
+<!-- Toast Notification Container -->
+<div class="fixed bottom-5 right-5 z-[9999] flex flex-col gap-2 pointer-events-none" id="toast-container"></div>
+<!-- Slide-in Drawer Modal for Workspace HITL -->
+<div class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-[9990] opacity-0 pointer-events-none transition-opacity duration-300" id="hitl-modal-backdrop"></div>
+<aside class="fixed top-0 right-0 w-full max-w-lg h-full bg-white z-[9995] shadow-2xl transform translate-x-full transition-transform duration-300 ease-out flex flex-col border-l border-slate-200" id="hitl-modal-drawer">
+<div class="p-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-700">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed text-[22px]">assignment_turned_in</span>
+<div>
+<h2 class="text-sm font-semibold text-white" id="modal-ticket-id">Hồ sơ Ticket #TK-1089</h2>
+<p class="text-xs text-slate-400">Workspace Phê duyệt HITL · VinFast O2O</p>
+</div>
+</div>
+<button class="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors" onclick="closeModal()">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-5 space-y-4">
+<div class="flex items-center justify-between bg-amber-50 p-3 rounded-lg border border-amber-200">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-amber-600 text-[20px]">hourglass_top</span>
+<span class="text-xs font-semibold text-amber-900">SLA cam kết: Phản hồi ≤ 60s</span>
+</div>
+<span class="px-2 py-0.5 rounded text-xs font-mono font-bold bg-amber-600 text-white" id="modal-sla-tag">38s còn lại</span>
+</div>
+<div class="border border-slate-200 rounded-lg p-3 bg-slate-50">
+<span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-2">Khách hàng O2O</span>
+<div class="flex items-center justify-between">
+<div class="text-sm font-bold text-slate-900" id="modal-customer-name">Nguyễn Văn A</div>
+<a class="text-xs font-mono text-primary flex items-center gap-1 font-semibold hover:underline" href="tel:0912888889">
+<span class="material-symbols-outlined text-[14px]">call</span> 0912 888 889
+          </a>
+</div>
+<div class="text-xs text-slate-500 mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">location_on</span> Cầu Giấy, Hà Nội
+        </div>
+<div class="text-xs text-slate-600 mt-2 bg-white p-2 rounded border border-slate-200">
+          Nhu cầu: Di chuyển 30km/ngày · Sạc tại chung cư · Đổi xe xăng cũ lấy ưu đãi Green O2O.
+        </div>
+</div>
+<div class="border border-slate-200 rounded-lg p-3">
+<span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-2">Cấu hình &amp; Dự toán đề xuất</span>
+<div class="flex justify-between items-center text-sm font-semibold text-slate-900 pb-2 border-b border-slate-100">
+<span id="modal-vehicle-name">VinFast VF 6 Comfort (2026)</span>
+<span class="text-primary font-mono text-base font-bold">742.500.000 đ</span>
+</div>
+<div class="grid grid-cols-2 gap-2 text-xs pt-2 text-slate-600">
+<div>Giá lăn bánh dự kiến:</div>
+<div class="text-right font-medium text-slate-900">~ 665.000.000 đ</div>
+<div>Gói hỗ trợ trả góp:</div>
+<div class="text-right font-medium text-emerald-600">12.08 tr/tháng</div>
+<div>Catalog chính sách:</div>
+<div class="text-right font-mono text-slate-800">Catalog v1.0.2</div>
+</div>
+</div>
+<div class="bg-blue-50/70 border border-blue-200 rounded-lg p-3 text-xs text-slate-700">
+<div class="font-semibold text-primary mb-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">verified_user</span> Xác thực biểu phí tự động (HITL)
+        </div>
+        Bảng giá đã khớp phụ lục khuyến mại HN-04. TVV cần xác nhận gửi báo giá hoặc mời lái thử trực tiếp.
+      </div>
+</div>
+<div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center gap-2">
+<button class="flex-1 py-2.5 px-4 bg-primary text-white hover:bg-primary-container rounded-lg font-semibold text-sm transition-all shadow-sm flex items-center justify-center gap-1.5 active:scale-[0.98]" onclick="approveTicket()">
+<span class="material-symbols-outlined text-[18px]">check</span> Phê duyệt &amp; Gửi Zalo OA
+      </button>
+<button class="py-2.5 px-3 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-lg text-sm font-medium transition-colors" onclick="closeModal()">
+        Đóng
+      </button>
+</div>
+</aside>
+<!-- Top Navigation Header -->
+<header class="fixed top-0 left-0 w-full z-50 bg-slate-900 border-b border-slate-700/80 shadow-sm">
+<div class="h-16 w-full px-gutter flex items-center justify-between">
+<div class="flex items-center gap-space-md">
+<div class="flex items-center justify-center w-9 h-9 rounded-lg bg-primary-container text-on-primary shadow-sm hover:scale-105 transition-transform cursor-pointer">
+<span class="material-symbols-outlined text-[22px]">electric_bolt</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="text-white font-semibold text-sm tracking-tight">VinFast O2O Advisor Portal</span>
+<span class="text-slate-500 text-xs">·</span>
+<span class="text-slate-300 text-xs font-medium">Showroom Cầu Giấy</span>
+<span class="ml-space-xs px-2 py-0.5 rounded text-[11px] font-medium bg-slate-700 text-slate-200 border border-slate-500/40">Portal TVV v1.2</span>
+</div>
+</div>
+</div>
+<nav class="hidden xl:flex items-center gap-space-xs" data-active-classes="bg-primary-container text-on-primary font-medium rounded-lg">
+<a aria-current="page" class="px-3 py-1.5 transition-colors bg-primary-container text-on-primary font-medium rounded-lg shadow-xs" data-path="hang-doi-ticket" href="#">Hàng đợi Ticket</a>
+<a class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700 transition-colors font-body text-body text-sm" data-path="lich-hen-lai-thu" href="#">Lịch hẹn Lái thử</a>
+<a class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700 transition-colors font-body text-body text-sm" data-path="khach-hang-o2o" href="#">Khách hàng O2O</a>
+<a class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700 transition-colors font-body text-body text-sm" data-path="bang-gia-va-catalog-xe" href="#">Bảng giá &amp; Catalog xe</a>
+<a class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700 transition-colors font-body text-body text-sm" data-path="bao-cao-sla" href="#">Báo cáo SLA</a>
+</nav>
+<div class="flex items-center gap-space-md">
+<div class="flex items-center gap-space-sm pl-space-md border-l border-slate-700">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center font-semibold text-xs text-on-primary tracking-wider ring-2 ring-primary/40">LVB</div>
+<div class="flex flex-col text-left">
+<span class="text-white text-xs font-semibold leading-tight">Lê Văn B (TVV-HN01)</span>
+<div class="flex items-center gap-1.5 mt-0.5">
+<span class="w-2 h-2 rounded-full bg-energy-emerald animate-pulse"></span>
+<span class="text-[11px] text-slate-300 font-medium leading-none">Đang trực tuyến</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<a class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors" data-path="chuyen-phien" href="#" title="Chuyển phiên">
+<span class="material-symbols-outlined text-[18px]">sync_alt</span>
+</a>
+<a class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors" data-path="dang-xuat" href="#" title="Đăng xuất">
+<span class="material-symbols-outlined text-[18px]">logout</span>
+</a>
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center ml-space-xs cursor-pointer hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+</div>
+</div>
+</div>
+</div>
+</header>
+<main class="w-full pt-16 bg-slate-50 min-h-screen">
+<div class="flex flex-col w-full">
+<!-- Interactive Top Broadcast & Realtime Bar -->
+<section class="w-full bg-slate-900 text-white px-gutter py-2 flex flex-wrap items-center justify-between gap-space-sm text-xs border-b border-slate-700 transition-colors">
+<div class="flex items-center gap-space-sm">
+<nav class="flex items-center gap-1.5 font-citation text-citation text-slate-300">
+<span class="hover:text-white cursor-pointer transition-colors">Bàn làm việc TVV</span>
+<span class="text-slate-500">/</span>
+<span class="text-white font-medium">Hàng đợi Ticket &amp; Yêu cầu O2O</span>
+</nav>
+<span class="hidden md:inline text-slate-600">|</span>
+<div class="hidden md:flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 text-[11px] shadow-inner">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-energy-emerald opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-energy-emerald"></span>
+</span>
+<span class="font-medium tracking-tight">WebSocket Cầu Giấy (NODE-HN04)</span>
+</div>
+</div>
+<div class="flex items-center gap-space-md">
+<div class="flex items-center gap-2 text-slate-300">
+<span class="material-symbols-outlined text-[15px] text-energy-emerald animate-spin" style="animation-duration: 6s;">sync</span>
+<span class="font-citation text-citation">Cập nhật tức thì: <strong class="text-white font-mono" id="live-clock">6:58:48 PM</strong></span>
+</div>
+<div class="flex items-center gap-1.5 bg-slate-800 px-2 py-0.5 rounded text-[11px] text-slate-300 border border-slate-700">
+<span class="material-symbols-outlined text-[13px] text-amber-600">timer</span>
+<span>SLA P0: ≤60s</span>
+</div>
+</div>
+</section>
+<!-- Main Viewport Canvas -->
+<div class="w-full px-gutter py-space-md flex flex-col gap-space-md">
+<!-- Header Panel & Quick Global Actions -->
+<header class="animate-fade-in-up stagger-1 flex flex-col lg:flex-row lg:items-center justify-between gap-space-md bg-surface-container-lowest p-space-md rounded-xl shadow-sm border border-slate-200">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-space-xs">
+<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-primary-fixed text-on-primary-fixed uppercase tracking-wider">O2O Dispatch Engine</span>
+<span class="px-2 py-0.5 rounded text-[11px] font-medium bg-surface-container text-on-surface-variant">Chi nhánh 01 · Cầu Giấy</span>
+</div>
+<h1 class="font-section-title text-section-title text-on-surface tracking-tight">Hàng đợi Ticket Tư vấn &amp; Dự toán</h1>
+<p class="font-body text-body text-slate-500 text-sm max-w-3xl">
+              Quản lý yêu cầu dự toán TCO, duyệt giá lăn bánh và xác nhận lịch hẹn lái thử từ khách hàng trực tuyến tại Hà Nội. Đảm bảo cam kết phản hồi trong 60 giây.
+            </p>
+</div>
+<!-- Action Bar -->
+<div class="flex flex-wrap items-center gap-space-xs">
+<button class="inline-flex items-center gap-1.5 px-3 py-2 bg-surface-container-lowest border border-slate-300 hover:bg-slate-100 hover:border-slate-400 active:scale-[0.98] text-slate-700 rounded-lg text-sm font-medium transition-all shadow-sm" id="btn-export-excel" onclick="handleExportExcel()">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span id="export-excel-text">Xuất Excel</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-3 py-2 bg-surface-container-lowest border border-slate-300 hover:bg-slate-100 hover:border-slate-400 active:scale-[0.98] text-slate-700 rounded-lg text-sm font-medium transition-all shadow-sm" id="btn-refresh" onclick="handleRefreshData()" title="Phím tắt: F5">
+<span class="material-symbols-outlined text-[18px] text-slate-500 transition-transform duration-500" id="refresh-icon">refresh</span>
+<span>Làm mới (F5)</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary-container text-on-primary hover:bg-primary active:scale-[0.98] rounded-lg text-sm font-semibold transition-all shadow-sm hover:shadow" onclick="handleManualTicket()">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+<span>Tạo ticket thủ công (+)</span>
+</button>
+</div>
+</header>
+<!-- KPI Metric Cards Grid -->
+<section aria-label="Chỉ số vận hành SLA" class="animate-fade-in-up stagger-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
+<!-- Metric 1: Pending Tickets -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl border border-amber-200/90 shadow-sm relative overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow">
+<div class="absolute top-0 left-0 w-1.5 h-full bg-amber-600"></div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Chờ duyệt giá &amp; TCO</span>
+<span class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 font-semibold text-xs border border-amber-200">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse"></span>
+                +1 mới nhận
+              </span>
+</div>
+<div class="my-space-xs flex items-baseline gap-2">
+<span class="font-financial-metric text-financial-metric text-slate-900" id="kpi-pending-count">3</span>
+<span class="text-sm font-medium text-slate-500">ticket</span>
+</div>
+<div class="flex items-center justify-between text-xs pt-2 border-t border-slate-100">
+<span class="text-amber-600 font-medium flex items-center gap-1" id="kpi-sla-container">
+<span class="material-symbols-outlined text-[14px]">hourglass_top</span>
+<span id="kpi-sla-countdown">SLA phản hồi: Còn 42 giây</span>
+</span>
+<span class="font-mono text-slate-400">P0</span>
+</div>
+</div>
+<!-- Metric 2: Approved Today -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between">
+<span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Đã duyệt hôm nay</span>
+<span class="inline-flex items-center gap-0.5 text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+                +25%
+              </span>
+</div>
+<div class="my-space-xs flex items-baseline gap-2">
+<span class="font-financial-metric text-financial-metric text-slate-900">12</span>
+<span class="text-sm font-medium text-slate-500">ticket hoàn tất</span>
+</div>
+<div class="flex items-center justify-between text-xs pt-2 border-t border-slate-100">
+<span class="text-slate-600 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-emerald-600">verified</span>
+                100% đúng hạn catalog v1.0.2
+              </span>
+<span class="font-citation text-slate-400">Hôm nay</span>
+</div>
+</div>
+<!-- Metric 3: Test-drive Appointments -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between">
+<span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Yêu cầu lái thử O2O</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-primary-fixed text-primary">
+                5 lịch hẹn
+              </span>
+</div>
+<div class="my-space-xs flex items-baseline gap-2">
+<span class="font-financial-metric text-financial-metric text-slate-900">5</span>
+<span class="text-sm font-medium text-slate-500">khách hàng</span>
+</div>
+<div class="flex items-center justify-between text-xs pt-2 border-t border-slate-100">
+<span class="text-slate-600 truncate">3 sáng, 2 chiều · Cầu Giấy &amp; Tây Mỗ</span>
+<span class="material-symbols-outlined text-[16px] text-slate-400">directions_car</span>
+</div>
+</div>
+<!-- Metric 4: Median Response SLA -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between">
+<span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Thời gian duyệt trung vị</span>
+<span class="inline-flex items-center gap-1 text-xs font-semibold text-energy-emerald bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                Đạt chuẩn
+              </span>
+</div>
+<div class="my-space-xs flex items-baseline gap-2">
+<span class="font-financial-metric text-financial-metric text-emerald-600">48</span>
+<span class="text-sm font-medium text-slate-500">giây/ticket</span>
+</div>
+<div class="flex items-center justify-between text-xs pt-2 border-t border-slate-100">
+<span class="text-slate-500">Mục tiêu SLA: ≤ 60s cam kết</span>
+<span class="font-mono text-xs text-slate-400">p50 = 48s</span>
+</div>
+</div>
+</section>
+<!-- Filter, Search and Segmented Controls -->
+<div class="animate-fade-in-up stagger-3 bg-surface-container-lowest p-space-sm rounded-xl border border-slate-200 shadow-sm flex flex-col gap-space-sm">
+<div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-space-sm">
+<!-- Search bar with keyboard shortcut -->
+<div class="relative flex-1 min-w-[280px]">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
+<input class="w-full pl-10 pr-12 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all" id="ticket-search-input" oninput="handleSearchFilter(this.value)" placeholder="Tìm theo mã ticket (#TK-...), tên khách hàng hoặc SĐT..." type="text"/>
+<button class="absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[11px] font-mono font-medium text-slate-400 bg-white border border-slate-200 rounded hover:border-slate-400 transition-colors" onclick="focusSearch()" title="Bấm ⌘K để tìm nhanh">⌘K</button>
+</div>
+<!-- Secondary Filters Dropdown Group -->
+<div class="flex flex-wrap items-center gap-space-xs">
+<div class="relative flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 hover:border-slate-300 transition-colors">
+<span class="material-symbols-outlined text-[16px] text-slate-500">directions_car</span>
+<span class="text-slate-500">Dòng xe:</span>
+<select class="bg-transparent font-medium text-slate-800 focus:outline-none cursor-pointer pr-1" id="vehicle-filter" onchange="handleVehicleFilter(this.value)">
+<option value="all">Tất cả xe (VF 3 - VF 9)</option>
+<option value="vf3">VF 3</option>
+<option value="vf5">VF 5 Plus</option>
+<option selected="" value="vf6">VF 6</option>
+<option value="vf7">VF 7</option>
+<option value="vf8">VF 8</option>
+<option value="vf9">VF 9</option>
+</select>
+</div>
+<div class="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 hover:border-slate-300 transition-colors">
+<span class="material-symbols-outlined text-[16px] text-slate-500">calendar_today</span>
+<span class="text-slate-500">Thời gian:</span>
+<select class="bg-transparent font-medium text-slate-800 focus:outline-none cursor-pointer pr-1">
+<option selected="" value="today">Hôm nay (13/11/2026)</option>
+<option value="yesterday">Hôm qua</option>
+<option value="7days">7 ngày qua</option>
+<option value="custom">Tùy chọn...</option>
+</select>
+</div>
+<button class="p-2 border border-slate-200 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors active:scale-95" onclick="showToast('Đang mở bộ lọc đa tiêu chí chi nhánh', 'info')" title="Lọc nâng cao">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+</div>
+</div>
+<!-- Segmented Status Tabs -->
+<div class="flex items-center gap-1 overflow-x-auto pb-1 text-xs border-t border-slate-100 pt-2" id="filter-tabs">
+<button class="filter-tab px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-medium whitespace-nowrap transition-all duration-150" onclick="setFilter('all', this)">
+              Tất cả <span class="ml-1 text-slate-400 font-mono">20</span>
+</button>
+<button class="filter-tab active-tab px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-700 border border-amber-300 font-semibold whitespace-nowrap flex items-center gap-1.5 transition-all duration-150 shadow-xs" onclick="setFilter('pending', this)">
+<span class="w-2 h-2 rounded-full bg-amber-600"></span>
+              Chờ duyệt <span class="ml-0.5 px-1.5 py-0.2 rounded-full bg-amber-600 text-white text-[11px] font-bold">3</span>
+</button>
+<button class="filter-tab px-3 py-1.5 rounded-lg text-rose-700 hover:bg-rose-50 border border-rose-200 font-medium whitespace-nowrap flex items-center gap-1 transition-all duration-150" onclick="setFilter('recalc', this)">
+<span class="material-symbols-outlined text-[14px] text-rose-600">warning</span>
+              Cần tính lại (Đổi giá v2) <span class="ml-1 font-mono font-bold text-rose-700">1</span>
+</button>
+<button class="filter-tab px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-medium whitespace-nowrap transition-all duration-150" onclick="setFilter('sent', this)">
+              Đã gửi dự toán <span class="ml-1 text-slate-400 font-mono">14</span>
+</button>
+<button class="filter-tab px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-medium whitespace-nowrap transition-all duration-150" onclick="setFilter('testdrive', this)">
+              Lái thử chờ gán xe <span class="ml-1 text-slate-400 font-mono">2</span>
+</button>
+</div>
+</div>
+<!-- Main Ticket Data Table (High Density WCAG Compliant) -->
+<div class="animate-fade-in-up stagger-4 bg-surface-container-lowest rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+<div class="overflow-x-auto w-full">
+<table class="w-full text-left border-collapse" id="ticket-table">
+<thead>
+<tr class="bg-slate-100/80 border-b border-slate-200 text-slate-600 font-citation text-citation uppercase tracking-wider">
+<th class="py-3 px-4 font-semibold" scope="col">Mã Ticket</th>
+<th class="py-3 px-4 font-semibold" scope="col">Thời gian</th>
+<th class="py-3 px-4 font-semibold" scope="col">Thông tin khách hàng</th>
+<th class="py-3 px-4 font-semibold" scope="col">Mẫu xe &amp; Cấu hình</th>
+<th class="py-3 px-4 font-semibold text-right" scope="col">Tổng dự toán (TCO)</th>
+<th class="py-3 px-4 font-semibold" scope="col">Phiên bản Catalog</th>
+<th class="py-3 px-4 font-semibold" scope="col">Trạng thái SLA</th>
+<th class="py-3 px-4 font-semibold text-center" scope="col">Hành động</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200 text-sm font-body" id="ticket-tbody">
+<!-- ROW 1: Chờ duyệt (High Priority SLA Alert) -->
+<tr class="ticket-row bg-amber-50/40 hover:bg-amber-50/70 transition-colors group" data-customer="Nguyễn Văn A" data-id="#TK-1089" data-status="pending" data-vehicle="vf6">
+<!-- Ticket Code -->
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-1.5">
+<a class="font-mono font-bold text-primary hover:underline text-sm tracking-tight ticket-id-link" href="javascript:void(0)" onclick="openApprovalModal('#TK-1089', 'Nguyễn Văn A', '0912 *** 889', 'VinFast VF 6 Comfort', '742.500.000 đ')">#TK-1089</a>
+<span class="px-1.5 py-0.5 text-[10px] font-bold uppercase rounded bg-rose-600 text-white tracking-wide animate-pulse">Ưu tiên cao</span>
+</div>
+<span class="text-xs text-slate-500 font-mono">Web O2O HN</span>
+</div>
+</td>
+<!-- Timestamp -->
+<td class="py-3.5 px-4 align-top whitespace-nowrap">
+<div class="flex flex-col">
+<span class="font-semibold text-slate-900 text-xs">2 phút trước</span>
+<span class="text-slate-500 text-xs font-mono">10:16 AM</span>
+</div>
+</td>
+<!-- Customer Info -->
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-semibold text-slate-900 customer-name-cell">Nguyễn Văn A</span>
+<span class="text-xs text-slate-400">·</span>
+<span class="font-mono text-xs text-slate-600">0912 *** 889</span>
+</div>
+<div class="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-slate-400">location_on</span>
+<span>Cầu Giấy, Hà Nội</span>
+</div>
+<div class="mt-1 flex items-center gap-1 text-[11px] text-slate-600 bg-white/80 px-2 py-0.5 rounded border border-slate-200 w-fit">
+<span class="material-symbols-outlined text-[13px] text-primary">commute</span>
+<span>30km/ngày · Sạc tại chung cư</span>
+</div>
+</div>
+</td>
+<!-- Vehicle Proposed -->
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col">
+<span class="font-semibold text-slate-900">VinFast VF 6 Comfort</span>
+<span class="text-xs text-slate-600">Ngoại thất Xanh ánh kim (2026)</span>
+<div class="flex items-center gap-1 text-[11px] text-slate-500 mt-1">
+<span class="bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">5 chỗ</span>
+<span class="bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">Pin LFP 60 kWh</span>
+</div>
+</div>
+</td>
+<!-- Total TCO Estimate -->
+<td class="py-3.5 px-4 align-top text-right whitespace-nowrap">
+<div class="flex flex-col items-end">
+<span class="font-mono font-bold text-slate-900 text-base">742.500.000 đ</span>
+<span class="text-xs text-slate-500">Lăn bánh: ~665 tr</span>
+<span class="text-[11px] font-medium text-emerald-600">Góp: 12.08 tr/tháng</span>
+</div>
+</td>
+<!-- Catalog Version / Source Citation -->
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col gap-1 items-start">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono font-medium bg-slate-100 text-slate-700 border border-slate-300">
+<span class="material-symbols-outlined text-[13px] text-emerald-600">check_circle</span>
+                        Catalog v1.0.2
+                      </span>
+<button class="text-[11px] text-primary hover:underline font-citation flex items-center gap-0.5" onclick="showToast('Nguồn giá: Phụ lục chính sách bán hàng HN số S01 áp dụng từ 13/11/2026', 'info')" title="Chính sách giá áp dụng từ 13/11/2026">
+<span>[Nguồn: S01 · 13/11/2026]</span>
+<span class="material-symbols-outlined text-[12px]">info</span>
+</button>
+</div>
+</td>
+<!-- Status with SLA Timer countdown -->
+<td class="py-3.5 px-4 align-top whitespace-nowrap">
+<div class="flex flex-col gap-1">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300">
+<span class="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
+                        Chờ duyệt
+                      </span>
+<span class="text-[11px] font-mono text-amber-700 font-semibold flex items-center gap-1 transition-all duration-300" id="ticket-sla-countdown">
+<span class="material-symbols-outlined text-[13px]">alarm</span>
+<span id="ticket-sla-seconds-text">Còn 38s trong SLA</span>
+</span>
+</div>
+</td>
+<!-- Actions -->
+<td class="py-3.5 px-4 align-top text-center whitespace-nowrap">
+<div class="flex items-center justify-center gap-1">
+<button class="group/btn inline-flex items-center gap-1 px-3 py-1.5 bg-primary text-on-primary hover:bg-primary-container active:scale-[0.97] text-xs font-semibold rounded-lg shadow-sm transition-all" onclick="openApprovalModal('#TK-1089', 'Nguyễn Văn A', '0912 *** 889', 'VinFast VF 6 Comfort', '742.500.000 đ')">
+<span>Mở duyệt nhanh</span>
+<span class="material-symbols-outlined text-[15px] group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<button class="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors" onclick="showToast('Thao tác mở rộng cho ticket #TK-1089', 'info')" title="Thao tác khác">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 2: Warning - Cần tính lại do đổi catalog -->
+<tr class="ticket-row hover:bg-slate-50 transition-colors" data-customer="Trần Thị C" data-id="#TK-1084" data-status="recalc" data-vehicle="vf5">
+<!-- Ticket Code -->
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col gap-1">
+<a class="font-mono font-bold text-primary hover:underline text-sm ticket-id-link" href="javascript:void(0)" onclick="openApprovalModal('#TK-1084', 'Trần Thị C', '0988 *** 231', 'VinFast VF 5 Plus', '558.000.000 đ')">#TK-1084</a>
+<span class="text-xs text-slate-500 font-mono">App VinFast</span>
+</div>
+</td>
+<!-- Timestamp -->
+<td class="py-3.5 px-4 align-top whitespace-nowrap">
+<div class="flex flex-col">
+<span class="font-medium text-slate-700 text-xs">15 phút trước</span>
+<span class="text-slate-400 text-xs font-mono">10:03 AM</span>
+</div>
+</td>
+<!-- Customer Info -->
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-semibold text-slate-900 customer-name-cell">Trần Thị C</span>
+<span class="text-xs text-slate-400">·</span>
+<span class="font-mono text-xs text-slate-600">0988 *** 231</span>
+</div>
+<div class="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-slate-400">location_on</span>
+<span>Hà Đông, Hà Nội</span>
+</div>
+<span class="text-[11px] text-slate-400 mt-0.5">Khách hỏi mua đứt kèm pin</span>
+</div>
+</td>
+<!-- Vehicle Proposed -->
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col">
+<span class="font-semibold text-slate-900">VinFast VF 5 Plus</span>
+<span class="text-xs text-slate-600">Gói kèm pin · Trắng ngọc trai</span>
+<div class="flex items-center gap-1 text-[11px] text-slate-500 mt-1">
+<span class="bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">Đô thị A-SUV</span>
+</div>
+</div>
+</td>
+<!-- Total TCO Estimate -->
+<td class="py-3.5 px-4 align-top text-right whitespace-nowrap">
+<div class="flex flex-col items-end">
+<span class="font-mono font-bold text-slate-900 text-base" id="row2-price">558.000.000 đ</span>
+<span class="text-xs text-rose-600 font-medium" id="row2-note">Chênh lệch giá v2</span>
+</div>
+</td>
+<!-- Catalog Version Warning -->
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col gap-1 items-start" id="row2-catalog-container">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono font-medium bg-rose-50 text-rose-700 border border-rose-300">
+<span class="material-symbols-outlined text-[13px] text-rose-600">warning</span>
+                        Catalog v1 (Hết hạn)
+                      </span>
+<span class="text-[11px] text-slate-500">Đã ra bản v1.0.2</span>
+</div>
+</td>
+<!-- Status -->
+<td class="py-3.5 px-4 align-top whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200" id="row2-status">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
+                      Cần tính lại
+                    </span>
+</td>
+<!-- Actions -->
+<td class="py-3.5 px-4 align-top text-center whitespace-nowrap">
+<button class="inline-flex items-center gap-1 px-3 py-1.5 bg-amber-50 border border-amber-300 text-amber-800 hover:bg-amber-100 active:scale-[0.98] text-xs font-semibold rounded-lg transition-all shadow-xs" id="btn-recalc-row2" onclick="handleRecalculateRow2(this)">
+<span class="material-symbols-outlined text-[14px]">sync_alt</span>
+<span>Cập nhật v2 &amp; Tính lại</span>
+</button>
+</td>
+</tr>
+<!-- ROW 3: Completed / Đã gửi dự toán -->
+<tr class="ticket-row hover:bg-slate-50 transition-colors" data-customer="Hoàng Minh D" data-id="#TK-1075" data-status="sent" data-vehicle="vf7">
+<!-- Ticket Code -->
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col gap-1">
+<a class="font-mono font-bold text-primary hover:underline text-sm ticket-id-link" href="javascript:void(0)" onclick="openApprovalModal('#TK-1075', 'Hoàng Minh D', '0904 *** 552', 'VinFast VF 7 Eco', '890.000.000 đ')">#TK-1075</a>
+<span class="text-xs text-slate-500 font-mono">Zalo OA O2O</span>
+</div>
+</td>
+<!-- Timestamp -->
+<td class="py-3.5 px-4 align-top whitespace-nowrap">
+<div class="flex flex-col">
+<span class="font-medium text-slate-700 text-xs">1 giờ trước</span>
+<span class="text-slate-400 text-xs font-mono">09:15 AM</span>
+</div>
+</td>
+<!-- Customer Info -->
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-semibold text-slate-900 customer-name-cell">Hoàng Minh D</span>
+<span class="text-xs text-slate-400">·</span>
+<span class="font-mono text-xs text-slate-600">0904 *** 552</span>
+</div>
+<div class="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-slate-400">location_on</span>
+<span>Nam Từ Liêm, Hà Nội</span>
+</div>
+</div>
+</td>
+<!-- Vehicle Proposed -->
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col">
+<span class="font-semibold text-slate-900">VinFast VF 7 Eco</span>
+<span class="text-xs text-slate-600">Pin 75 kWh · Xám Bạc</span>
+</div>
+</td>
+<!-- Total TCO Estimate -->
+<td class="py-3.5 px-4 align-top text-right whitespace-nowrap">
+<div class="flex flex-col items-end">
+<span class="font-mono font-bold text-slate-900 text-base">890.000.000 đ</span>
+<span class="text-xs text-slate-500">Vay ưu đãi 70%</span>
+</div>
+</td>
+<!-- Catalog Version -->
+<td class="py-3.5 px-4 align-top">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                      Catalog v1.0.2
+                    </span>
+</td>
+<!-- Status -->
+<td class="py-3.5 px-4 align-top whitespace-nowrap">
+<div class="flex flex-col gap-0.5">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="material-symbols-outlined text-[13px]">check_circle</span>
+                        Đã gửi dự toán
+                      </span>
+<span class="text-[11px] text-slate-400">Đã mở qua Zalo</span>
+</div>
+</td>
+<!-- Actions -->
+<td class="py-3.5 px-4 align-top text-center whitespace-nowrap">
+<button class="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 active:scale-[0.98] text-slate-700 text-xs font-semibold rounded-lg transition-all shadow-xs" onclick="showToast('Đang tải bản xem trước dự toán #TK-1075 (PDF/Web)', 'info')">
+<span class="material-symbols-outlined text-[14px] text-slate-500">visibility</span>
+<span>Xem lại dự toán</span>
+</button>
+</td>
+</tr>
+<!-- ROW 4: Test Drive Coordinated -->
+<tr class="ticket-row hover:bg-slate-50 transition-colors" data-customer="Lê Hoàng Y" data-id="#TK-1068" data-status="testdrive" data-vehicle="vf6">
+<!-- Ticket Code -->
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col gap-1">
+<a class="font-mono font-bold text-primary hover:underline text-sm ticket-id-link" href="javascript:void(0)" onclick="openApprovalModal('#TK-1068', 'Lê Hoàng Y', '0936 *** 714', 'VinFast VF 6 Comfort', '742.500.000 đ')">#TK-1068</a>
+<span class="text-xs text-slate-500 font-mono">Web Booking</span>
+</div>
+</td>
+<!-- Timestamp -->
+<td class="py-3.5 px-4 align-top whitespace-nowrap">
+<div class="flex flex-col">
+<span class="font-medium text-slate-700 text-xs">1.5 giờ trước</span>
+<span class="text-slate-400 text-xs font-mono">08:45 AM</span>
+</div>
+</td>
+<!-- Customer Info -->
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-semibold text-slate-900 customer-name-cell">Lê Hoàng Y</span>
+<span class="text-xs text-slate-400">·</span>
+<span class="font-mono text-xs text-slate-600">0936 *** 714</span>
+</div>
+<div class="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-slate-400">location_on</span>
+<span>Tây Mỗ, Nam Từ Liêm</span>
+</div>
+</div>
+</td>
+<!-- Vehicle Proposed -->
+<td class="py-3.5 px-4 align-top">
+<div class="flex flex-col">
+<span class="font-semibold text-slate-900">VinFast VF 6 Comfort</span>
+<span class="text-xs text-slate-500">Xe lái thử: Biển số 30K-882.11</span>
+</div>
+</td>
+<!-- Total TCO Estimate -->
+<td class="py-3.5 px-4 align-top text-right whitespace-nowrap">
+<div class="flex flex-col items-end">
+<span class="font-mono font-bold text-slate-900 text-base">742.500.000 đ</span>
+<span class="text-xs text-slate-400">Đã chốt cấu hình</span>
+</div>
+</td>
+<!-- Schedule Badge -->
+<td class="py-3.5 px-4 align-top">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-primary border border-blue-200">
+<span class="material-symbols-outlined text-[13px]">event</span>
+                      Lịch: T7, 21/11 (09:00)
+                    </span>
+</td>
+<!-- Status -->
+<td class="py-3.5 px-4 align-top whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-800 border border-blue-200">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                      Đã điều phối xe lái
+                    </span>
+</td>
+<!-- Actions -->
+<td class="py-3.5 px-4 align-top text-center whitespace-nowrap">
+<button class="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 active:scale-[0.98] text-slate-700 text-xs font-semibold rounded-lg transition-all shadow-xs" onclick="showToast('Chi tiết xe VF 6 (30K-882.11) và lộ trình thử tại Tây Mỗ đã sẵn sàng', 'info')">
+<span class="material-symbols-outlined text-[14px] text-slate-500">assignment</span>
+<span>Chi tiết lịch hẹn</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Bottom Pagination & Realtime Status Bar -->
+<footer class="p-space-sm bg-slate-50 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-space-sm text-xs text-slate-500">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-emerald-600">hub</span>
+<span id="pagination-info">Hiển thị <strong>1 - 4</strong> của <strong>20</strong> tickets · Tự động gán theo showroom Cầu Giấy (Hà Nội)</span>
+</div>
+<div class="flex items-center gap-space-md">
+<!-- Rows per page selector -->
+<div class="flex items-center gap-1.5">
+<span>Hiển thị:</span>
+<select class="bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-700 focus:outline-none">
+<option value="10">10 / trang</option>
+<option selected="" value="20">20 / trang</option>
+<option value="50">50 / trang</option>
+</select>
+</div>
+<!-- Pagination buttons -->
+<div class="inline-flex items-center -space-x-px rounded-md shadow-sm">
+<button class="px-2.5 py-1.5 rounded-l-md border border-slate-300 bg-white text-slate-400 hover:bg-slate-100 disabled:opacity-50 cursor-not-allowed" disabled="">
+                  Trước
+                </button>
+<button class="px-3 py-1.5 border border-primary-container bg-primary-container text-white font-semibold">
+                  1
+                </button>
+<button class="px-3 py-1.5 border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 transition-colors" onclick="showToast('Chuyển sang trang 2', 'info')">
+                  2
+                </button>
+<button class="px-3 py-1.5 border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 transition-colors" onclick="showToast('Chuyển sang trang 3', 'info')">
+                  3
+                </button>
+<button class="px-3 py-1.5 border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 transition-colors" onclick="showToast('Chuyển sang trang 4', 'info')">
+                  4
+                </button>
+<button class="px-3 py-1.5 border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 transition-colors" onclick="showToast('Chuyển sang trang 5', 'info')">
+                  5
+                </button>
+<button class="px-2.5 py-1.5 rounded-r-md border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 transition-colors" onclick="showToast('Chuyển sang trang tiếp theo', 'info')">
+                  Sau
+                </button>
+</div>
+</div>
+</footer>
+</div>
+<!-- Quick Info Banner for Advisor on Duty -->
+<div class="animate-fade-in-up stagger-5 p-space-sm bg-blue-50/70 border border-blue-200 rounded-lg flex items-start gap-space-sm text-xs text-slate-700 shadow-xs">
+<span class="material-symbols-outlined text-[20px] text-primary shrink-0 mt-0.5">info</span>
+<div class="flex-1">
+<span class="font-semibold text-primary">Lưu ý TVV ca trực:</span>
+<span class="ml-1">
+              Theo quy chế O2O VinFast 2026, mọi yêu cầu dự toán sơ bộ có dấu hiệu chênh lệch biểu phí hoặc thay đổi chính sách từ Phòng Bán Hàng vùng Hà Nội phải được phê duyệt hoặc đối soát trong vòng tối đa <strong>60 giây</strong> kể từ khi ticket được gán.
+            </span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="w-full bg-surface-container-lowest border-t border-slate-200 py-space-sm">
+<div class="w-full px-gutter flex flex-col sm:flex-row items-center justify-between gap-2 font-citation text-citation text-slate-500">
+<div>Hệ thống Điều phối &amp; Bán hàng Đa kênh VinFast O2O · Chi nhánh Cầu Giấy (Hà Nội)</div>
+<div>Hỗ trợ kỹ thuật Showroom: 1900 23 23 89 · Phiên bản hạ tầng 2026.4</div>
+</div>
+</footer>
+<!-- Vanilla JavaScript for Realtime Interactions & State Management -->
+<script>
+    // --- 1. Dynamic Live Clock ---
+    (function updateLiveClock() {
+      const clockElement = document.getElementById('live-clock');
+      if (clockElement) {
+        const now = new Date();
+        clockElement.textContent = now.toLocaleTimeString('en-US', { hour12: true });
+      }
+      setTimeout(updateLiveClock, 1000);
+    })();
+
+    // --- 2. Dynamic SLA Countdown Timers (Active tick down) ---
+    let ticketSeconds = 38;
+    let kpiSeconds = 42;
+
+    const timerInterval = setInterval(() => {
+      // Ticket 1089 countdown
+      const ticketEl = document.getElementById('ticket-sla-seconds-text');
+      const ticketContainer = document.getElementById('ticket-sla-countdown');
+      const modalSlaTag = document.getElementById('modal-sla-tag');
+
+      if (ticketSeconds > 0) {
+        ticketSeconds--;
+        if (ticketEl) ticketEl.textContent = `Còn ${ticketSeconds}s trong SLA`;
+        if (modalSlaTag) modalSlaTag.textContent = `${ticketSeconds}s còn lại`;
+
+        if (ticketSeconds <= 20 && ticketContainer) {
+          ticketContainer.classList.add('text-rose-600', 'animate-pulse');
+          ticketContainer.classList.remove('text-amber-700');
+        }
+      } else {
+        if (ticketEl) ticketEl.textContent = `Vượt SLA P0!`;
+        if (ticketContainer) {
+          ticketContainer.classList.add('text-rose-700', 'font-bold');
+        }
+      }
+
+      // KPI card countdown
+      const kpiEl = document.getElementById('kpi-sla-countdown');
+      if (kpiSeconds > 0) {
+        kpiSeconds--;
+        if (kpiEl) kpiEl.textContent = `SLA phản hồi: Còn ${kpiSeconds} giây`;
+      }
+    }, 1000);
+
+    // --- 3. Filter Tabs Logic ---
+    let currentStatusFilter = 'pending';
+    let currentVehicleFilter = 'vf6';
+
+    function setFilter(status, btnElement) {
+      currentStatusFilter = status;
+      
+      // Update UI tabs
+      document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.className = "filter-tab px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-medium whitespace-nowrap transition-all duration-150";
+      });
+
+      if (status === 'all') {
+        btnElement.className = "filter-tab active-tab px-3 py-1.5 rounded-lg bg-slate-900 text-white font-semibold whitespace-nowrap transition-all duration-150 shadow-xs";
+      } else if (status === 'pending') {
+        btnElement.className = "filter-tab active-tab px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-700 border border-amber-300 font-semibold whitespace-nowrap flex items-center gap-1.5 transition-all duration-150 shadow-xs";
+      } else if (status === 'recalc') {
+        btnElement.className = "filter-tab active-tab px-3 py-1.5 rounded-lg bg-rose-50 text-rose-700 border border-rose-300 font-semibold whitespace-nowrap flex items-center gap-1 transition-all duration-150 shadow-xs";
+      } else {
+        btnElement.className = "filter-tab active-tab px-3 py-1.5 rounded-lg bg-primary text-white font-semibold whitespace-nowrap transition-all duration-150 shadow-xs";
+      }
+
+      applyFilters();
+    }
+
+    function handleVehicleFilter(val) {
+      currentVehicleFilter = val;
+      applyFilters();
+      showToast(`Đã lọc dòng xe: ${val.toUpperCase()}`, 'info');
+    }
+
+    function handleSearchFilter(query) {
+      applyFilters(query.trim().toLowerCase());
+    }
+
+    function applyFilters(searchQuery = '') {
+      const rows = document.querySelectorAll('#ticket-tbody tr');
+      let visibleCount = 0;
+
+      rows.forEach(row => {
+        const rowStatus = row.getAttribute('data-status');
+        const rowVehicle = row.getAttribute('data-vehicle');
+        const rowCustomer = (row.getAttribute('data-customer') || '').toLowerCase();
+        const rowId = (row.getAttribute('data-id') || '').toLowerCase();
+
+        let matchesStatus = (currentStatusFilter === 'all') || (rowStatus === currentStatusFilter);
+        let matchesVehicle = (currentVehicleFilter === 'all') || (rowVehicle === currentVehicleFilter);
+        let matchesSearch = !searchQuery || rowCustomer.includes(searchQuery) || rowId.includes(searchQuery);
+
+        if (matchesStatus && matchesVehicle && matchesSearch) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      const paginationInfo = document.getElementById('pagination-info');
+      if (paginationInfo) {
+        paginationInfo.innerHTML = `Hiển thị <strong>1 - ${visibleCount}</strong> của <strong>20</strong> tickets · Tự động gán theo showroom Cầu Giấy (Hà Nội)`;
+      }
+    }
+
+    // --- 4. Interactive Slide-in Drawer Modal for HITL ---
+    function openApprovalModal(ticketId, customer, phone, vehicle, price) {
+      document.getElementById('modal-ticket-id').textContent = `Hồ sơ Ticket ${ticketId}`;
+      document.getElementById('modal-customer-name').textContent = customer;
+      document.getElementById('modal-vehicle-name').textContent = vehicle;
+
+      const backdrop = document.getElementById('hitl-modal-backdrop');
+      const drawer = document.getElementById('hitl-modal-drawer');
+
+      backdrop.classList.remove('opacity-0', 'pointer-events-none');
+      backdrop.classList.add('opacity-100');
+
+      drawer.classList.remove('translate-x-full');
+      drawer.classList.add('translate-x-0');
+
+      showToast(`Đang mở Workspace HITL cho ticket ${ticketId}`, 'info');
+    }
+
+    function closeModal() {
+      const backdrop = document.getElementById('hitl-modal-backdrop');
+      const drawer = document.getElementById('hitl-modal-drawer');
+
+      backdrop.classList.add('opacity-0', 'pointer-events-none');
+      backdrop.classList.remove('opacity-100');
+
+      drawer.classList.add('translate-x-full');
+      drawer.classList.remove('translate-x-0');
+    }
+
+    function approveTicket() {
+      closeModal();
+      showToast('Đã phê duyệt dự toán thành công và gửi thông báo Zalo OA!', 'success');
+      // Update pending count in UI
+      const kpiPending = document.getElementById('kpi-pending-count');
+      if (kpiPending && parseInt(kpiPending.textContent) > 0) {
+        kpiPending.textContent = parseInt(kpiPending.textContent) - 1;
+      }
+    }
+
+    // --- 5. Interactive Refresh, Export, Recalculate Handlers ---
+    function handleRefreshData() {
+      const icon = document.getElementById('refresh-icon');
+      icon.classList.add('rotate-[360deg]');
+      showToast('Đang đồng bộ dữ liệu WebSocket...', 'info');
+
+      setTimeout(() => {
+        icon.classList.remove('rotate-[360deg]');
+        showToast('Dữ liệu hàng đợi đã được cập nhật mới nhất!', 'success');
+      }, 600);
+    }
+
+    function handleExportExcel() {
+      const text = document.getElementById('export-excel-text');
+      text.textContent = 'Đang trích xuất...';
+      showToast('Đang khởi tạo tệp Excel danh sách 20 tickets...', 'info');
+
+      setTimeout(() => {
+        text.textContent = 'Xuất Excel';
+        showToast('Xuất báo cáo O2O_CauGiay_13112026.xlsx thành công!', 'success');
+      }, 1000);
+    }
+
+    function handleManualTicket() {
+      showToast('Đang mở form tạo ticket tư vấn khách hàng trực tiếp...', 'info');
+    }
+
+    function handleRecalculateRow2(btn) {
+      btn.innerHTML = `<span class="material-symbols-outlined text-[14px] animate-spin">refresh</span> Đang tính toán...`;
+      btn.disabled = true;
+
+      setTimeout(() => {
+        btn.innerHTML = `<span class="material-symbols-outlined text-[14px] text-emerald-600">check</span> Đã cập nhật v1.0.2`;
+        btn.className = "inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs font-semibold rounded-lg transition-all shadow-xs";
+
+        const priceEl = document.getElementById('row2-price');
+        const noteEl = document.getElementById('row2-note');
+        const catalogContainer = document.getElementById('row2-catalog-container');
+        const statusEl = document.getElementById('row2-status');
+
+        if (priceEl) priceEl.textContent = '548.000.000 đ';
+        if (noteEl) {
+          noteEl.textContent = 'Đã áp giá Catalog v1.0.2';
+          noteEl.className = 'text-xs text-emerald-600 font-medium';
+        }
+        if (catalogContainer) {
+          catalogContainer.innerHTML = `
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono font-medium bg-slate-100 text-slate-700 border border-slate-300">
+              <span class="material-symbols-outlined text-[13px] text-emerald-600">check_circle</span>
+              Catalog v1.0.2
+            </span>
+            <span class="text-[11px] text-slate-500">Khớp chính sách ngày 13/11</span>
+          `;
+        }
+        if (statusEl) {
+          statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Đã cập nhật v2`;
+          statusEl.className = "inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200";
+        }
+
+        showToast('Ticket #TK-1084 đã được tính lại theo biểu giá Catalog v1.0.2!', 'success');
+      }, 800);
+    }
+
+    // --- 6. Keyboard Shortcut (⌘K / Ctrl+K / /) ---
+    function focusSearch() {
+      const input = document.getElementById('ticket-search-input');
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        focusSearch();
+      } else if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+        e.preventDefault();
+        focusSearch();
+      } else if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
+
+    // Close modal on backdrop click
+    document.getElementById('hitl-modal-backdrop').addEventListener('click', closeModal);
+
+    // --- 7. Toast Notification Utility ---
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      const bgColor = type === 'success' ? 'bg-slate-900 border-emerald-500 text-white' : 'bg-slate-900 border-slate-700 text-white';
+      const icon = type === 'success' ? 'check_circle' : 'info';
+      const iconColor = type === 'success' ? 'text-energy-emerald' : 'text-primary-fixed';
+
+      toast.className = `pointer-events-auto flex items-center gap-2 px-3.5 py-2.5 rounded-lg shadow-xl border text-xs font-medium animate-fade-in-up ${bgColor} transition-all duration-300`;
+      toast.innerHTML = `
+        <span class="material-symbols-outlined text-[18px] ${iconColor}">${icon}</span>
+        <span>${message}</span>
+      `;
+
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+  </script>
+
+<script>
+// Flow Navigation Bridge for VinFast EV Advisor (VFO2O-01)
+function navigateToFlowStep(step, fallbackUrl) {
+  if (window.parent && window.parent !== window) {
+    window.parent.postMessage({ type: 'NAVIGATE', step: step }, '*');
+  } else if (fallbackUrl) {
+    window.location.href = fallbackUrl;
+  }
+}
+</script>
+
+</body></html>
