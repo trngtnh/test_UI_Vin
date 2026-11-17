@@ -60,10 +60,10 @@ export const EmptyStagePlaceholder: React.FC = () => {
                     {car.display_name}
                   </h3>
                   <div className="mt-1 flex items-baseline gap-1.5">
-                    <span className="text-xs font-bold text-brand-blue">
-                      {car.price.toLocaleString('vi-VN')} đ
+                    <span className="text-xs font-bold text-brand-blue tabular-nums whitespace-nowrap">
+                      {car.price.toLocaleString('vi-VN')}&nbsp;đ
                     </span>
-                    <span className="text-[10px] text-slate-400">(kèm pin)</span>
+                    <span className="text-[10px] text-slate-400 whitespace-nowrap">(kèm pin)</span>
                   </div>
                 </div>
 

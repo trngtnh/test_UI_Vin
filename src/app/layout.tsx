@@ -23,7 +23,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="h-full flex flex-col overflow-hidden bg-slate-50 text-slate-900 selection:bg-brand-accent selection:text-white">
+      <body className="h-full flex flex-col overflow-hidden bg-[#eef2f6] text-slate-900 selection:bg-brand-accent selection:text-white">
         <Header />
         <main className="flex-1 min-h-0 flex flex-col overflow-hidden">{children}</main>
         <Toast />

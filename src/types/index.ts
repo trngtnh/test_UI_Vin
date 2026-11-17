@@ -17,6 +17,53 @@ export interface CarColor {
   hex: string;
 }
 
+export interface CarVariant {
+  id: string;
+  name: string;
+  price: number;
+  battery_kwh: number;
+  range_nedc: number;
+  range_real: number;
+  motor_power: string;
+  charging_time: string;
+  drivetrain?: string;
+  badge?: string;
+  features_highlight?: string;
+}
+
+export type VehicleCategory = 'passenger' | 'commercial';
+
+export interface UnifiedCarVariant {
+  id: string;
+  model_id: string;
+  category: VehicleCategory;
+  category_name: string;
+  model_name: string;
+  version_name: string;
+  display_name: string;
+  badge: string;
+  price: number;
+  seats: string;
+  seats_count: number;
+  range_nedc: number;
+  range_real: number;
+  battery_kwh: number;
+  consumption_kwh_100km: number;
+  warranty_years: string;
+  dimensions: string;
+  wheelbase: string;
+  ground_clearance: string;
+  motor_power: string;
+  charging_time: string;
+  adas: string;
+  status: string;
+  reason_budget: string;
+  reason_charging: string;
+  colors?: CarColor[];
+  features_highlight?: string;
+  drivetrain?: string;
+}
+
 export interface CarModel {
   model_id: ModelId;
   generation_id: string;
@@ -42,6 +89,7 @@ export interface CarModel {
   ground_clearance: string;
   adas: string;
   colors: CarColor[];
+  variants?: CarVariant[];
 }
 
 export type LoanMethod = 'decreasing' | 'annuity';

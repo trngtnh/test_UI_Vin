@@ -80,10 +80,10 @@ export const CarCatalogGrid: React.FC = () => {
                     {car.display_name}
                   </h3>
                   <div className="mt-1 flex items-baseline gap-2">
-                    <span className="text-lg font-black text-brand-blue">
-                      {car.price.toLocaleString('vi-VN')} đ
+                    <span className="text-lg font-black text-brand-blue tabular-nums whitespace-nowrap">
+                      {car.price.toLocaleString('vi-VN')}&nbsp;đ
                     </span>
-                    <span className="text-[11px] text-slate-400">(kèm pin & sạc)</span>
+                    <span className="text-[11px] text-slate-400 whitespace-nowrap">(kèm pin & sạc)</span>
                   </div>
                 </div>
 

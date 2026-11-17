@@ -80,10 +80,10 @@ export const CarRecommendationCard: React.FC = () => {
                 {car.display_name}
               </h3>
               <div className="text-right">
-                <span className="text-lg font-black text-brand-blue block">
-                  {car.price.toLocaleString('vi-VN')} VNĐ
+                <span className="text-lg font-black text-brand-blue tabular-nums whitespace-nowrap block">
+                  {car.price.toLocaleString('vi-VN')}&nbsp;VNĐ
                 </span>
-                <span className="text-[10px] text-slate-400">(Giá đã gồm Pin & Bộ sạc chính hãng)</span>
+                <span className="text-[10px] text-slate-400 whitespace-nowrap">(Giá đã gồm Pin & Bộ sạc chính hãng)</span>
               </div>
             </div>
           </div>

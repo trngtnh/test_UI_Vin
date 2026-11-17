@@ -2,9 +2,11 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useAppStore } from '@/store/useAppStore';
-import { Bot, ArrowUp, ArrowRight, RotateCcw, Layers, Sparkles, CheckCircle2, Scale, MapPin } from 'lucide-react';
-import { ModelId, CityId } from '@/types';
+import { Bot, ArrowUp, ArrowRight, RotateCcw, Scale, MapPin } from 'lucide-react';
+import { ModelId } from '@/types';
 import { CAR_CATALOG, VINFAST_FACILITIES } from '@/lib/catalog';
+import { Button } from '@/components/common/Button';
+import { Badge } from '@/components/common/Badge';
 
 interface Message {
   id: string;
@@ -24,7 +26,6 @@ export const AgentCopilotPane: React.FC = () => {
   const canvasMode = useAppStore((state) => state.canvasMode);
   const openComparisonModal = useAppStore((state) => state.openComparisonModal);
   const selectedCity = useAppStore((state) => state.selectedCity) || 'national';
-  const setCity = useAppStore((state) => state.setCity);
 
   const currentFacility = VINFAST_FACILITIES[selectedCity] || VINFAST_FACILITIES.national;
 
@@ -71,6 +72,24 @@ export const AgentCopilotPane: React.FC = () => {
 
     setTimeout(() => {
       setIsAiThinking(false);
+      selectModel(modelId, false);
+      setCanvasMode('recommendations');
+      setJourneyStep(2);
+
+      if (modelId === 'VF3') {
+        updateInputs({ daily_km: 25, charging_facility: 'vgreen' });
+      } else if (modelId === 'VF5') {
+        updateInputs({ daily_km: 35, charging_facility: 'home' });
+      } else if (modelId === 'VF6') {
+        updateInputs({ daily_km: 40, charging_facility: 'home' });
+      } else if (modelId === 'VF7') {
+        updateInputs({ daily_km: 50, charging_facility: 'home' });
+      } else if (modelId === 'VF8') {
+        updateInputs({ daily_km: 60, charging_facility: 'home' });
+      } else if (modelId === 'VF9') {
+        updateInputs({ daily_km: 70, charging_facility: 'home' });
+      }
+
       setMessages((prev) => [
         ...prev,
         {
@@ -83,13 +102,15 @@ export const AgentCopilotPane: React.FC = () => {
           recommendedTag: modelTag,
         },
       ]);
-    }, 500);
+    }, 600);
   };
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    const trimmed = inputText.trim();
-    if (!trimmed) return;
+    if (!inputText.trim()) return;
+
+    const userMsg = inputText.trim();
+    setInputText('');
 
     const now = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
     setMessages((prev) => [
@@ -97,136 +118,96 @@ export const AgentCopilotPane: React.FC = () => {
       {
         id: `u-${Date.now()}`,
         sender: 'user',
-        text: trimmed,
+        text: userMsg,
         timestamp: now,
       },
     ]);
-    setInputText('');
+
     setIsAiThinking(true);
 
-    const lower = trimmed.toLowerCase();
     setTimeout(() => {
       setIsAiThinking(false);
+      const lower = userMsg.toLowerCase();
       let replyText = '';
-      let recModelId: ModelId | undefined = undefined;
-      let recModelName: string | undefined = undefined;
-      let recTag: string | undefined = undefined;
+      let recModelId: ModelId = 'VF6';
+      let recModelName = 'VinFast VF 6 Comfort';
+      let recTag = 'Gia đình 600 - 800 triệu';
 
-      // Location auto-detection and dynamic showroom switching
-      let locationNotice = '';
-      if (lower.includes('hà nội') || lower.includes('hanoi')) {
-        setCity('hanoi');
-        const fac = VINFAST_FACILITIES.hanoi;
-        locationNotice = `Em đã chuyển cơ sở phục vụ về <strong>${fac.showroomName}</strong> (${fac.cityName}). `;
-      } else if (
-        lower.includes('hồ chí minh') ||
-        lower.includes('tphcm') ||
-        lower.includes('tp.hcm') ||
-        lower.includes('sài gòn') ||
-        lower.includes('saigon')
-      ) {
-        setCity('hcm');
-        const fac = VINFAST_FACILITIES.hcm;
-        locationNotice = `Em đã chuyển cơ sở phục vụ về <strong>${fac.showroomName}</strong> (${fac.cityName}). `;
-      } else if (lower.includes('đà nẵng') || lower.includes('da nang')) {
-        setCity('danang');
-        const fac = VINFAST_FACILITIES.danang;
-        locationNotice = `Em đã chuyển cơ sở phục vụ về <strong>${fac.showroomName}</strong> (${fac.cityName}). `;
-      } else if (lower.includes('hải phòng') || lower.includes('hai phong')) {
-        setCity('haiphong');
-        const fac = VINFAST_FACILITIES.haiphong;
-        locationNotice = `Em đã chuyển cơ sở phục vụ về <strong>${fac.showroomName}</strong> (${fac.cityName}). `;
-      } else if (lower.includes('cần thơ') || lower.includes('can tho')) {
-        setCity('cantho');
-        const fac = VINFAST_FACILITIES.cantho;
-        locationNotice = `Em đã chuyển cơ sở phục vụ về <strong>${fac.showroomName}</strong> (${fac.cityName}). `;
-      } else if (lower.includes('toàn quốc')) {
-        setCity('national');
-        locationNotice = 'Em đã chuyển về chế độ tư vấn VinFast Toàn quốc. ';
-      }
+      const locationNotice = selectedCity !== 'national'
+        ? `<em>Đã áp dụng chính sách ưu đãi và cơ sở lái thử tại ${currentFacility.cityName}.</em><br/><br/>`
+        : '';
 
       if (
         lower.includes('so sánh') ||
-        lower.includes('phân vân') ||
-        lower.includes('khác nhau') ||
-        lower.includes('đối chiếu')
+        lower.includes('đối chiếu') ||
+        lower.includes('khác nhau')
       ) {
         replyText =
           locationNotice +
-          'Để đối chiếu trực quan các dòng xe, em đã hỗ trợ <strong>Bảng So sánh Đa mẫu xe</strong> dạng pop-up. Anh/chị có thể tùy chọn 2 hoặc 3 mẫu xe bất kỳ để đối chiếu chi tiết thông số kích thước, tầm chạy và tiền sạc hàng tháng.';
-        recModelId = 'VF6';
-        recModelName = 'So sánh Đa mẫu xe';
+          'Em đã mở <strong>Bảng So sánh Đa mẫu xe</strong> trên màn hình. Anh/chị có thể tích chọn 2 đến 3 mẫu xe bất kỳ để đối chiếu trực tiếp thông số kích thước, dung lượng pin, công nghệ ADAS và chi phí nuôi xe 5 năm.';
+        openComparisonModal([]);
         recTag = 'So sánh 2-3 xe';
       } else if (
-        lower.includes('sạc') ||
-        lower.includes('chung cư') ||
-        lower.includes('nhà riêng') ||
-        lower.includes('trạm sạc')
-      ) {
-        replyText =
-          locationNotice +
-          `VinFast và V-GREEN đã triển khai hệ thống trạm sạc công cộng rộng khắp tại ${currentFacility.cityName} (trung tâm thương mại, chung cư, cây xăng PVOIL...). Với nhu cầu đi lại phổ biến 30-40 km/ngày, trung bình <strong>10 đến 12 ngày anh/chị mới cần cắm sạc một lần</strong> (theo chu kỳ an toàn 85% DoD). Cả ở chung cư lẫn nhà phố đều sử dụng rất an tâm.`;
-        updateInputs({ charging_facility: 'vgreen' });
-      } else if (
-        lower.includes('vf3') ||
-        lower.includes('vf 3') ||
         lower.includes('300') ||
-        lower.includes('dưới 400') ||
+        lower.includes('350') ||
+        lower.includes('vf 3') ||
+        lower.includes('vf3') ||
         lower.includes('mini') ||
-        lower.includes('nhỏ gọn nhất')
+        lower.includes('nhỏ nhất')
       ) {
         replyText =
           locationNotice +
-          'Với tầm tài chính từ hơn 300 triệu và nhu cầu xe mini đô thị nhỏ gọn dễ lái, mẫu <strong>VinFast VF 3</strong> (322 triệu) là lựa chọn quốc dân số 1. Xe sạc cực tiện, luồn lách phố hẹp linh hoạt. Mời anh/chị nhấn nút xem đề xuất bên dưới.';
+          'Với ngân sách quanh 300 - 350 triệu và nhu cầu xe đô thị nhỏ gọn dễ luồn lách, chiếc <strong>VinFast VF 3</strong> (322 triệu) là lựa chọn tiết kiệm nhất. Xe có tầm chạy 215 km/lần sạc, chi phí sử dụng chỉ khoảng 350đ/km.';
         recModelId = 'VF3';
         recModelName = 'VinFast VF 3';
-        recTag = 'Mini Đô thị ~322 tr';
+        recTag = 'Đô thị Mini tiết kiệm';
       } else if (
-        lower.includes('vf5') ||
-        lower.includes('vf 5') ||
         lower.includes('500') ||
-        lower.includes('dưới 600') ||
-        lower.includes('tiết kiệm')
+        lower.includes('450') ||
+        lower.includes('vf 5') ||
+        lower.includes('vf5') ||
+        lower.includes('dịch vụ') ||
+        lower.includes('kinh doanh')
       ) {
         replyText =
           locationNotice +
-          'Với ngân sách dưới 600 triệu lăn bánh, mẫu xe phù hợp nhất là <strong>VinFast VF 5 Plus</strong> (496 triệu). Chi phí nhận xe chỉ từ ~150 triệu (vay 70%), tiền sạc điện chỉ khoảng ~500.000 đ/tháng. Em đã soạn sẵn hồ sơ đề xuất cho anh/chị.';
+          'Với tầm tiền dưới 500 triệu hoặc chạy dịch vụ kinh doanh, chiếc <strong>VinFast VF 5 Plus</strong> (496 triệu kèm pin) là lựa chọn kinh tế hàng đầu. Chi phí nuôi xe siêu rẻ, thu hồi vốn nhanh và không gian 5 chỗ đủ rộng rãi.';
         recModelId = 'VF5';
         recModelName = 'VinFast VF 5 Plus';
-        recTag = 'Ngân sách <600 triệu';
+        recTag = 'Kinh tế & Dịch vụ';
       } else if (
-        lower.includes('vf7') ||
-        lower.includes('vf 7') ||
+        lower.includes('700') ||
         lower.includes('800') ||
-        (lower.includes('1 tỷ') && (lower.includes('dưới') || lower.includes('tầm') || lower.includes('khoảng'))) ||
+        lower.includes('vf 7') ||
+        lower.includes('vf7') ||
+        lower.includes('thể thao') ||
         lower.includes('hạng c')
       ) {
         replyText =
           locationNotice +
-          'Với ngân sách từ 800 triệu đến 1 tỷ và nhu cầu SUV hạng C rộng rãi, tiện nghi vượt trội, em đề xuất chiếc <strong>VinFast VF 7 Eco</strong> (740 triệu) trang bị gói trợ lái thông minh ADAS Level 2 và thiết kế thể thao dẫn đầu phân khúc.';
+          'Với phân khúc 700 triệu - 1 tỷ, chiếc C-SUV thể thao <strong>VinFast VF 7 Eco</strong> (850 triệu) là lựa chọn vượt trội với thiết kế cá tính, công suất mạnh mẽ 174 HP và hệ thống trợ lái ADAS thông minh.';
         recModelId = 'VF7';
         recModelName = 'VinFast VF 7 Eco';
-        recTag = 'C-SUV Cao cấp';
+        recTag = 'C-SUV Thể thao Công nghệ';
       } else if (
-        lower.includes('vf8') ||
+        lower.includes('1 tỷ') ||
+        lower.includes('1.1') ||
+        lower.includes('1.2') ||
         lower.includes('vf 8') ||
-        lower.includes('hạng d') ||
-        lower.includes('1 tỷ 1') ||
-        lower.includes('1 tỷ 2') ||
-        lower.includes('doanh nhân')
+        lower.includes('vf8') ||
+        lower.includes('hạng d')
       ) {
         replyText =
           locationNotice +
-          'Trong phân khúc SUV hạng D cao cấp quanh mốc 1 tỷ đồng, <strong>VinFast VF 8 Eco</strong> (1.079 tỷ) là mẫu xe điện toàn cầu với khả năng vận hành mạnh mẽ, công nghệ thông minh vượt bậc và không gian đẳng cấp.';
+          'Với ngân sách từ 1 tỷ đến 1.3 tỷ cho dòng D-SUV gia đình cao cấp, chiếc <strong>VinFast VF 8 Eco</strong> (1.079 tỷ) mang lại không gian rộng rãi, công suất 349 HP 2 cầu AWD và hệ thống an toàn 5 sao tiêu chuẩn toàn cầu.';
         recModelId = 'VF8';
         recModelName = 'VinFast VF 8 Eco';
-        recTag = 'D-SUV Đẳng cấp';
+        recTag = 'D-SUV Toàn cầu 5 sao';
       } else if (
-        lower.includes('vf9') ||
-        lower.includes('vf 9') ||
         lower.includes('7 chỗ') ||
-        lower.includes('bảy chỗ') ||
-        lower.includes('chủ tịch') ||
+        lower.includes('vf 9') ||
+        lower.includes('vf9') ||
+        lower.includes('hạng sang') ||
         lower.includes('hạng e') ||
         lower.includes('1.5 tỷ')
       ) {
@@ -285,35 +266,22 @@ export const AgentCopilotPane: React.FC = () => {
   return (
     <div className="flex flex-col h-full bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
       {/* Executive AI Copilot Header */}
-      <div className="px-4 py-3 bg-slate-50/80 border-b border-slate-200/80 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center shadow-2xs shrink-0">
-            <Bot className="w-4 h-4 text-blue-400" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-xs font-bold text-slate-900 tracking-tight">Trợ lý Tư vấn AI</h2>
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/70">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Trực tuyến
-              </span>
-            </div>
-            <p className="text-[10px] text-slate-500 mt-0.5">
-              Hỗ trợ tìm xe, tính ngân sách & lập hồ sơ 24/7
-            </p>
-          </div>
+      <div className="h-12 px-4 bg-slate-50/80 border-b border-slate-200/80 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-2">
+          <Bot className="w-4 h-4 text-slate-700" />
+          <h2 className="text-xs font-bold text-slate-900 tracking-tight">Trợ lý Tư vấn AI</h2>
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" title="Trực tuyến" />
         </div>
 
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="xs"
           onClick={handleReset}
+          icon={<RotateCcw className="w-3.5 h-3.5" />}
           title="Làm mới hội thoại"
-          className="px-2.5 py-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition flex items-center gap-1 text-[11px] font-medium border border-transparent hover:border-slate-200"
-          aria-label="Làm mới đoạn chat"
         >
-          <RotateCcw className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Làm mới</span>
-        </button>
+        </Button>
       </div>
 
       {/* Messages Stream */}
@@ -328,38 +296,42 @@ export const AgentCopilotPane: React.FC = () => {
             <div
               className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-semibold ${
                 m.sender === 'user'
-                  ? 'bg-slate-800 text-white'
-                  : 'bg-brand-blue text-white shadow-xs'
+                  ? 'bg-brand-blue text-white shadow-2xs'
+                  : 'bg-slate-900 text-white shadow-2xs'
               }`}
             >
-              {m.sender === 'user' ? 'Tôi' : <Bot className="w-3.5 h-3.5" />}
+              {m.sender === 'user' ? 'KH' : <Bot className="w-3.5 h-3.5 text-blue-400" />}
             </div>
 
             <div
-              className={`p-3.5 rounded-2xl max-w-[85%] leading-relaxed space-y-1.5 ${
+              className={`max-w-[85%] rounded-2xl p-3.5 space-y-2 shadow-2xs ${
                 m.sender === 'user'
                   ? 'bg-brand-blue text-white rounded-tr-xs'
-                  : 'bg-slate-50 border border-slate-200/80 text-slate-800 rounded-tl-xs'
+                  : 'bg-slate-50 border border-slate-200 text-slate-800 rounded-tl-xs'
               }`}
             >
               <div
+                className="leading-relaxed text-[11px]"
                 dangerouslySetInnerHTML={{ __html: m.text }}
-                className="prose prose-xs max-w-none text-current"
               />
 
-              {/* Requirement 2: Dedicated Recommendation Action Button inside Agent */}
-              {m.recommendedModelId && (
-                <div className="mt-2.5 pt-2.5 border-t border-slate-200 flex flex-col gap-1.5">
-                  <div className="flex items-center justify-between text-[11px] text-slate-600">
-                    <span className="font-semibold text-slate-800">
-                      Gợi ý: <strong>{m.recommendedModelName}</strong>
-                    </span>
-                    <span className="text-[10px] text-brand-blue font-bold px-1.5 py-0.5 rounded bg-blue-100/70">
-                      {m.recommendedTag}
+              {/* Action Card inside AI Message */}
+              {m.recommendedModelId && m.sender === 'ai' && (
+                <div className="p-3 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-2 mt-2">
+                  <div className="flex items-center justify-between">
+                    <Badge variant="brand">{m.recommendedTag}</Badge>
+                    <span className="text-[10px] text-slate-500 font-medium">VinFast Chính hãng</span>
+                  </div>
+                  <div>
+                    <h4 className="font-extrabold text-slate-900 text-xs">{m.recommendedModelName}</h4>
+                    <span className="text-[11px] font-bold text-brand-blue tabular-nums whitespace-nowrap">
+                      {CAR_CATALOG[m.recommendedModelId]?.price.toLocaleString('vi-VN')}&nbsp;đ (kèm pin)
                     </span>
                   </div>
-                  <button
-                    type="button"
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    fullWidth
                     onClick={() => {
                       if (m.recommendedTag === 'So sánh 2-3 xe') {
                         openComparisonModal([]);
@@ -369,13 +341,11 @@ export const AgentCopilotPane: React.FC = () => {
                         setJourneyStep(2);
                       }
                     }}
-                    className="w-full py-2 px-3 rounded-xl bg-brand-blue hover:bg-slate-900 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-xs group"
+                    icon={<ArrowRight className="w-3.5 h-3.5" />}
+                    iconPosition="right"
                   >
-                    <span>
-                      {m.recommendedTag === 'So sánh 2-3 xe' ? 'Mở bảng so sánh 2-3 xe' : 'Xem đề xuất xe phù hợp trên Sảnh'}
-                    </span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                  </button>
+                    {m.recommendedTag === 'So sánh 2-3 xe' ? 'Mở bảng so sánh 2-3 xe' : 'Xem đề xuất xe phù hợp'}
+                  </Button>
                 </div>
               )}
 
@@ -401,47 +371,40 @@ export const AgentCopilotPane: React.FC = () => {
                 AI đang phân tích nhu cầu và khớp danh mục xe
               </span>
               <div className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-bounce" style={{ animationDelay: '300ms' }} />
               </div>
             </div>
           </div>
         )}
 
-        {/* Executive Quick Scenario Pills - Zero Emojis */}
-        <div className="pt-3 space-y-2 border-t border-slate-100">
-          <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 px-0.5">
-            <span>Kịch bản tư vấn nhanh:</span>
-            <button
-              onClick={handleReset}
-              title="Làm mới hội thoại"
-              className="text-slate-400 hover:text-slate-700 transition"
-            >
-              <RotateCcw className="w-3 h-3" />
-            </button>
-          </div>
-          <div className="flex flex-col gap-1.5">
+        {/* Quick Scenario Recommendation Chips (Origin UI Style) */}
+        <div className="pt-2 border-t border-slate-100 space-y-2">
+          <span className="text-[10px] font-semibold text-slate-400 block uppercase tracking-wider">
+            Gợi ý tình huống nhanh
+          </span>
+          <div className="space-y-1.5">
             <button
               type="button"
               onClick={() =>
                 handleSelectScenario(
-                  'VF5',
-                  'VinFast VF 5 Plus',
-                  'Dưới 600 triệu',
-                  'Tôi có ngân sách dưới 600 triệu, đi làm nội thành hàng ngày, ưu tiên chi phí tiết kiệm nhất.',
-                  'Với ngân sách dưới 600 triệu, mẫu <strong>VinFast VF 5 Plus</strong> là lựa chọn tiết kiệm nhất phân khúc. Xe nhỏ gọn, sạc tại nhà chỉ ~500k/tháng. Anh/chị có thể nhấn nút bên dưới để xem chi tiết đề xuất trên Sảnh.'
+                  'VF3',
+                  'VinFast VF 3',
+                  'Đô thị Mini ~300 triệu',
+                  'Ngân sách tôi khoảng 300 - 350 triệu, cần xe mini nhỏ gọn đi làm nội thành hàng ngày.',
+                  'Dạ với ngân sách khoảng 300 triệu, <strong>VinFast VF 3</strong> (322 triệu) là chiếc xe đô thị hoàn hảo nhất. Chi phí lăn bánh tiết kiệm, tầm chạy 215 km đủ cho cả tuần đi làm nội đô.'
                 )
               }
-              className="w-full text-left px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-xs font-medium transition flex items-center justify-between group"
+              className="w-full text-left px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-xs font-medium transition-[background-color,border-color] duration-150 ease-out flex items-center justify-between group active:scale-[0.98]"
             >
-              <div className="flex items-center gap-2">
-                <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 group-hover:bg-blue-50 group-hover:text-brand-blue">
-                  VF 5 Plus
-                </span>
-                <span>Ngân sách dưới 600 triệu · Đô thị linh hoạt</span>
+              <div className="flex items-center gap-2 min-w-0">
+                <Badge variant="outline" className="group-hover:bg-blue-50 group-hover:text-brand-blue group-hover:border-blue-200 shrink-0">
+                  VF 3
+                </Badge>
+                <span className="truncate">Xe Mini đô thị tiết kiệm (ngân sách ~300 triệu)</span>
               </div>
-              <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-blue group-hover:translate-x-0.5 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-blue group-hover:translate-x-0.5 transition-transform shrink-0" />
             </button>
 
             <button
@@ -451,19 +414,19 @@ export const AgentCopilotPane: React.FC = () => {
                   'VF6',
                   'VinFast VF 6 Comfort',
                   'Gia đình 600 - 800 triệu',
-                  'Tôi có ngân sách khoảng 700 triệu, phục vụ gia đình 4 người, thỉnh thoảng đi ngoại tỉnh.',
-                  'Trong tầm ngân sách 700 triệu cho gia đình 4 người, <strong>VinFast VF 6 Comfort</strong> là lựa chọn lý tưởng. Khoang lái rộng rãi, tầm chạy 510 km. Anh/chị có thể nhấn nút bên dưới để xem chi tiết đề xuất trên Sảnh.'
+                  'Tôi cần tìm xe SUV cho gia đình 4-5 người, ngân sách khoảng 600 - 800 triệu, đi làm và cuối tuần về quê.',
+                  'Dạ với nhu cầu gia đình và ngân sách 600 - 800 triệu, chiếc <strong>VinFast VF 6 Comfort</strong> (675 triệu) là phương án tối ưu nhất. Mời anh/chị xem chi tiết đề xuất bên dưới.'
                 )
               }
-              className="w-full text-left px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-xs font-medium transition flex items-center justify-between group"
+              className="w-full text-left px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-xs font-medium transition-[background-color,border-color] duration-150 ease-out flex items-center justify-between group active:scale-[0.98]"
             >
-              <div className="flex items-center gap-2">
-                <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 group-hover:bg-blue-50 group-hover:text-brand-blue">
-                  VF 6
-                </span>
-                <span>Gia đình 4-5 người (600 - 800 triệu)</span>
+              <div className="flex items-center gap-2 min-w-0">
+                <Badge variant="outline" className="group-hover:bg-blue-50 group-hover:text-brand-blue group-hover:border-blue-200 shrink-0">
+                  VF 6 Comfort
+                </Badge>
+                <span className="truncate">SUV Gia đình đô thị (ngân sách 600 - 800 triệu)</span>
               </div>
-              <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-blue group-hover:translate-x-0.5 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-blue group-hover:translate-x-0.5 transition-transform shrink-0" />
             </button>
 
             <button
@@ -477,15 +440,15 @@ export const AgentCopilotPane: React.FC = () => {
                   'Trong phân khúc trên 800 triệu, em đề xuất chiếc <strong>VinFast VF 7 Eco</strong>. Mẫu C-SUV thiết kế thời thượng và hệ thống ADAS thông minh. Mời anh/chị nhấn nút xem đề xuất bên dưới.'
                 )
               }
-              className="w-full text-left px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-xs font-medium transition flex items-center justify-between group"
+              className="w-full text-left px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-xs font-medium transition-[background-color,border-color] duration-150 ease-out flex items-center justify-between group active:scale-[0.98]"
             >
-              <div className="flex items-center gap-2">
-                <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 group-hover:bg-blue-50 group-hover:text-brand-blue">
+              <div className="flex items-center gap-2 min-w-0">
+                <Badge variant="outline" className="group-hover:bg-blue-50 group-hover:text-brand-blue group-hover:border-blue-200 shrink-0">
                   VF 7 Eco
-                </span>
-                <span>Crossover hạng C cao cấp (trên 800 triệu)</span>
+                </Badge>
+                <span className="truncate">Crossover hạng C cao cấp (trên 800 triệu)</span>
               </div>
-              <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-blue group-hover:translate-x-0.5 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-blue group-hover:translate-x-0.5 transition-transform shrink-0" />
             </button>
 
             <button
@@ -508,13 +471,13 @@ export const AgentCopilotPane: React.FC = () => {
                   },
                 ]);
               }}
-              className="w-full text-left px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-blue-50/70 hover:border-blue-200 text-brand-blue text-xs font-semibold transition flex items-center justify-between group"
+              className="w-full text-left px-3 py-2 rounded-xl border border-blue-200 bg-blue-50/70 hover:bg-blue-100/80 text-brand-blue text-xs font-semibold transition-[background-color,border-color] duration-150 ease-out flex items-center justify-between group active:scale-[0.98]"
             >
-              <span className="flex items-center gap-2">
-                <Scale className="w-3.5 h-3.5" />
-                <span>So sánh đối chiếu đa mẫu xe (chọn 2-3 xe)</span>
+              <span className="flex items-center gap-2 min-w-0">
+                <Scale className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">So sánh đối chiếu đa mẫu xe (chọn 2-3 xe)</span>
               </span>
-              <ArrowRight className="w-3.5 h-3.5 text-brand-blue group-hover:translate-x-0.5 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 text-brand-blue group-hover:translate-x-0.5 transition-transform shrink-0" />
             </button>
           </div>
         </div>
@@ -532,14 +495,15 @@ export const AgentCopilotPane: React.FC = () => {
             placeholder="Nhập câu hỏi (ngân sách, lãi suất vay, trạm sạc...)"
             className="flex-1 bg-transparent text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden py-1"
           />
-          <button
+          <Button
             type="submit"
+            variant="primary"
+            size="icon-sm"
             disabled={!inputText.trim()}
-            className="w-7 h-7 rounded-lg bg-brand-blue text-white flex items-center justify-center hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition shrink-0"
             aria-label="Gửi yêu cầu"
           >
             <ArrowUp className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
       </form>
     </div>

@@ -69,8 +69,8 @@ export const CarComparisonMatrix: React.FC = () => {
                       <h4 className="font-extrabold text-slate-900 text-sm">
                         {car.display_name}
                       </h4>
-                      <div className="text-sm font-black text-brand-blue mt-1">
-                        {car.price.toLocaleString('vi-VN')} đ
+                      <div className="text-sm font-black text-brand-blue mt-1 tabular-nums whitespace-nowrap">
+                        {car.price.toLocaleString('vi-VN')}&nbsp;đ
                       </div>
                     </th>
                   );

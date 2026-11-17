@@ -11,7 +11,14 @@ import {
   CanvasMode,
   CityId,
 } from '@/types';
-import { CAR_CATALOG, CATALOG_VERSION, VINFAST_FACILITIES } from '@/lib/catalog';
+import {
+  CAR_CATALOG,
+  CATALOG_VERSION,
+  VINFAST_FACILITIES,
+  getCarModelWithVariant,
+  ALL_VINFAST_VARIANTS,
+  VARIANTS_BY_ID,
+} from '@/lib/catalog';
 import { calculateDeterministicTCO } from '@/lib/engine';
 
 export interface ToastInfo {
@@ -47,12 +54,16 @@ interface AppStoreState {
   isProfileModalOpen: boolean;
   profileActiveTab: 'profile' | 'history';
   isComparisonModalOpen: boolean;
+  comparisonInitialView: 'picker' | 'table';
   comparisonModelIds: ModelId[];
+  comparisonVariantIds: string[];
   selectedCity: CityId;
+  selectedVariantIds: Record<string, string>;
 
   // Actions
   setRole: (role: Role) => void;
   setCity: (cityId: CityId) => void;
+  selectVariant: (modelId: string, variantId: string) => void;
   setCustomerTab: (tab: CustomerViewTab) => void;
   setJourneyStep: (step: JourneyStep) => void;
   setCanvasMode: (mode: CanvasMode) => void;
@@ -60,9 +71,11 @@ interface AppStoreState {
   proceedToTCO: (modelId?: ModelId) => void;
   setProfileModalOpen: (open: boolean, tab?: 'profile' | 'history') => void;
   updateUserProfile: (partial: Partial<UserProfile>) => void;
-  openComparisonModal: (models?: ModelId[]) => void;
+  openComparisonModal: (identifiers?: string[], initialView?: 'picker' | 'table') => void;
   closeComparisonModal: () => void;
   toggleComparisonModel: (modelId: ModelId) => void;
+  toggleComparisonVariant: (variantId: string) => void;
+  setComparisonSlot: (slotIndex: number, variantId: string) => void;
   toggleChat: () => void;
   toggleNotificationOpen: () => void;
   markNotificationsAsRead: () => void;
@@ -122,6 +135,15 @@ const DEFAULT_USER_PROFILE: UserProfile = {
   dailyKm: 30,
 };
 
+const DEFAULT_VARIANT_IDS: Record<ModelId, string> = {
+  VF3: 'VF3_PLUS',
+  VF5: 'VF5_PREMIUM',
+  VF6: 'VF6_COMFORT',
+  VF7: 'VF7_ECO',
+  VF8: 'VF8_ECO',
+  VF9: 'VF9_ECO',
+};
+
 export const useAppStore = create<AppStoreState>((set, get) => ({
   currentRole: 'customer',
   customerTab: 'catalog',
@@ -129,6 +151,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
   canvasMode: 'hall',
   isChatOpen: true,
   selectedModelId: 'VF6',
+  selectedVariantIds: DEFAULT_VARIANT_IDS,
   customerInputs: DEFAULT_INPUTS,
   ticket: INITIAL_TICKET,
   notifications: INITIAL_NOTIFICATIONS,
@@ -141,7 +164,9 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
   isProfileModalOpen: false,
   profileActiveTab: 'history',
   isComparisonModalOpen: false,
+  comparisonInitialView: 'picker',
   comparisonModelIds: [],
+  comparisonVariantIds: [],
   selectedCity: 'national',
 
   setRole: (role) => set({ currentRole: role }),
@@ -155,6 +180,33 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
         : `Đã kết nối trực tiếp với ${facility.showroomName} (${facility.cityName}).`,
       'info'
     );
+  },
+
+  selectVariant: (modelId, variantId) => {
+    const { comparisonVariantIds } = get();
+    // Check if comparisonVariantIds has existing variants of this model
+    const existingVariantsOfModel = comparisonVariantIds.filter(
+      (id) => VARIANTS_BY_ID[id]?.model_id === modelId
+    );
+
+    let updatedComp = comparisonVariantIds;
+    // If exactly 1 variant of this model was in comparison, switching trim on this card replaces it!
+    // It remains 1 car selected without duplicating or expanding!
+    if (existingVariantsOfModel.length === 1 && existingVariantsOfModel[0] !== variantId) {
+      updatedComp = comparisonVariantIds.map((id) =>
+        id === existingVariantsOfModel[0] ? variantId : id
+      );
+    }
+
+    set((state) => ({
+      selectedVariantIds: {
+        ...state.selectedVariantIds,
+        [modelId]: variantId,
+      },
+      comparisonVariantIds: updatedComp,
+      comparisonModelIds: Array.from(new Set(updatedComp.map((vId) => (VARIANTS_BY_ID[vId]?.model_id || vId) as ModelId))),
+    }));
+    get().markTicketNeedsRecalc('Khách hàng đổi phiên bản trang bị');
   },
 
   setCustomerTab: (tab) => set({ customerTab: tab }),
@@ -178,27 +230,97 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
   updateUserProfile: (partial) =>
     set((state) => ({ userProfile: { ...state.userProfile, ...partial } })),
 
-  openComparisonModal: (models) => {
-    if (models) {
-      set({ comparisonModelIds: models.slice(0, 3), isComparisonModalOpen: true });
+  openComparisonModal: (identifiers, initialView = 'picker') => {
+    if (identifiers && identifiers.length > 0) {
+      const LEGACY_VARIANT_MAP: Record<string, string> = {
+        comfort: 'VF6_COMFORT',
+        plus: 'VF5_PREMIUM',
+        base: 'VF3_ECO',
+        eco: 'VF7_ECO',
+        VF5_PLUS: 'VF5_PREMIUM',
+      };
+      const resolvedVariantIds = identifiers
+        .map((rawId) => {
+          const id = LEGACY_VARIANT_MAP[rawId] || rawId;
+          if (VARIANTS_BY_ID[id]) return id;
+          const activeVar = get().selectedVariantIds?.[id];
+          if (activeVar && VARIANTS_BY_ID[activeVar]) return activeVar;
+          const matchedByModel = ALL_VINFAST_VARIANTS.find((v) => v.model_id === id);
+          if (matchedByModel) return matchedByModel.id;
+          const matchedByExactName = ALL_VINFAST_VARIANTS.find(
+            (v) => v.id.toLowerCase() === id.toLowerCase() || v.version_name.toLowerCase() === id.toLowerCase()
+          );
+          if (matchedByExactName) return matchedByExactName.id;
+          return null;
+        })
+        .filter((vId): vId is string => Boolean(vId && VARIANTS_BY_ID[vId]));
+
+      const dedupedVariantIds = Array.from(new Set(resolvedVariantIds)).slice(0, 3);
+      const resolvedModelIds = dedupedVariantIds.map((vId) => (VARIANTS_BY_ID[vId]?.model_id || vId) as ModelId);
+      set({
+        comparisonVariantIds: dedupedVariantIds,
+        comparisonModelIds: Array.from(new Set(resolvedModelIds)),
+        comparisonInitialView: initialView,
+        isComparisonModalOpen: true,
+      });
     } else {
-      set({ comparisonModelIds: [], isComparisonModalOpen: true });
+      set({
+        comparisonVariantIds: [],
+        comparisonModelIds: [],
+        comparisonInitialView: 'picker',
+        isComparisonModalOpen: true,
+      });
     }
   },
 
   closeComparisonModal: () => set({ isComparisonModalOpen: false }),
 
-  toggleComparisonModel: (modelId) => {
-    const { comparisonModelIds } = get();
-    if (comparisonModelIds.includes(modelId)) {
-      // User can freely remove any car down to 1 or 0 without any blocking warning
-      set({ comparisonModelIds: comparisonModelIds.filter((id) => id !== modelId) });
+  toggleComparisonVariant: (variantId) => {
+    const { comparisonVariantIds } = get();
+    if (comparisonVariantIds.includes(variantId)) {
+      const updated = comparisonVariantIds.filter((id) => id !== variantId);
+      set({
+        comparisonVariantIds: updated,
+        comparisonModelIds: Array.from(new Set(updated.map((vId) => (VARIANTS_BY_ID[vId]?.model_id || vId) as ModelId))),
+      });
     } else {
-      if (comparisonModelIds.length >= 3) {
-        get().showToast('Bảng đối chiếu tối đa 3 mẫu xe cùng lúc. Bạn có thể bỏ bớt 1 xe để thêm xe khác.', 'info');
+      if (comparisonVariantIds.length >= 3) {
+        get().showToast('Bảng đối chiếu tối đa 3 phiên bản cùng lúc. Bạn có thể bỏ bớt 1 bản để thêm bản khác.', 'info');
         return;
       }
-      set({ comparisonModelIds: [...comparisonModelIds, modelId] });
+      const updated = Array.from(new Set([...comparisonVariantIds, variantId])).slice(0, 3);
+      set({
+        comparisonVariantIds: updated,
+        comparisonModelIds: Array.from(new Set(updated.map((vId) => (VARIANTS_BY_ID[vId]?.model_id || vId) as ModelId))),
+      });
+    }
+  },
+
+  setComparisonSlot: (slotIndex, variantId) => {
+    const { comparisonVariantIds } = get();
+    // If the variant is already present at another slot, do not create duplicate column
+    const existingIndex = comparisonVariantIds.indexOf(variantId);
+    if (existingIndex !== -1 && existingIndex !== slotIndex) {
+      get().showToast('Phiên bản này đã có trong bảng so sánh.', 'info');
+      return;
+    }
+    const updated = [...comparisonVariantIds];
+    if (slotIndex < updated.length) {
+      updated[slotIndex] = variantId;
+    } else {
+      updated.push(variantId);
+    }
+    const deduped = Array.from(new Set(updated)).slice(0, 3);
+    set({
+      comparisonVariantIds: deduped,
+      comparisonModelIds: Array.from(new Set(deduped.map((vId) => (VARIANTS_BY_ID[vId]?.model_id || vId) as ModelId))),
+    });
+  },
+
+  toggleComparisonModel: (modelId) => {
+    const activeVar = get().selectedVariantIds?.[modelId] || ALL_VINFAST_VARIANTS.find((v) => v.model_id === modelId)?.id;
+    if (activeVar) {
+      get().toggleComparisonVariant(activeVar);
     }
   },
 
@@ -375,9 +497,10 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
   },
 
   getComputedEstimate: () => {
-    const { selectedModelId, customerInputs } = get();
+    const { selectedModelId, selectedVariantIds, customerInputs } = get();
     if (!selectedModelId) return null;
-    const car = CAR_CATALOG[selectedModelId];
+    const variantId = selectedVariantIds?.[selectedModelId];
+    const car = getCarModelWithVariant(selectedModelId, variantId);
     return calculateDeterministicTCO({ car, ...customerInputs });
   },
 }));

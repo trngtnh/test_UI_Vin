@@ -88,8 +88,8 @@ export const DynamicArbiterWidget: React.FC = () => {
                   <h4 className="text-sm font-extrabold text-slate-900">
                     {car.display_name}
                   </h4>
-                  <div className="text-base font-black text-brand-blue mt-0.5 tabular-nums">
-                    {car.price.toLocaleString('vi-VN')} đ
+                  <div className="text-base font-black text-brand-blue mt-0.5 tabular-nums whitespace-nowrap">
+                    {car.price.toLocaleString('vi-VN')}&nbsp;đ
                   </div>
                 </div>
 

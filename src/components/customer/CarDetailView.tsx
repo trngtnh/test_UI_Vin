@@ -125,10 +125,10 @@ export const CarDetailView: React.FC = () => {
                 {car.display_name}
               </h2>
               <div className="mt-2 flex items-baseline gap-2">
-                <span className="text-2xl font-black text-brand-blue">
-                  {car.price.toLocaleString('vi-VN')} VNĐ
+                <span className="text-2xl font-black text-brand-blue tabular-nums whitespace-nowrap">
+                  {car.price.toLocaleString('vi-VN')}&nbsp;VNĐ
                 </span>
-                <span className="text-xs text-slate-500">(Đã gồm Pin & Sạc)</span>
+                <span className="text-xs text-slate-500 whitespace-nowrap">(Đã gồm Pin & Sạc)</span>
               </div>
               <p className="text-xs text-emerald-700 font-semibold mt-1 flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />

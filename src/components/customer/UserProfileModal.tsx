@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { CAR_CATALOG } from '@/lib/catalog';
 import { formatVND } from '@/lib/engine';
+import { CustomSelect } from '@/components/common/CustomSelect';
 import {
   X,
   User,
@@ -42,6 +43,17 @@ export const UserProfileModal: React.FC = () => {
     if (profileActiveTab) setActiveTab(profileActiveTab);
   }, [profileActiveTab]);
 
+  React.useEffect(() => {
+    if (!isProfileModalOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setProfileModalOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isProfileModalOpen, setProfileModalOpen]);
+
   if (!isProfileModalOpen) return null;
 
   const handleSaveProfile = (e: React.FormEvent) => {
@@ -55,8 +67,14 @@ export const UserProfileModal: React.FC = () => {
   const registeredCar = ticket.model_id ? CAR_CATALOG[ticket.model_id] : null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200 cursor-pointer"
+      onClick={() => setProfileModalOpen(false)}
+    >
+      <div
+        className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 cursor-default"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
@@ -306,14 +324,16 @@ export const UserProfileModal: React.FC = () => {
                 {/* Parking Type */}
                 <div className="sm:col-span-2 space-y-1">
                   <label className="font-semibold text-slate-700 block">Vị trí đỗ xe & sạc điện chính:</label>
-                  <select
+                  <CustomSelect<'apartment' | 'house'>
                     value={formData.parkingType}
-                    onChange={(e) => setFormData({ ...formData, parkingType: e.target.value as 'apartment' | 'house' })}
-                    className="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-brand-accent focus:outline-hidden transition"
-                  >
-                    <option value="apartment">Ở chung cư (Sạc tại trạm công cộng V-GREEN / Hầm chung cư)</option>
-                    <option value="house">Nhà phố / Có gara riêng (Có thể sạc trụ gia đình qua đêm)</option>
-                  </select>
+                    onChange={(val) => setFormData({ ...formData, parkingType: val })}
+                    options={[
+                      { value: 'apartment', label: 'Ở chung cư (Sạc trạm công cộng V-GREEN / Hầm chung cư)' },
+                      { value: 'house', label: 'Nhà phố / Có gara riêng (Sạc trụ gia đình qua đêm)' },
+                    ]}
+                    size="md"
+                    className="w-full"
+                  />
                 </div>
               </div>
 

@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { Car, X, ShieldCheck } from 'lucide-react';
+import { CustomSelect } from '@/components/common/CustomSelect';
 
 export const TestDriveModal: React.FC = () => {
   const isOpen = useAppStore((state) => state.isTestDriveModalOpen);
@@ -14,6 +15,16 @@ export const TestDriveModal: React.FC = () => {
   const [name, setName] = useState('Nguyễn Văn A');
   const [phone, setPhone] = useState('0912 345 678');
   const [consent, setConsent] = useState(false);
+  const [timeSlot, setTimeSlot] = useState('morning');
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, setOpen]);
 
   if (!isOpen) return null;
 
@@ -32,8 +43,14 @@ export const TestDriveModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 fade-enter border border-slate-100">
+    <div
+      className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 cursor-pointer"
+      onClick={() => setOpen(false)}
+    >
+      <div
+        className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 fade-enter border border-slate-100 cursor-default"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-blue-50 text-brand-blue flex items-center justify-center">
@@ -59,24 +76,18 @@ export const TestDriveModal: React.FC = () => {
             <label className="block font-semibold text-slate-700 mb-1">
               Showroom tiếp nhận yêu cầu
             </label>
-            <select
+            <CustomSelect
               value={showroom}
-              onChange={(e) => setShowroom(e.target.value)}
-              className="w-full p-2.5 border border-slate-300 rounded-xl font-medium bg-slate-50 focus:bg-white focus:outline-hidden focus:border-brand-accent transition"
-            >
-              <option value="Showroom VinFast Cầu Giấy (Hà Nội)">
-                Showroom VinFast Cầu Giấy (Hà Nội)
-              </option>
-              <option value="Showroom VinFast Phạm Văn Đồng (Hà Nội)">
-                Showroom VinFast Phạm Văn Đồng (Hà Nội)
-              </option>
-              <option value="Showroom VinFast Smart City (Nam Từ Liêm)">
-                Showroom VinFast Smart City (Nam Từ Liêm)
-              </option>
-              <option value="Showroom VinFast Long Biên (Hà Nội)">
-                Showroom VinFast Long Biên (Hà Nội)
-              </option>
-            </select>
+              onChange={(val) => setShowroom(val)}
+              options={[
+                { value: 'Showroom VinFast Cầu Giấy (Hà Nội)', label: 'Showroom VinFast Cầu Giấy (Hà Nội)', badge: 'Sẵn xe' },
+                { value: 'Showroom VinFast Phạm Văn Đồng (Hà Nội)', label: 'Showroom VinFast Phạm Văn Đồng (Hà Nội)' },
+                { value: 'Showroom VinFast Smart City (Nam Từ Liêm)', label: 'Showroom VinFast Smart City (Nam Từ Liêm)' },
+                { value: 'Showroom VinFast Long Biên (Hà Nội)', label: 'Showroom VinFast Long Biên (Hà Nội)' },
+              ]}
+              size="md"
+              className="w-full"
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -96,11 +107,17 @@ export const TestDriveModal: React.FC = () => {
               <label className="block font-semibold text-slate-700 mb-1">
                 Khung giờ thuận tiện
               </label>
-              <select className="w-full p-2 border border-slate-300 rounded-xl text-xs bg-slate-50 focus:bg-white focus:outline-hidden focus:border-brand-accent transition">
-                <option>Sáng (09:00 - 11:30)</option>
-                <option>Chiều (14:00 - 17:00)</option>
-                <option>Cuối tuần (Thỏa thuận)</option>
-              </select>
+              <CustomSelect
+                value={timeSlot}
+                onChange={(val) => setTimeSlot(val)}
+                options={[
+                  { value: 'morning', label: 'Sáng (09:00 - 11:30)' },
+                  { value: 'afternoon', label: 'Chiều (14:00 - 17:00)' },
+                  { value: 'weekend', label: 'Cuối tuần (Thỏa thuận)' },
+                ]}
+                size="md"
+                className="w-full"
+              />
             </div>
           </div>
 

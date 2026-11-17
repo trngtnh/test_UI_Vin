@@ -3,7 +3,7 @@
 import React from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { formatVND } from '@/lib/engine';
-import { CAR_CATALOG } from '@/lib/catalog';
+import { CAR_CATALOG, getCarModelWithVariant } from '@/lib/catalog';
 import {
   Wallet,
   Sliders,
@@ -17,8 +17,13 @@ import {
   Info,
 } from 'lucide-react';
 
+import { Button } from '@/components/common/Button';
+import { CustomSelect } from '@/components/common/CustomSelect';
+import { VINFAST_FACILITIES } from '@/lib/catalog';
+
 export const TCOEstimateCard: React.FC = () => {
   const selectedModelId = useAppStore((state) => state.selectedModelId);
+  const selectedCity = useAppStore((state) => state.selectedCity) || 'national';
   const customerInputs = useAppStore((state) => state.customerInputs);
   const updateInputs = useAppStore((state) => state.updateInputs);
   const isAccordionOpen = useAppStore((state) => state.isSlidersAccordionOpen);
@@ -26,10 +31,16 @@ export const TCOEstimateCard: React.FC = () => {
   const submitTicket = useAppStore((state) => state.submitTicketToAdvisor);
   const setTestDriveModalOpen = useAppStore((state) => state.setTestDriveModalOpen);
   const getComputedEstimate = useAppStore((state) => state.getComputedEstimate);
+  const selectedVariantIds = useAppStore((state) => state.selectedVariantIds);
+  const selectVariant = useAppStore((state) => state.selectVariant);
+
+  const currentFacility = VINFAST_FACILITIES[selectedCity] || VINFAST_FACILITIES.national;
 
   if (!selectedModelId) return null;
 
-  const car = CAR_CATALOG[selectedModelId];
+  const baseCar = CAR_CATALOG[selectedModelId];
+  const activeVariantId = selectedVariantIds?.[selectedModelId] || baseCar?.variants?.[0]?.id;
+  const car = getCarModelWithVariant(selectedModelId, activeVariantId);
   const estimate = getComputedEstimate();
   if (!estimate) return null;
 
@@ -72,6 +83,42 @@ export const TCOEstimateCard: React.FC = () => {
         <span className="text-[10px] font-semibold text-slate-600 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-2xs">
           Dự toán dự kiến · Đang chờ xác nhận từ Showroom
         </span>
+      </div>
+
+      {/* Model & Version Switcher Strip */}
+      <div className="px-4 py-2.5 bg-blue-50/50 border-b border-blue-100 flex items-center justify-between flex-wrap gap-2 text-xs">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="font-extrabold text-slate-900">{car.display_name}</span>
+          <span className="text-brand-blue font-black tabular-nums">
+            {car.price.toLocaleString('vi-VN')}&nbsp;đ
+          </span>
+          <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
+            Tiết kiệm ~{Math.round(car.price * 0.1 / 1000000)}&nbsp;tr trước&nbsp;bạ
+          </span>
+        </div>
+
+        {baseCar.variants && baseCar.variants.length > 1 && (
+          <div className="flex items-center gap-1 p-0.5 bg-white rounded-lg border border-slate-200 shadow-2xs">
+            {baseCar.variants.map((v) => {
+              const isSelected = activeVariantId === v.id;
+              return (
+                <button
+                  key={v.id}
+                  type="button"
+                  onClick={() => selectVariant(selectedModelId, v.id)}
+                  className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                    isSelected
+                      ? 'bg-brand-blue text-white shadow-2xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
+                  title={`${v.name} · ${v.price.toLocaleString('vi-VN')} đ`}
+                >
+                  {v.name.replace('Bản ', '')}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* 3 Key Financial Metrics Strip */}
@@ -264,16 +311,16 @@ export const TCOEstimateCard: React.FC = () => {
                 <span className="block text-[11px] font-semibold text-slate-700 mb-1.5">
                   Phương thức tính lãi & gốc ngân hàng:
                 </span>
-                <select
+                <CustomSelect<'decreasing' | 'annuity'>
                   value={customerInputs.loan_method}
-                  onChange={(e) =>
-                    updateInputs({ loan_method: e.target.value as 'decreasing' | 'annuity' })
-                  }
-                  className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium focus:outline-hidden focus:border-brand-accent"
-                >
-                  <option value="decreasing">Gốc đều, lãi trên dư nợ giảm dần</option>
-                  <option value="annuity">Niên kim cố định hàng tháng (PMT)</option>
-                </select>
+                  onChange={(val) => updateInputs({ loan_method: val })}
+                  options={[
+                    { value: 'decreasing', label: 'Gốc đều, lãi dư nợ giảm dần' },
+                    { value: 'annuity', label: 'Niên kim cố định hàng tháng (PMT)' },
+                  ]}
+                  size="sm"
+                  className="w-full"
+                />
                 <p className="text-[10px] text-slate-400 mt-1">
                   Kỳ hạn vay chuẩn: 60 tháng (5 năm) · Lãi suất giả định 8%/năm
                 </p>
@@ -283,16 +330,16 @@ export const TCOEstimateCard: React.FC = () => {
                 <span className="block text-[11px] font-semibold text-slate-700 mb-1.5">
                   Nguồn sạc điện chính hàng ngày:
                 </span>
-                <select
+                <CustomSelect<'vgreen' | 'home'>
                   value={customerInputs.charging_facility}
-                  onChange={(e) =>
-                    updateInputs({ charging_facility: e.target.value as 'vgreen' | 'home' })
-                  }
-                  className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium focus:outline-hidden focus:border-brand-accent"
-                >
-                  <option value="vgreen">Trạm sạc công cộng V-GREEN (3.858 đ/kWh)</option>
-                  <option value="home">Sạc tại nhà / Chung cư gia đình (~3.200 đ/kWh)</option>
-                </select>
+                  onChange={(val) => updateInputs({ charging_facility: val })}
+                  options={[
+                    { value: 'vgreen', label: 'Trạm sạc V-GREEN (3.858 đ/kWh)' },
+                    { value: 'home', label: 'Sạc tại nhà / Chung cư (~3.200 đ/kWh)' },
+                  ]}
+                  size="sm"
+                  className="w-full"
+                />
                 <p className="text-[10px] text-slate-400 mt-1">
                   Đã tính 10% tổn hao sạc điện AC/DC thực tế theo chuẩn WLTP
                 </p>
@@ -303,24 +350,26 @@ export const TCOEstimateCard: React.FC = () => {
       </div>
 
       {/* CTA Action Row */}
-      <div className="p-5 flex flex-col sm:flex-row items-center gap-3 bg-slate-50/60">
-        <button
-          type="button"
+      <div className="p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-3 bg-slate-50/80 border-t border-slate-200">
+        <Button
+          variant="outline"
+          size="md"
+          fullWidth
           onClick={() => setTestDriveModalOpen(true)}
-          className="w-full sm:w-1/2 py-2.5 px-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-800 text-xs font-bold flex items-center justify-center gap-2 transition shadow-2xs"
+          icon={<Calendar className="w-4 h-4 text-brand-blue" />}
         >
-          <Calendar className="w-4 h-4 text-brand-blue" />
-          <span>Đăng ký Lái thử Trải nghiệm</span>
-        </button>
+          Đăng ký Lái thử Trải nghiệm
+        </Button>
 
-        <button
-          type="button"
+        <Button
+          variant="primary"
+          size="md"
+          fullWidth
           onClick={submitTicket}
-          className="w-full sm:w-1/2 py-2.5 px-4 rounded-xl bg-brand-blue hover:bg-slate-800 text-white text-xs font-bold flex items-center justify-center gap-2 transition shadow-xs hover:shadow"
+          icon={<Send className="w-4 h-4" />}
         >
-          <Send className="w-4 h-4" />
-          <span>Gửi dự toán đến Showroom Cầu Giấy</span>
-        </button>
+          Gửi dự toán đến {selectedCity === 'national' ? 'Showroom VinFast' : currentFacility.showroomName.replace('Showroom VinFast ', '')}
+        </Button>
       </div>
     </div>
   );
