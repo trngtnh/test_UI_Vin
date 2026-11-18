@@ -304,7 +304,7 @@ export const LivingCanvasPane: React.FC = () => {
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
-                    🚗 Xe Du lịch (17 bản)
+                    Xe Du lịch (17 bản)
                   </button>
                   <button
                     type="button"
@@ -315,7 +315,7 @@ export const LivingCanvasPane: React.FC = () => {
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
-                    🚐 Xe Thương mại (10 bản)
+                    Xe Thương mại (10 bản)
                   </button>
                 </div>
               </div>
@@ -549,25 +549,31 @@ export const LivingCanvasPane: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* Specs Matrix */}
-                        <div className="grid grid-cols-2 gap-px bg-slate-200/80 rounded-xl overflow-hidden border border-slate-200/90 text-[10px]">
-                          <div className="bg-slate-50/90 px-2.5 py-1.5 flex items-center justify-between">
-                            <span className="text-slate-500 font-medium">Tầm chạy:</span>
-                            <span className="font-bold text-slate-800">{item.range_nedc} km</span>
-                          </div>
-                          <div className="bg-slate-50/90 px-2.5 py-1.5 flex items-center justify-between">
-                            <span className="text-slate-500 font-medium">Pin:</span>
-                            <span className="font-bold text-slate-800">{item.battery_kwh} kWh</span>
-                          </div>
-                          <div className="bg-slate-50/90 px-2.5 py-1.5 flex items-center justify-between">
-                            <span className="text-slate-500 font-medium">Công suất:</span>
-                            <span className="font-bold text-slate-800 truncate" title={item.motor_power}>
-                              {item.motor_power.split('(')[0]}
+                        {/* Bento Metric Tiles (Baoyu Visual Chunking) */}
+                        <div className="grid grid-cols-2 gap-1.5 text-xs">
+                          <div className="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex flex-col justify-between">
+                            <span className="text-[10px] font-semibold text-slate-400">Tầm chạy NEDC</span>
+                            <span className="text-xs font-black text-slate-900 tabular-nums mt-0.5">
+                              {item.range_nedc} <span className="text-[10px] font-bold text-slate-400">km</span>
                             </span>
                           </div>
-                          <div className="bg-slate-50/90 px-2.5 py-1.5 flex items-center justify-between">
-                            <span className="text-slate-500 font-medium">Sạc nhanh:</span>
-                            <span className="font-bold text-slate-800">{item.charging_time.replace('trong ', '')}</span>
+                          <div className="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex flex-col justify-between">
+                            <span className="text-[10px] font-semibold text-slate-400">Dung lượng Pin</span>
+                            <span className="text-xs font-black text-slate-900 tabular-nums mt-0.5">
+                              {item.battery_kwh} <span className="text-[10px] font-bold text-slate-400">kWh</span>
+                            </span>
+                          </div>
+                          <div className="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex flex-col justify-between">
+                            <span className="text-[10px] font-semibold text-slate-400">Công suất động cơ</span>
+                            <span className="text-xs font-black text-slate-900 tabular-nums mt-0.5 truncate" title={item.motor_power}>
+                              {item.motor_power.split('(')[0].trim()}
+                            </span>
+                          </div>
+                          <div className="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex flex-col justify-between">
+                            <span className="text-[10px] font-semibold text-slate-400">Sạc nhanh 10-70%</span>
+                            <span className="text-xs font-black text-slate-900 tabular-nums mt-0.5 truncate" title={item.charging_time}>
+                              {item.charging_time.replace('trong ', '')}
+                            </span>
                           </div>
                         </div>
 
@@ -581,38 +587,40 @@ export const LivingCanvasPane: React.FC = () => {
                           </p>
                         </div>
 
-                        {/* Action Buttons - Clean Minimalist Typography (Baoyu Visual De-clutter) */}
-                        <div className="mt-auto pt-3 border-t border-slate-100 grid grid-cols-3 gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            fullWidth
-                            onClick={() => handleOpenCarDetail(item.model_id, item.id)}
-                            title="Xem chi tiết thông số kỹ thuật"
-                          >
-                            Chi tiết
-                          </Button>
-                          <Button
-                            variant={isCompared ? 'primary' : 'secondary'}
-                            size="sm"
-                            fullWidth
-                            onClick={() => {
-                              if (!isCompared) {
-                                const updated = Array.from(new Set([...comparisonVariantIds, item.id])).slice(0, 3);
-                                openComparisonModal(updated, 'picker');
-                              } else {
-                                toggleComparisonVariant(item.id);
+                        {/* 2-Tier Action Hierarchy (Baoyu Design: Secondary Exploration vs Primary Conversion CTA) */}
+                        <div className="mt-auto pt-3 border-t border-slate-100 space-y-1.5">
+                          <div className="grid grid-cols-2 gap-1.5">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              fullWidth
+                              onClick={() => handleOpenCarDetail(item.model_id, item.id)}
+                              title="Xem chi tiết thông số kỹ thuật"
+                            >
+                              Chi tiết
+                            </Button>
+                            <Button
+                              variant={isCompared ? 'primary' : 'secondary'}
+                              size="sm"
+                              fullWidth
+                              onClick={() => {
+                                if (!isCompared) {
+                                  const updated = Array.from(new Set([...comparisonVariantIds, item.id])).slice(0, 3);
+                                  openComparisonModal(updated, 'picker');
+                                } else {
+                                  toggleComparisonVariant(item.id);
+                                }
+                              }}
+                              title={isCompared ? 'Nhấn để bỏ chọn phiên bản này' : 'Chọn so sánh phiên bản này'}
+                              className={
+                                isCompared
+                                  ? 'hover:bg-rose-600 hover:border-rose-600 hover:text-white transition-colors'
+                                  : ''
                               }
-                            }}
-                            title={isCompared ? 'Nhấn để bỏ chọn phiên bản này' : 'Chọn so sánh phiên bản này'}
-                            className={
-                              isCompared
-                                ? 'hover:bg-rose-600 hover:border-rose-600 hover:text-white transition-colors'
-                                : ''
-                            }
-                          >
-                            {isCompared ? '✓ Đã chọn' : '+ So sánh'}
-                          </Button>
+                            >
+                              {isCompared ? '✓ Đã chọn' : '+ So sánh'}
+                            </Button>
+                          </div>
                           <Button
                             variant="primary"
                             size="sm"
@@ -624,9 +632,10 @@ export const LivingCanvasPane: React.FC = () => {
                               setCanvasMode('recommendations');
                               proceedToTCO(baseModel);
                             }}
+                            className="bg-brand-blue hover:bg-blue-600 shadow-2xs font-extrabold text-xs"
                             title="Tính TCO & Lập hồ sơ"
                           >
-                            TCO
+                            Dự toán chi phí & Tính TCO ➔
                           </Button>
                         </div>
                       </div>
@@ -742,23 +751,31 @@ export const LivingCanvasPane: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* Specs Matrix */}
-                        <div className="grid grid-cols-2 gap-px bg-slate-200/80 rounded-xl overflow-hidden border border-slate-200/90 text-[10px]">
-                          <div className="bg-slate-50/90 px-2.5 py-2 flex items-center justify-between">
-                            <span className="text-slate-500 font-medium">Tầm chạy:</span>
-                            <span className="font-bold text-slate-800">{item.range_nedc} km</span>
+                        {/* Bento Metric Tiles (Baoyu Visual Chunking) */}
+                        <div className="grid grid-cols-2 gap-1.5 text-xs">
+                          <div className="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex flex-col justify-between">
+                            <span className="text-[10px] font-semibold text-slate-400">Tầm chạy NEDC</span>
+                            <span className="text-xs font-black text-slate-900 tabular-nums mt-0.5">
+                              {item.range_nedc} <span className="text-[10px] font-bold text-slate-400">km</span>
+                            </span>
                           </div>
-                          <div className="bg-slate-50/90 px-2.5 py-2 flex items-center justify-between">
-                            <span className="text-slate-500 font-medium">Pin:</span>
-                            <span className="font-bold text-slate-800">{item.battery_kwh} kWh</span>
+                          <div className="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex flex-col justify-between">
+                            <span className="text-[10px] font-semibold text-slate-400">Dung lượng Pin</span>
+                            <span className="text-xs font-black text-slate-900 tabular-nums mt-0.5">
+                              {item.battery_kwh} <span className="text-[10px] font-bold text-slate-400">kWh</span>
+                            </span>
                           </div>
-                          <div className="bg-slate-50/90 px-2.5 py-2 flex items-center justify-between">
-                            <span className="text-slate-500 font-medium">Sạc 10-70%:</span>
-                            <span className="font-bold text-slate-800">{item.charging_time.replace('trong ', '')}</span>
+                          <div className="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex flex-col justify-between">
+                            <span className="text-[10px] font-semibold text-slate-400">Sạc nhanh 10-70%</span>
+                            <span className="text-xs font-black text-slate-900 tabular-nums mt-0.5 truncate" title={item.charging_time}>
+                              {item.charging_time.replace('trong ', '')}
+                            </span>
                           </div>
-                          <div className="bg-slate-50/90 px-2.5 py-2 flex items-center justify-between">
-                            <span className="text-slate-500 font-medium">Bảo hành:</span>
-                            <span className="font-bold text-slate-800">{item.warranty_years.split(' hoặc ')[0]}</span>
+                          <div className="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex flex-col justify-between">
+                            <span className="text-[10px] font-semibold text-slate-400">Bảo hành chính hãng</span>
+                            <span className="text-xs font-black text-slate-900 tabular-nums mt-0.5 truncate">
+                              {item.warranty_years ? item.warranty_years.split(' hoặc ')[0] : '7 năm'}
+                            </span>
                           </div>
                         </div>
 
@@ -770,38 +787,40 @@ export const LivingCanvasPane: React.FC = () => {
                           <p className="line-clamp-2">{item.reason_budget}</p>
                         </div>
 
-                        {/* Triple Action Buttons - Clean Minimalist Typography (Baoyu Visual De-clutter) */}
-                        <div className="mt-auto pt-3 border-t border-slate-100 grid grid-cols-3 gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            fullWidth
-                            onClick={() => handleOpenCarDetail(mId, item.id)}
-                            title="Xem chi tiết thông số kỹ thuật"
-                          >
-                            Chi tiết
-                          </Button>
-                          <Button
-                            variant={isCompared ? 'primary' : 'secondary'}
-                            size="sm"
-                            fullWidth
-                            onClick={() => {
-                              if (!isCompared) {
-                                const updated = Array.from(new Set([...comparisonVariantIds, item.id])).slice(0, 3);
-                                openComparisonModal(updated, 'picker');
-                              } else {
-                                toggleComparisonVariant(item.id);
+                        {/* 2-Tier Action Hierarchy (Baoyu Design: Secondary Exploration vs Primary Conversion CTA) */}
+                        <div className="mt-auto pt-3 border-t border-slate-100 space-y-1.5">
+                          <div className="grid grid-cols-2 gap-1.5">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              fullWidth
+                              onClick={() => handleOpenCarDetail(mId, item.id)}
+                              title="Xem chi tiết thông số kỹ thuật"
+                            >
+                              Chi tiết
+                            </Button>
+                            <Button
+                              variant={isCompared ? 'primary' : 'secondary'}
+                              size="sm"
+                              fullWidth
+                              onClick={() => {
+                                if (!isCompared) {
+                                  const updated = Array.from(new Set([...comparisonVariantIds, item.id])).slice(0, 3);
+                                  openComparisonModal(updated, 'picker');
+                                } else {
+                                  toggleComparisonVariant(item.id);
+                                }
+                              }}
+                              title={isCompared ? 'Nhấn để bỏ chọn phiên bản này' : 'Chọn so sánh phiên bản này'}
+                              className={
+                                isCompared
+                                  ? 'hover:bg-rose-600 hover:border-rose-600 hover:text-white transition-colors'
+                                  : ''
                               }
-                            }}
-                            title={isCompared ? 'Nhấn để bỏ chọn phiên bản này' : 'Chọn so sánh phiên bản này'}
-                            className={
-                              isCompared
-                                ? 'hover:bg-rose-600 hover:border-rose-600 hover:text-white transition-colors'
-                                : ''
-                            }
-                          >
-                            {isCompared ? '✓ Đã chọn' : '+ So sánh'}
-                          </Button>
+                            >
+                              {isCompared ? '✓ Đã chọn' : '+ So sánh'}
+                            </Button>
+                          </div>
                           <Button
                             variant="primary"
                             size="sm"
@@ -813,9 +832,10 @@ export const LivingCanvasPane: React.FC = () => {
                               setCanvasMode('recommendations');
                               proceedToTCO(baseModel);
                             }}
+                            className="bg-brand-blue hover:bg-blue-600 shadow-2xs font-extrabold text-xs"
                             title="Tính TCO & Lập hồ sơ"
                           >
-                            TCO
+                            Dự toán chi phí & Tính TCO ➔
                           </Button>
                         </div>
                       </div>
