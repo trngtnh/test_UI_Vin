@@ -242,101 +242,7 @@ export const CarComparisonModal: React.FC = () => {
             ========================================================================= */}
         {viewMode === 'picker' && (
           <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Guide Step Banner & Filter Strip */}
-            <div className="px-5 py-3 bg-blue-50/70 border-b border-blue-100/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs shrink-0">
-              <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-brand-blue text-white flex items-center justify-center text-[10px] font-black shrink-0">
-                  {comparedVariants.length === 0 ? '1' : comparedVariants.length === 1 ? '2' : '✓'}
-                </span>
-                <span className="font-semibold text-slate-800">
-                  {comparedVariants.length === 0
-                    ? 'Bước 1: Chọn phiên bản xe đầu tiên (có thể chọn 2 bản của cùng 1 dòng xe)'
-                    : comparedVariants.length === 1
-                    ? 'Bước 2: Chọn thêm 1 phiên bản đối chiếu (cùng dòng hoặc khác dòng xe)'
-                    : 'Đã chọn đủ xe: Nhấn nút [So sánh ngay] bên phải hoặc chọn thêm bản thứ 3'}
-                </span>
-              </div>
-
-              {comparedVariants.length >= 2 && (
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={() => setViewMode('table')}
-                  icon={<Scale className="w-3.5 h-3.5" />}
-                >
-                  So sánh ngay ({comparedVariants.length} xe)
-                </Button>
-              )}
-            </div>
-
-            {/* PINNED SELECTION HEADER BAR IN PICKER: Always visible whenever 1+ cars selected */}
-            {comparedVariants.length > 0 && (
-              <div className="px-5 py-2.5 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-800 shrink-0 animate-in fade-in duration-150">
-                <div className="flex items-center gap-2 flex-wrap min-w-0">
-                  <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider shrink-0 flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span>Đang chọn ({comparedVariants.length}/3 xe):</span>
-                  </span>
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    {comparedVariants.map((c) => (
-                      <span
-                        key={c.id}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black bg-brand-blue text-white shadow-2xs border border-blue-400/30 animate-in zoom-in-95 duration-150"
-                      >
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                        <span>{c.display_name}</span>
-                        <span className="text-[10px] text-blue-200 tabular-nums">
-                          ({(c.price / 1000000).toLocaleString('vi-VN')} tr)
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => toggleComparisonVariant(c.id)}
-                          className="text-blue-200 hover:text-white ml-0.5 p-0.5 rounded cursor-pointer"
-                          title="Bỏ chọn xe này"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Quick sister trim compare shortcut or call-to-action */}
-                <div className="flex items-center gap-2 shrink-0">
-                  {comparedVariants.length === 1 && sisterVariants.length > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        toggleComparisonVariant(sisterVariants[0].id);
-                        setViewMode('table');
-                      }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 shadow-sm cursor-pointer transition-all hover:scale-102"
-                      title={`Nhấp để so sánh nhanh với bản cùng dòng: ${sisterVariants[0].display_name}`}
-                    >
-                      <Sparkles className="w-3.5 h-3.5 text-slate-950 shrink-0" />
-                      <span>So sánh nhanh với {sisterVariants[0].version_name}</span>
-                      <span className="text-[10px] font-bold opacity-80 tabular-nums">
-                        ({(sisterVariants[0].price / 1000000).toLocaleString('vi-VN')} tr) ➔
-                      </span>
-                    </button>
-                  )}
-
-                  {comparedVariants.length >= 2 && (
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={() => setViewMode('table')}
-                      icon={<Scale className="w-3.5 h-3.5" />}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-black shadow-sm"
-                    >
-                      Xem Bảng So Sánh ({comparedVariants.length} xe) ➔
-                    </Button>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Filter and Search Bar for 27 Variants */}
+            {/* Filter and Search Bar for 27 Variants (Tối ưu không gian, đưa trực tiếp lên đầu) */}
             <div className="px-5 py-2.5 bg-slate-50/90 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shrink-0">
               <div className="inline-flex p-1 bg-slate-200/70 rounded-xl gap-1">
                 <button
@@ -492,47 +398,53 @@ export const CarComparisonModal: React.FC = () => {
               </div>
             </div>
 
-            {/* FLOATING ACTION BAR IN PICKER WHEN 1+ CARS SELECTED */}
+            {/* SINGLE PROMINENT BOTTOM BAR IN PICKER (Dễ nhìn, nổi bật, thanh duy nhất điều hướng) */}
             {comparedVariants.length >= 1 && (
-              <div className="p-3 bg-slate-900/95 backdrop-blur-md border-t border-slate-700/80 text-white flex items-center justify-between gap-3 shrink-0 animate-in fade-in slide-in-from-bottom-2 duration-150">
-                <div className="flex items-center gap-2 overflow-x-auto">
-                  <span className="text-xs font-bold text-slate-300 shrink-0">
-                    Đã chọn ({comparedVariants.length}/3 xe):
-                  </span>
-                  <div className="flex items-center gap-1.5">
+              <div className="p-3.5 sm:px-5 bg-slate-900/95 backdrop-blur-md border-t border-slate-700/90 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0 shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-150">
+                <div className="flex items-center gap-2.5 overflow-x-auto min-w-0 py-0.5">
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <Scale className="w-4 h-4 text-brand-blue" />
+                    <span className="text-xs font-black text-white whitespace-nowrap">
+                      Đã chọn ({comparedVariants.length}/3 xe):
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     {comparedVariants.map((car) => (
                       <span
                         key={car.id}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-800 text-white border border-slate-700 shadow-2xs"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black bg-brand-blue text-white shadow-2xs border border-blue-400/30 animate-in zoom-in-95 duration-150"
                       >
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                         <span>{car.display_name.replace('VinFast ', '')}</span>
+                        <span className="text-[10px] text-blue-200 tabular-nums">
+                          ({(car.price / 1000000).toLocaleString('vi-VN')}&nbsp;tr)
+                        </span>
                         <button
                           type="button"
                           onClick={() => toggleComparisonVariant(car.id)}
-                          className="text-slate-400 hover:text-rose-400 ml-1 cursor-pointer"
-                          title="Bỏ phiên bản này"
+                          className="text-blue-200 hover:text-white ml-0.5 p-0.5 rounded cursor-pointer transition-colors"
+                          title="Bỏ chọn phiên bản này"
                         >
-                          <X className="w-3 h-3" />
+                          <X className="w-3.5 h-3.5" />
                         </button>
                       </span>
                     ))}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-2.5 shrink-0 self-end sm:self-auto">
                   {comparedVariants.length === 1 && (
-                    <span className="text-xs text-slate-400 hidden sm:inline">
+                    <span className="text-xs text-slate-300 font-medium">
                       Chọn thêm ít nhất 1 xe để bắt đầu so sánh
                     </span>
                   )}
                   {comparedVariants.length >= 2 && (
                     <Button
                       variant="primary"
-                      size="sm"
+                      size="md"
                       onClick={() => setViewMode('table')}
-                      icon={<Scale className="w-3.5 h-3.5" />}
-                      className="bg-brand-blue hover:bg-blue-600 text-xs shrink-0 font-extrabold shadow-sm"
+                      icon={<Scale className="w-4 h-4" />}
+                      className="bg-brand-blue hover:bg-blue-600 text-xs sm:text-sm font-black shadow-lg hover:shadow-blue-500/25 transition-all px-5 py-2 cursor-pointer"
                     >
                       So sánh ngay ({comparedVariants.length} xe) ➔
                     </Button>
