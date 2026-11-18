@@ -1362,6 +1362,7 @@ export const LivingCanvasPane: React.FC = () => {
         variantId={detailModalVariantId}
         isOpen={isDetailModalOpen}
         onClose={() => setIsDetailModalOpen(false)}
+        onVariantChange={(vId) => setDetailModalVariantId(vId)}
         onSelectAndProceed={(mId) => {
           setIsDetailModalOpen(false);
           proceedToTCO(mId);

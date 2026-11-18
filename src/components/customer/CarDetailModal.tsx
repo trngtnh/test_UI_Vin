@@ -31,6 +31,7 @@ interface CarDetailModalProps {
   variantId?: string | null;
   isOpen: boolean;
   onClose: () => void;
+  onVariantChange?: (variantId: string) => void;
   onSelectAndProceed?: (modelId: ModelId) => void;
 }
 
@@ -39,6 +40,7 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
   variantId,
   isOpen,
   onClose,
+  onVariantChange,
   onSelectAndProceed,
 }) => {
   const setTestDriveModalOpen = useAppStore((state) => state.setTestDriveModalOpen);
@@ -49,9 +51,12 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
 
   // Local state for actively selected variant inside the modal to support instant switching
   const [currentVariantId, setCurrentVariantId] = useState<string | null>(null);
+  const prevOpenRef = React.useRef(false);
+  const prevModelIdRef = React.useRef(modelId);
 
   useEffect(() => {
-    if (isOpen) {
+    // Only re-initialize when modal transitions from closed to open, or when modelId changes from outside
+    if (isOpen && (!prevOpenRef.current || prevModelIdRef.current !== modelId)) {
       const initialVarId =
         variantId ||
         (modelId ? selectedVariantIds?.[modelId] : null) ||
@@ -60,7 +65,9 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
         'VF6_COMFORT';
       setCurrentVariantId(initialVarId);
     }
-  }, [isOpen, variantId, modelId, selectedVariantIds]);
+    prevOpenRef.current = isOpen;
+    prevModelIdRef.current = modelId;
+  }, [isOpen, modelId, variantId, selectedVariantIds]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -95,7 +102,7 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
   // If it's one of the 6 core catalog cars
   const catalogCar = CAR_CATALOG[resolvedModelId];
 
-  const car = catalogCar
+  const rawCar = catalogCar
     ? getCarModelWithVariant(resolvedModelId, activeVariantId)
     : targetVariant
     ? {
@@ -130,10 +137,43 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
       }
     : CAR_CATALOG.VF6;
 
-  const baseCar = catalogCar || car;
+  const car = {
+    ...rawCar,
+    ...(targetVariant
+      ? {
+          variant_id: targetVariant.id,
+          display_name: targetVariant.display_name || rawCar.display_name,
+          badge: targetVariant.badge || rawCar.badge,
+          price: targetVariant.price || rawCar.price,
+          seats: targetVariant.seats || rawCar.seats,
+          range_nedc: targetVariant.range_nedc || rawCar.range_nedc,
+          range_real: targetVariant.range_real || rawCar.range_real,
+          battery_kwh: targetVariant.battery_kwh || rawCar.battery_kwh,
+          consumption_kwh_100km: targetVariant.consumption_kwh_100km || rawCar.consumption_kwh_100km,
+          warranty_years: targetVariant.warranty_years || rawCar.warranty_years,
+          reason_budget: targetVariant.reason_budget || rawCar.reason_budget,
+          reason_charging: targetVariant.reason_charging || rawCar.reason_charging,
+          dimensions: targetVariant.dimensions || rawCar.dimensions,
+          wheelbase: targetVariant.wheelbase || rawCar.wheelbase,
+          motor_power: targetVariant.motor_power || rawCar.motor_power,
+          charging_time: targetVariant.charging_time || rawCar.charging_time,
+          ground_clearance: targetVariant.ground_clearance || rawCar.ground_clearance,
+          adas: targetVariant.adas || rawCar.adas,
+        }
+      : {}),
+    variants: availableVariants,
+  };
+
   const currentColor = car.colors[selectedColorIndex] || car.colors[0];
 
+  const handleVariantSwitch = (newVariantId: string) => {
+    setCurrentVariantId(newVariantId);
+    onVariantChange?.(newVariantId);
+    selectVariant(resolvedModelId, newVariantId);
+  };
+
   const handleOpenComparison = () => {
+    selectVariant(resolvedModelId, activeVariantId);
     onClose();
     openComparisonModal([activeVariantId], 'picker');
   };
@@ -241,10 +281,7 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
                         <button
                           key={v.id}
                           type="button"
-                          onClick={() => {
-                            setCurrentVariantId(v.id);
-                            selectVariant(resolvedModelId, v.id);
-                          }}
+                          onClick={() => handleVariantSwitch(v.id)}
                           className={`p-2 rounded-xl text-left border transition-all cursor-pointer ${
                             isSelected
                               ? 'bg-white border-brand-blue ring-2 ring-brand-blue/15 shadow-2xs text-brand-blue'
@@ -422,6 +459,7 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
               variant="primary"
               size="md"
               onClick={() => {
+                selectVariant(resolvedModelId, activeVariantId);
                 onClose();
                 onSelectAndProceed(resolvedModelId);
               }}
