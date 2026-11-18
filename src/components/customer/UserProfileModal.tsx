@@ -8,18 +8,9 @@ import { CustomSelect } from '@/components/common/CustomSelect';
 import {
   X,
   User,
-  History,
-  Phone,
-  Mail,
-  MapPin,
-  Car,
   CheckCircle2,
   Clock,
-  ShieldCheck,
-  Calendar,
   ExternalLink,
-  Save,
-  AlertCircle,
 } from 'lucide-react';
 
 export const UserProfileModal: React.FC = () => {
@@ -111,7 +102,6 @@ export const UserProfileModal: React.FC = () => {
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            <History className="w-3.5 h-3.5" />
             <span>Lịch sử đăng ký & Hồ sơ xe</span>
             {ticket.status !== 'draft' && (
               <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
@@ -127,7 +117,6 @@ export const UserProfileModal: React.FC = () => {
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            <User className="w-3.5 h-3.5" />
             <span>Thông tin cá nhân</span>
           </button>
         </div>
@@ -341,9 +330,8 @@ export const UserProfileModal: React.FC = () => {
               <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
                 <button
                   type="submit"
-                  className="py-2.5 px-5 rounded-xl bg-brand-blue hover:bg-slate-900 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs"
+                  className="py-2.5 px-5 rounded-xl bg-brand-blue hover:bg-slate-900 text-white text-xs font-bold transition shadow-xs cursor-pointer"
                 >
-                  <Save className="w-4 h-4" />
                   <span>{isSaved ? 'Đã lưu thay đổi!' : 'Lưu thông tin tài khoản'}</span>
                 </button>
               </div>

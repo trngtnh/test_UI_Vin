@@ -13,18 +13,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { Button } from '@/components/common/Button';
 import { Badge } from '@/components/common/Badge';
 import { CarVisualSilhouette } from '@/components/common/CarVisualSilhouette';
-import {
-  X,
-  BatteryCharging,
-  Zap,
-  ShieldCheck,
-  Clock,
-  Gauge,
-  Calendar,
-  ArrowRight,
-  Scale,
-  CheckCircle2,
-} from 'lucide-react';
+import { X } from 'lucide-react';
 
 interface CarDetailModalProps {
   modelId?: ModelId | string | null;
@@ -206,7 +195,6 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
               variant="outline"
               size="sm"
               onClick={handleOpenComparison}
-              icon={<Scale className="w-3.5 h-3.5 text-brand-blue" />}
               className="hidden sm:inline-flex"
             >
               So sánh dòng xe
@@ -327,8 +315,8 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
 
               {/* Operation & Charging AI Note */}
               <div key={`charging-note-${activeVariantId}`} className="p-4 rounded-2xl bg-blue-50/60 border border-blue-100 text-slate-700 space-y-1.5 animate-in fade-in duration-200">
-                <div className="flex items-center gap-1.5 text-brand-blue">
-                  <CheckCircle2 className="w-4 h-4" />
+                <div className="flex items-center gap-2 text-brand-blue">
+                  <span className="w-2 h-2 rounded-full bg-brand-blue shrink-0" />
                   <span className="text-xs font-bold">Thói quen sạc & Vận hành</span>
                 </div>
                 <p className="text-[11px] text-slate-600 leading-relaxed">
@@ -338,12 +326,12 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
 
               {/* Official Catalog Tech Chips (Zero Hallucinated Features) */}
               <div className="grid grid-cols-2 gap-2 text-[10px]">
-                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-1.5 text-slate-700">
-                  <Zap className="w-3.5 h-3.5 text-brand-blue shrink-0" />
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2 text-slate-700">
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand-blue shrink-0" />
                   <span>Trạm sạc <strong>V-GREEN toàn quốc</strong></span>
                 </div>
-                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-1.5 text-slate-700">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2 text-slate-700">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                   <span>Bảo hành <strong>{car.warranty_years}</strong></span>
                 </div>
               </div>
@@ -353,10 +341,7 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
           {/* Key Flagship Performance Metrics Strip (Baoyu Harmonized Palette) */}
           <div key={`metrics-strip-${activeVariantId}`} className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1 animate-in fade-in duration-200">
             <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between h-[84px]">
-              <div className="flex items-center justify-between text-slate-500 mb-1">
-                <span className="text-[10px] font-semibold">Tầm chạy NEDC</span>
-                <BatteryCharging className="w-3.5 h-3.5 text-slate-400" />
-              </div>
+              <span className="text-[10px] font-semibold text-slate-500 mb-1">Tầm chạy NEDC</span>
               <strong className="text-lg font-black text-slate-900 tabular-nums">
                 {car.range_nedc} <span className="text-xs font-bold text-slate-500">km</span>
               </strong>
@@ -364,10 +349,7 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
             </div>
 
             <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between h-[84px]">
-              <div className="flex items-center justify-between text-slate-500 mb-1">
-                <span className="text-[10px] font-semibold">Sạc nhanh 10-70%</span>
-                <Clock className="w-3.5 h-3.5 text-slate-400" />
-              </div>
+              <span className="text-[10px] font-semibold text-slate-500 mb-1">Sạc nhanh 10-70%</span>
               <strong className="text-lg font-black text-slate-900 tabular-nums truncate">
                 {car.charging_time.replace('trong ', '')}
               </strong>
@@ -375,10 +357,7 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
             </div>
 
             <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between h-[84px]">
-              <div className="flex items-center justify-between text-slate-500 mb-1">
-                <span className="text-[10px] font-semibold">Công suất động cơ</span>
-                <Gauge className="w-3.5 h-3.5 text-slate-400" />
-              </div>
+              <span className="text-[10px] font-semibold text-slate-500 mb-1">Công suất động cơ</span>
               <strong className="text-sm font-black text-slate-900 truncate" title={car.motor_power}>
                 {car.motor_power.split('(')[0]}
               </strong>
@@ -386,10 +365,7 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
             </div>
 
             <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between h-[84px]">
-              <div className="flex items-center justify-between text-slate-500 mb-1">
-                <span className="text-[10px] font-semibold">Dung lượng Pin</span>
-                <Zap className="w-3.5 h-3.5 text-slate-400" />
-              </div>
+              <span className="text-[10px] font-semibold text-slate-500 mb-1">Dung lượng Pin</span>
               <strong className="text-lg font-black text-slate-900 tabular-nums">
                 {car.battery_kwh} <span className="text-xs font-bold text-slate-500">kWh</span>
               </strong>
@@ -441,7 +417,6 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
                 onClose();
                 setTestDriveModalOpen(true);
               }}
-              icon={<Calendar className="w-3.5 h-3.5 text-brand-blue" />}
             >
               Đăng ký Lái thử
             </Button>
@@ -450,7 +425,6 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
               variant="secondary"
               size="md"
               onClick={handleOpenComparison}
-              icon={<Scale className="w-3.5 h-3.5 text-brand-blue" />}
             >
               So sánh dòng xe
             </Button>
@@ -465,11 +439,9 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
                 onClose();
                 onSelectAndProceed(resolvedModelId);
               }}
-              icon={<ArrowRight className="w-3.5 h-3.5" />}
-              iconPosition="right"
               className="w-full sm:w-auto"
             >
-              Chốt chọn mẫu xe này & Tính TCO
+              Chốt chọn mẫu xe này & Tính TCO ➔
             </Button>
           )}
         </div>

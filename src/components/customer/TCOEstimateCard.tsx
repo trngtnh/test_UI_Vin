@@ -4,18 +4,7 @@ import React from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { formatVND } from '@/lib/engine';
 import { CAR_CATALOG, getCarModelWithVariant } from '@/lib/catalog';
-import {
-  Wallet,
-  Sliders,
-  ChevronDown,
-  Calendar,
-  Send,
-  Fuel,
-  Zap,
-  BatteryCharging,
-  TrendingDown,
-  Info,
-} from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 import { Button } from '@/components/common/Button';
 import { CustomSelect } from '@/components/common/CustomSelect';
@@ -69,16 +58,11 @@ export const TCOEstimateCard: React.FC = () => {
     <div className="rounded-2xl border border-slate-200/90 bg-white overflow-hidden shadow-2xs space-y-0">
       {/* Header Strip */}
       <div className="p-4 border-b border-slate-200/80 bg-slate-50/80 flex items-center justify-between flex-wrap gap-2">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-blue-100/80 text-brand-blue flex items-center justify-center shrink-0">
-            <Wallet className="w-4 h-4" />
-          </div>
-          <div>
-            <h3 className="text-xs font-bold text-slate-900">
-              Tổng chi phí sở hữu 5 năm — ước tính (TCO)
-            </h3>
-            <span className="text-[10px] text-slate-500">Mô hình toán học tất định CALC01–CALC06</span>
-          </div>
+        <div>
+          <h3 className="text-xs font-bold text-slate-900">
+            Tổng chi phí sở hữu 5 năm — ước tính (TCO)
+          </h3>
+          <span className="text-[10px] text-slate-500">Mô hình toán học tất định CALC01–CALC06</span>
         </div>
         <span className="text-[10px] font-semibold text-slate-600 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-2xs">
           Dự toán dự kiến · Đang chờ xác nhận từ Showroom
@@ -161,9 +145,8 @@ export const TCOEstimateCard: React.FC = () => {
           <div className="text-xl font-extrabold text-emerald-700 tracking-tight tabular-nums">
             ~{formatVND(estimate.monthly_energy)} / tháng
           </div>
-          <p className="text-[10px] text-emerald-700 mt-1 font-medium flex items-center gap-1.5 tabular-nums">
-            <BatteryCharging className="w-3.5 h-3.5" />
-            <span>Khoảng {chargeFreqDays} ngày mới cần sạc 1 lần</span>
+          <p className="text-[10px] text-emerald-700 mt-1 font-medium tabular-nums">
+            Khoảng {chargeFreqDays} ngày mới cần sạc 1 lần
           </p>
         </div>
       </div>
@@ -171,12 +154,9 @@ export const TCOEstimateCard: React.FC = () => {
       {/* DYNAMIC COMPARISON: VINFAST EV VS GASOLINE CAR */}
       <div className="p-5 bg-gradient-to-r from-emerald-50/40 via-white to-blue-50/30 border-b border-slate-200/80 space-y-3">
         <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div className="flex items-center gap-2">
-            <TrendingDown className="w-4 h-4 text-emerald-600" />
-            <h4 className="text-xs font-bold text-slate-800">
-              So sánh chi phí nhiên liệu thực tế: VinFast {car.display_name.replace('VinFast ', '')} vs Xe Xăng
-            </h4>
-          </div>
+          <h4 className="text-xs font-bold text-slate-800">
+            So sánh chi phí nhiên liệu thực tế: VinFast {car.display_name.replace('VinFast ', '')} vs Xe Xăng
+          </h4>
           <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 tabular-nums">
             Tiết kiệm ~{formatVND(savings5y)} sau 5 năm
           </span>
@@ -188,7 +168,7 @@ export const TCOEstimateCard: React.FC = () => {
           <div>
             <div className="flex justify-between text-[11px] font-semibold mb-1">
               <span className="flex items-center gap-1.5 text-brand-blue">
-                <Zap className="w-3.5 h-3.5 fill-blue-500" />
+                <span className="w-2 h-2 rounded-full bg-brand-blue shrink-0 inline-block" />
                 <span>{car.display_name} (Điện {customerInputs.charging_facility === 'vgreen' ? 'V-GREEN' : 'Tại nhà'})</span>
               </span>
               <span className="font-extrabold text-brand-blue tabular-nums">~{formatVND(evMonthlyEnergy)} / tháng</span>
@@ -205,7 +185,7 @@ export const TCOEstimateCard: React.FC = () => {
           <div>
             <div className="flex justify-between text-[11px] font-semibold mb-1">
               <span className="flex items-center gap-1.5 text-slate-600">
-                <Fuel className="w-3.5 h-3.5 text-slate-500" />
+                <span className="w-2 h-2 rounded-full bg-slate-400 shrink-0 inline-block" />
                 <span>Xe Xăng cùng hạng ({iceFuelConsumptionLper100km}L/100km · Xăng RON 95)</span>
               </span>
               <span className="font-extrabold text-slate-700 tabular-nums">~{formatVND(iceMonthlyFuel)} / tháng</span>
@@ -233,9 +213,8 @@ export const TCOEstimateCard: React.FC = () => {
           onClick={toggleAccordion}
           className="w-full px-5 py-3.5 flex items-center justify-between text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
         >
-          <span className="flex items-center gap-2">
-            <Sliders className="w-4 h-4 text-brand-blue" />
-            <span>Tùy chỉnh Thông số Vay & Nhu cầu Di chuyển thực tế</span>
+          <span className="text-xs font-semibold text-slate-700">
+            Tùy chỉnh Thông số Vay & Nhu cầu Di chuyển thực tế
           </span>
           <div className="flex items-center gap-2">
             <span className="text-[11px] text-slate-400 font-normal">
@@ -356,7 +335,6 @@ export const TCOEstimateCard: React.FC = () => {
           size="md"
           fullWidth
           onClick={() => setTestDriveModalOpen(true)}
-          icon={<Calendar className="w-4 h-4 text-brand-blue" />}
         >
           Đăng ký Lái thử Trải nghiệm
         </Button>
@@ -366,9 +344,8 @@ export const TCOEstimateCard: React.FC = () => {
           size="md"
           fullWidth
           onClick={submitTicket}
-          icon={<Send className="w-4 h-4" />}
         >
-          Gửi dự toán đến {selectedCity === 'national' ? 'Showroom VinFast' : currentFacility.showroomName.replace('Showroom VinFast ', '')}
+          Gửi dự toán đến {selectedCity === 'national' ? 'Showroom VinFast' : currentFacility.showroomName.replace('Showroom VinFast ', '')} ➔
         </Button>
       </div>
     </div>

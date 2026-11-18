@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useAppStore } from '@/store/useAppStore';
-import { Bot, ArrowUp, ArrowRight, RotateCcw, Scale, MapPin } from 'lucide-react';
+import { Bot, ArrowUp, RotateCcw } from 'lucide-react';
 import { ModelId } from '@/types';
 import { CAR_CATALOG, VINFAST_FACILITIES } from '@/lib/catalog';
 import { Button } from '@/components/common/Button';
@@ -341,10 +341,8 @@ export const AgentCopilotPane: React.FC = () => {
                         setJourneyStep(2);
                       }
                     }}
-                    icon={<ArrowRight className="w-3.5 h-3.5" />}
-                    iconPosition="right"
                   >
-                    {m.recommendedTag === 'So sánh 2-3 xe' ? 'Mở bảng so sánh 2-3 xe' : 'Xem đề xuất xe phù hợp'}
+                    {m.recommendedTag === 'So sánh 2-3 xe' ? 'Mở bảng so sánh 2-3 xe ➔' : 'Xem đề xuất xe phù hợp ➔'}
                   </Button>
                 </div>
               )}
@@ -396,15 +394,12 @@ export const AgentCopilotPane: React.FC = () => {
                   'Dạ với ngân sách khoảng 300 triệu, <strong>VinFast VF 3</strong> (322 triệu) là chiếc xe đô thị hoàn hảo nhất. Chi phí lăn bánh tiết kiệm, tầm chạy 215 km đủ cho cả tuần đi làm nội đô.'
                 )
               }
-              className="w-full text-left px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-xs font-medium transition-[background-color,border-color] duration-150 ease-out flex items-center justify-between group active:scale-[0.98]"
+              className="w-full text-left px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-xs font-medium transition-[background-color,border-color] duration-150 ease-out flex items-center gap-2 group active:scale-[0.98]"
             >
-              <div className="flex items-center gap-2 min-w-0">
-                <Badge variant="outline" className="group-hover:bg-blue-50 group-hover:text-brand-blue group-hover:border-blue-200 shrink-0">
-                  VF 3
-                </Badge>
-                <span className="truncate">Xe Mini đô thị tiết kiệm (ngân sách ~300 triệu)</span>
-              </div>
-              <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-blue group-hover:translate-x-0.5 transition-transform shrink-0" />
+              <Badge variant="outline" className="group-hover:bg-blue-50 group-hover:text-brand-blue group-hover:border-blue-200 shrink-0">
+                VF 3
+              </Badge>
+              <span className="truncate">Xe Mini đô thị tiết kiệm (ngân sách ~300 triệu)</span>
             </button>
 
             <button
@@ -418,15 +413,12 @@ export const AgentCopilotPane: React.FC = () => {
                   'Dạ với nhu cầu gia đình và ngân sách 600 - 800 triệu, chiếc <strong>VinFast VF 6 Comfort</strong> (675 triệu) là phương án tối ưu nhất. Mời anh/chị xem chi tiết đề xuất bên dưới.'
                 )
               }
-              className="w-full text-left px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-xs font-medium transition-[background-color,border-color] duration-150 ease-out flex items-center justify-between group active:scale-[0.98]"
+              className="w-full text-left px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-xs font-medium transition-[background-color,border-color] duration-150 ease-out flex items-center gap-2 group active:scale-[0.98]"
             >
-              <div className="flex items-center gap-2 min-w-0">
-                <Badge variant="outline" className="group-hover:bg-blue-50 group-hover:text-brand-blue group-hover:border-blue-200 shrink-0">
-                  VF 6 Comfort
-                </Badge>
-                <span className="truncate">SUV Gia đình đô thị (ngân sách 600 - 800 triệu)</span>
-              </div>
-              <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-blue group-hover:translate-x-0.5 transition-transform shrink-0" />
+              <Badge variant="outline" className="group-hover:bg-blue-50 group-hover:text-brand-blue group-hover:border-blue-200 shrink-0">
+                VF 6 Comfort
+              </Badge>
+              <span className="truncate">SUV Gia đình đô thị (ngân sách 600 - 800 triệu)</span>
             </button>
 
             <button
@@ -440,15 +432,12 @@ export const AgentCopilotPane: React.FC = () => {
                   'Trong phân khúc trên 800 triệu, em đề xuất chiếc <strong>VinFast VF 7 Eco</strong>. Mẫu C-SUV thiết kế thời thượng và hệ thống ADAS thông minh. Mời anh/chị nhấn nút xem đề xuất bên dưới.'
                 )
               }
-              className="w-full text-left px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-xs font-medium transition-[background-color,border-color] duration-150 ease-out flex items-center justify-between group active:scale-[0.98]"
+              className="w-full text-left px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-xs font-medium transition-[background-color,border-color] duration-150 ease-out flex items-center gap-2 group active:scale-[0.98]"
             >
-              <div className="flex items-center gap-2 min-w-0">
-                <Badge variant="outline" className="group-hover:bg-blue-50 group-hover:text-brand-blue group-hover:border-blue-200 shrink-0">
-                  VF 7 Eco
-                </Badge>
-                <span className="truncate">Crossover hạng C cao cấp (trên 800 triệu)</span>
-              </div>
-              <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-blue group-hover:translate-x-0.5 transition-transform shrink-0" />
+              <Badge variant="outline" className="group-hover:bg-blue-50 group-hover:text-brand-blue group-hover:border-blue-200 shrink-0">
+                VF 7 Eco
+              </Badge>
+              <span className="truncate">Crossover hạng C cao cấp (trên 800 triệu)</span>
             </button>
 
             <button
@@ -471,13 +460,12 @@ export const AgentCopilotPane: React.FC = () => {
                   },
                 ]);
               }}
-              className="w-full text-left px-3 py-2 rounded-xl border border-blue-200 bg-blue-50/70 hover:bg-blue-100/80 text-brand-blue text-xs font-semibold transition-[background-color,border-color] duration-150 ease-out flex items-center justify-between group active:scale-[0.98]"
+              className="w-full text-left px-3 py-2 rounded-xl border border-blue-200 bg-blue-50/70 hover:bg-blue-100/80 text-brand-blue text-xs font-semibold transition-[background-color,border-color] duration-150 ease-out flex items-center gap-2 group active:scale-[0.98]"
             >
-              <span className="flex items-center gap-2 min-w-0">
-                <Scale className="w-3.5 h-3.5 shrink-0" />
-                <span className="truncate">So sánh đối chiếu đa mẫu xe (chọn 2-3 xe)</span>
-              </span>
-              <ArrowRight className="w-3.5 h-3.5 text-brand-blue group-hover:translate-x-0.5 transition-transform shrink-0" />
+              <Badge variant="brand" className="shrink-0">
+                So sánh
+              </Badge>
+              <span className="truncate">So sánh đối chiếu đa mẫu xe (chọn 2-3 xe)</span>
             </button>
           </div>
         </div>

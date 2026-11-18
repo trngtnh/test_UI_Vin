@@ -22,29 +22,13 @@ import { Button } from '@/components/common/Button';
 import { Badge } from '@/components/common/Badge';
 import { CarVisualSilhouette } from '@/components/common/CarVisualSilhouette';
 import {
-  CheckCircle2,
-  Zap,
-  Layers,
-  FileText,
-  ShieldCheck,
-  Gauge,
-  ArrowRight,
   ArrowLeft,
-  BatteryCharging,
-  Clock,
-  Sparkles,
-  Calendar,
-  Send,
-  Sliders,
   Check,
-  Scale,
-  Car,
   RotateCcw,
   Info,
   Search,
-  SlidersHorizontal,
   X,
-  Filter,
+  Scale,
 } from 'lucide-react';
 
 if (typeof window !== 'undefined') {
@@ -167,7 +151,6 @@ export const LivingCanvasPane: React.FC = () => {
           {/* Hall Header Strip */}
           <div className="h-12 px-4 bg-slate-50/90 border-b border-slate-200/80 flex items-center justify-between gap-3 shrink-0">
             <div className="flex items-center gap-2">
-              <Car className="w-4 h-4 text-slate-700" />
               <h2 className="text-xs font-bold text-slate-900 tracking-tight">
                 {selectedCity === 'national'
                   ? 'Dải 27 Phiên Bản Xe Điện VinFast Toàn Cầu'
@@ -184,7 +167,6 @@ export const LivingCanvasPane: React.FC = () => {
                 variant={comparisonVariantIds.length >= 2 ? 'primary' : 'secondary'}
                 size="sm"
                 onClick={() => openComparisonModal(comparisonVariantIds, comparisonVariantIds.length >= 2 ? 'table' : 'picker')}
-                icon={<Scale className="w-3.5 h-3.5" />}
               >
                 {comparisonVariantIds.length >= 2
                   ? `So sánh ngay (${comparisonVariantIds.length} xe)`
@@ -200,7 +182,7 @@ export const LivingCanvasPane: React.FC = () => {
             <div className="px-4 py-2.5 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-800 shrink-0 shadow-sm animate-in fade-in duration-150">
               <div className="flex items-center gap-2 flex-wrap min-w-0">
                 <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider shrink-0 flex items-center gap-1.5">
-                  <Scale className="w-3.5 h-3.5 text-brand-blue shrink-0" />
+                  <span className="w-2 h-2 rounded-full bg-brand-blue shrink-0" />
                   <span>Xe đang chọn ({comparisonVariantIds.length}/3):</span>
                 </span>
                 <div className="flex items-center gap-1.5 flex-wrap">
@@ -245,7 +227,6 @@ export const LivingCanvasPane: React.FC = () => {
                   variant="primary"
                   size="sm"
                   onClick={() => openComparisonModal(comparisonVariantIds, comparisonVariantIds.length >= 2 ? 'table' : 'picker')}
-                  icon={<Scale className="w-3.5 h-3.5" />}
                   className="text-xs h-8 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold shadow-sm"
                 >
                   {comparisonVariantIds.length >= 2 ? `So sánh ngay (${comparisonVariantIds.length} xe) ➔` : 'Mở bảng chọn đối chiếu'}
@@ -855,7 +836,7 @@ export const LivingCanvasPane: React.FC = () => {
             <div className="mx-4 mb-3 p-2.5 sm:p-3 rounded-2xl bg-slate-900/95 backdrop-blur-md text-white shadow-xl border border-slate-700/80 flex flex-wrap items-center justify-between gap-2.5 shrink-0 animate-in fade-in slide-in-from-bottom-2 duration-150">
               <div className="flex items-center gap-2 overflow-x-auto py-0.5">
                 <div className="flex items-center gap-1.5 shrink-0">
-                  <Scale className="w-4 h-4 text-brand-blue" />
+                  <span className="w-2 h-2 rounded-full bg-brand-blue shrink-0" />
                   <span className="text-xs font-bold text-white">
                     Đã chọn ({comparisonVariantIds.length}/3):
                   </span>
@@ -896,7 +877,6 @@ export const LivingCanvasPane: React.FC = () => {
                   variant="primary"
                   size="sm"
                   onClick={() => openComparisonModal(comparisonVariantIds, comparisonVariantIds.length >= 2 ? 'table' : 'picker')}
-                  icon={<Scale className="w-3.5 h-3.5" />}
                   className="text-xs h-8 px-3.5 bg-brand-blue hover:bg-blue-600 shadow-xs"
                 >
                   {comparisonVariantIds.length >= 2 ? 'So sánh ngay' : 'Thêm xe đối chiếu'}
@@ -1009,13 +989,13 @@ export const LivingCanvasPane: React.FC = () => {
                   {/* 2 AI Reasons */}
                   <div className="space-y-2 text-xs text-slate-700 bg-blue-50/50 p-3 rounded-xl border border-blue-100/90">
                     <div className="flex items-start gap-2">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 mt-0.5 shrink-0" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
                       <p className="text-[11px] leading-relaxed">
                         <strong className="text-slate-900">Tài chính:</strong> {car.reason_budget}
                       </p>
                     </div>
                     <div className="flex items-start gap-2">
-                      <Zap className="w-3.5 h-3.5 text-brand-blue mt-0.5 shrink-0" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-brand-blue mt-1.5 shrink-0" />
                       <p className="text-[11px] leading-relaxed">
                         <strong className="text-slate-900">Vận hành:</strong> {car.reason_charging}
                       </p>
@@ -1040,7 +1020,6 @@ export const LivingCanvasPane: React.FC = () => {
                       variant="outline"
                       size="md"
                       onClick={() => setTestDriveModalOpen(true)}
-                      icon={<Calendar className="w-3.5 h-3.5 text-brand-blue" />}
                     >
                       Lái thử
                     </Button>
@@ -1049,7 +1028,6 @@ export const LivingCanvasPane: React.FC = () => {
                       variant="secondary"
                       size="md"
                       onClick={() => openComparisonModal([selectedModelId])}
-                      icon={<Scale className="w-3.5 h-3.5 text-brand-blue" />}
                     >
                       So sánh
                     </Button>
@@ -1059,10 +1037,8 @@ export const LivingCanvasPane: React.FC = () => {
                       size="md"
                       fullWidth
                       onClick={() => proceedToTCO(selectedModelId)}
-                      icon={<ArrowRight className="w-3.5 h-3.5" />}
-                      iconPosition="right"
                     >
-                      Chọn xe này & Tính TCO
+                      Chọn xe này & Tính TCO ➔
                     </Button>
                   </div>
                 </div>
@@ -1097,7 +1073,6 @@ export const LivingCanvasPane: React.FC = () => {
                 variant="secondary"
                 size="sm"
                 onClick={() => openComparisonModal([selectedModelId])}
-                icon={<Scale className="w-3.5 h-3.5" />}
               >
                 So sánh dòng xe
               </Button>
@@ -1166,10 +1141,8 @@ export const LivingCanvasPane: React.FC = () => {
                 size="lg"
                 fullWidth
                 onClick={() => proceedToTCO(selectedModelId)}
-                icon={<ArrowRight className="w-4 h-4" />}
-                iconPosition="right"
               >
-                Chốt chọn mẫu xe này & Tính toán TCO 5 năm
+                Chốt chọn mẫu xe này & Tính toán TCO 5 năm ➔
               </Button>
             </div>
 
@@ -1243,7 +1216,6 @@ export const LivingCanvasPane: React.FC = () => {
                           size="xs"
                           fullWidth
                           onClick={() => openComparisonModal([selectedModelId, otherId as ModelId])}
-                          icon={<Scale className="w-3 h-3" />}
                         >
                           So sánh
                         </Button>
@@ -1252,8 +1224,6 @@ export const LivingCanvasPane: React.FC = () => {
                           size="xs"
                           fullWidth
                           onClick={() => proceedToTCO(otherId as ModelId)}
-                          icon={<ArrowRight className="w-3 h-3" />}
-                          iconPosition="right"
                         >
                           Chọn TCO
                         </Button>
@@ -1327,9 +1297,8 @@ export const LivingCanvasPane: React.FC = () => {
               variant="primary"
               size="md"
               onClick={() => openComparisonModal(['VF5', 'VF6', 'VF7'])}
-              icon={<Scale className="w-4 h-4" />}
             >
-              Mở bảng so sánh pop-up
+              Mở bảng so sánh pop-up ➔
             </Button>
             <Button
               variant="outline"

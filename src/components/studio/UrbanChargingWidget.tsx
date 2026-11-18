@@ -3,7 +3,7 @@
 import React from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { CAR_CATALOG } from '@/lib/catalog';
-import { BatteryCharging, Zap, MapPin, ShieldCheck, Clock, Info } from 'lucide-react';
+import { Info } from 'lucide-react';
 
 export const UrbanChargingWidget: React.FC = () => {
   const selectedModelId = useAppStore((state) => state.selectedModelId) || 'VF6';
@@ -20,18 +20,13 @@ export const UrbanChargingWidget: React.FC = () => {
     <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-200/90 shadow-2xs space-y-3">
       {/* Widget Header with Sleek Info Popover */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-blue-100 text-brand-blue flex items-center justify-center shrink-0">
-            <BatteryCharging className="w-4 h-4" />
-          </div>
-          <div>
-            <h4 className="text-xs font-bold text-slate-900">
-              Mô phỏng Hạ tầng Sạc Đô thị Hà Nội (Chu kỳ 85% DoD)
-            </h4>
-            <p className="text-[10px] text-slate-500">
-              Độ sâu xả pin tối ưu bảo vệ tuổi thọ pack pin lithium
-            </p>
-          </div>
+        <div>
+          <h4 className="text-xs font-bold text-slate-900">
+            Mô phỏng Hạ tầng Sạc Đô thị Hà Nội (Chu kỳ 85% DoD)
+          </h4>
+          <p className="text-[10px] text-slate-500">
+            Độ sâu xả pin tối ưu bảo vệ tuổi thọ pack pin lithium
+          </p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -81,10 +76,7 @@ export const UrbanChargingWidget: React.FC = () => {
         </div>
 
         <div className="p-3 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
-          <div className="flex items-center justify-between text-slate-400 mb-0.5">
-            <span className="text-[10px] font-semibold">Sạc nhanh 10-70%:</span>
-            <Clock className="w-3 h-3 text-slate-400" />
-          </div>
+          <span className="text-[10px] font-semibold text-slate-400 block mb-0.5">Sạc nhanh 10-70%:</span>
           <div className="text-sm font-black text-slate-900 tabular-nums">
             {car.charging_time.replace('trong ', '')}
           </div>
@@ -94,9 +86,8 @@ export const UrbanChargingWidget: React.FC = () => {
 
       {/* Facility Selection */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-1 text-xs">
-        <span className="text-[11px] font-semibold text-slate-600 flex items-center gap-1.5 self-start sm:self-auto">
-          <MapPin className="w-3.5 h-3.5 text-slate-400" />
-          <span>Điểm sạc chính:</span>
+        <span className="text-[11px] font-semibold text-slate-600 self-start sm:self-auto">
+          Điểm sạc chính:
         </span>
 
         <div className="flex items-center gap-2 w-full sm:w-auto">

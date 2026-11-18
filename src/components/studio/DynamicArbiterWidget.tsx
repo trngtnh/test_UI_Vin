@@ -5,7 +5,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { CAR_CATALOG } from '@/lib/catalog';
 import { calculateDeterministicTCO, formatVND } from '@/lib/engine';
 import { ModelId } from '@/types';
-import { Check, ArrowRight, BatteryCharging, Shield, Zap, Scale } from 'lucide-react';
+import { Check } from 'lucide-react';
 
 export const DynamicArbiterWidget: React.FC = () => {
   const selectedModelId = useAppStore((state) => state.selectedModelId);
@@ -27,7 +27,7 @@ export const DynamicArbiterWidget: React.FC = () => {
       <div className="p-4 rounded-2xl bg-slate-900 text-white shadow-xs flex items-center justify-between gap-4 border border-slate-800">
         <div>
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-950 text-blue-200 border border-blue-800/60 mb-1.5">
-            <Scale className="w-3.5 h-3.5 text-blue-400" />
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
             <span>AI Arbiter · Trọng tài Đối đầu Trực quan</span>
           </div>
           <h3 className="text-sm font-extrabold text-white">
@@ -132,14 +132,13 @@ export const DynamicArbiterWidget: React.FC = () => {
                     selectModel(mId, true);
                     setCanvasMode('detail');
                   }}
-                  className={`w-full py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition ${
+                  className={`w-full py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center transition ${
                     isSelected
                       ? 'bg-brand-blue text-white shadow-xs'
                       : 'bg-slate-100 hover:bg-brand-blue hover:text-white text-slate-700'
                   }`}
                 >
-                  <span>{isSelected ? 'Đang chọn làm Hồ sơ chính' : 'Chốt chọn mẫu xe này'}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <span>{isSelected ? 'Đang chọn làm Hồ sơ chính' : 'Chốt chọn mẫu xe này ➔'}</span>
                 </button>
               </div>
             </div>

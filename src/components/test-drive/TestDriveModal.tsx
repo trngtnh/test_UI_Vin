@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAppStore } from '@/store/useAppStore';
-import { Car, X, ShieldCheck } from 'lucide-react';
+import { X } from 'lucide-react';
 import { CustomSelect } from '@/components/common/CustomSelect';
 
 export const TestDriveModal: React.FC = () => {
@@ -52,20 +52,15 @@ export const TestDriveModal: React.FC = () => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 text-brand-blue flex items-center justify-center">
-              <Car className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-slate-900">
-                Đăng ký Lái thử Trải nghiệm Xe VinFast
-              </h3>
-              <p className="text-[10px] text-slate-400">Trải nghiệm thực tế công nghệ sạc và trợ lái ADAS</p>
-            </div>
+          <div>
+            <h3 className="text-sm font-bold text-slate-900">
+              Đăng ký Lái thử Trải nghiệm Xe VinFast
+            </h3>
+            <p className="text-[10px] text-slate-400">Trải nghiệm thực tế công nghệ sạc và trợ lái ADAS</p>
           </div>
           <button
             onClick={() => setOpen(false)}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>

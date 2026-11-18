@@ -23,19 +23,9 @@ import {
   X,
   Scale,
   Check,
-  CheckCircle2,
-  BatteryCharging,
-  Gauge,
-  Clock,
-  ShieldCheck,
-  Zap,
-  ArrowRight,
   ArrowLeft,
   Plus,
-  Info,
   Search,
-  Sparkles,
-  SlidersHorizontal,
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
@@ -204,7 +194,6 @@ export const CarComparisonModal: React.FC = () => {
         {/* Modal Top Header */}
         <div className="h-14 px-5 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
-            <Scale className="w-4 h-4 text-slate-700" />
             <h3 className="text-sm font-extrabold text-slate-900">
               So sánh các dòng & phiên bản xe VinFast
             </h3>
@@ -403,7 +392,7 @@ export const CarComparisonModal: React.FC = () => {
               <div className="p-3.5 sm:px-5 bg-slate-900/95 backdrop-blur-md border-t border-slate-700/90 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0 shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-150">
                 <div className="flex items-center gap-2.5 overflow-x-auto min-w-0 py-0.5">
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <Scale className="w-4 h-4 text-brand-blue" />
+                    <span className="w-2 h-2 rounded-full bg-brand-blue shrink-0" />
                     <span className="text-xs font-black text-white whitespace-nowrap">
                       Đã chọn ({comparedVariants.length}/3 xe):
                     </span>
@@ -443,7 +432,6 @@ export const CarComparisonModal: React.FC = () => {
                       variant="primary"
                       size="md"
                       onClick={() => setViewMode('table')}
-                      icon={<Scale className="w-4 h-4" />}
                       className="bg-brand-blue hover:bg-blue-600 text-xs sm:text-sm font-black shadow-lg hover:shadow-blue-500/25 transition-all px-5 py-2 cursor-pointer"
                     >
                       So sánh ngay ({comparedVariants.length} xe) ➔
