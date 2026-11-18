@@ -3,14 +3,18 @@
 import React from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { formatVND } from '@/lib/engine';
-import { CAR_CATALOG, getCarModelWithVariant } from '@/lib/catalog';
+import { CAR_CATALOG, getCarModelWithVariant, formatShortTrimLabel } from '@/lib/catalog';
 import { ChevronDown } from 'lucide-react';
 
 import { Button } from '@/components/common/Button';
 import { CustomSelect } from '@/components/common/CustomSelect';
 import { VINFAST_FACILITIES } from '@/lib/catalog';
 
-export const TCOEstimateCard: React.FC = () => {
+export interface TCOEstimateCardProps {
+  onOpenCarDetail?: () => void;
+}
+
+export const TCOEstimateCard: React.FC<TCOEstimateCardProps> = ({ onOpenCarDetail }) => {
   const selectedModelId = useAppStore((state) => state.selectedModelId);
   const selectedCity = useAppStore((state) => state.selectedCity) || 'national';
   const customerInputs = useAppStore((state) => state.customerInputs);
@@ -22,12 +26,17 @@ export const TCOEstimateCard: React.FC = () => {
   const getComputedEstimate = useAppStore((state) => state.getComputedEstimate);
   const selectedVariantIds = useAppStore((state) => state.selectedVariantIds);
   const selectVariant = useAppStore((state) => state.selectVariant);
+  const ticket = useAppStore((state) => state.ticket);
 
   const currentFacility = VINFAST_FACILITIES[selectedCity] || VINFAST_FACILITIES.national;
+  const showroomLabel =
+    selectedCity === 'national'
+      ? 'Showroom VinFast'
+      : currentFacility.showroomName.replace('Showroom VinFast ', 'Showroom ');
 
   if (!selectedModelId) return null;
 
-  const baseCar = CAR_CATALOG[selectedModelId];
+  const baseCar = CAR_CATALOG[selectedModelId] || CAR_CATALOG.VF6;
   const activeVariantId = selectedVariantIds?.[selectedModelId] || baseCar?.variants?.[0]?.id;
   const car = getCarModelWithVariant(selectedModelId, activeVariantId);
   const estimate = getComputedEstimate();
@@ -60,13 +69,27 @@ export const TCOEstimateCard: React.FC = () => {
       <div className="p-4 border-b border-slate-200/80 bg-slate-50/80 flex items-center justify-between flex-wrap gap-2">
         <div>
           <h3 className="text-xs font-bold text-slate-900">
-            Tổng chi phí sở hữu 5 năm — ước tính (TCO)
+            Tổng chi phí sở hữu 5 năm · Dự toán TCO
           </h3>
-          <span className="text-[10px] text-slate-500">Mô hình toán học tất định CALC01–CALC06</span>
+          <span className="text-[10px] text-slate-500">Mô hình toán học tất định CALC01-CALC06</span>
         </div>
-        <span className="text-[10px] font-semibold text-slate-600 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-2xs">
-          Dự toán dự kiến · Đang chờ xác nhận từ Showroom
-        </span>
+        {ticket.status === 'approved' ? (
+          <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 shadow-2xs">
+            Đã được {showroomLabel} phê duyệt
+          </span>
+        ) : ticket.status === 'pending_approval' ? (
+          <span className="text-[10px] font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200 shadow-2xs">
+            Đang chờ {showroomLabel} xác nhận
+          </span>
+        ) : ticket.status === 'needs_recalculation' ? (
+          <span className="text-[10px] font-bold text-rose-700 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 shadow-2xs">
+            Thông số vừa đổi · Cần gửi xác nhận lại
+          </span>
+        ) : (
+          <span className="text-[10px] font-semibold text-slate-600 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-2xs">
+            Dự toán trực tuyến · Chưa gửi {showroomLabel}
+          </span>
+        )}
       </div>
 
       {/* Model & Version Switcher Strip */}
@@ -81,28 +104,40 @@ export const TCOEstimateCard: React.FC = () => {
           </span>
         </div>
 
-        {baseCar.variants && baseCar.variants.length > 1 && (
-          <div className="flex items-center gap-1 p-0.5 bg-white rounded-lg border border-slate-200 shadow-2xs">
-            {baseCar.variants.map((v) => {
-              const isSelected = activeVariantId === v.id;
-              return (
-                <button
-                  key={v.id}
-                  type="button"
-                  onClick={() => selectVariant(selectedModelId, v.id)}
-                  className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
-                    isSelected
-                      ? 'bg-brand-blue text-white shadow-2xs'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                  }`}
-                  title={`${v.name} · ${v.price.toLocaleString('vi-VN')} đ`}
-                >
-                  {v.name.replace('Bản ', '')}
-                </button>
-              );
-            })}
-          </div>
-        )}
+        <div className="flex items-center gap-2 flex-wrap">
+          {car.variants && car.variants.length > 1 && (
+            <div className="flex items-center gap-1 p-0.5 bg-white rounded-lg border border-slate-200 shadow-2xs">
+              {car.variants.map((v) => {
+                const isSelected = activeVariantId === v.id;
+                return (
+                  <button
+                    key={v.id}
+                    type="button"
+                    onClick={() => selectVariant(selectedModelId, v.id)}
+                    className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-brand-blue text-white shadow-2xs'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    }`}
+                    title={`${v.name} · ${v.price.toLocaleString('vi-VN')} đ`}
+                  >
+                    {formatShortTrimLabel(v.name)}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {onOpenCarDetail && (
+            <button
+              type="button"
+              onClick={onOpenCarDetail}
+              className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-brand-blue/50 text-[10px] font-bold text-slate-700 hover:text-brand-blue transition cursor-pointer shadow-2xs"
+            >
+              Xem thông số xe
+            </button>
+          )}
+        </div>
       </div>
 
       {/* 3 Key Financial Metrics Strip */}

@@ -1,4 +1,19 @@
-export type ModelId = 'VF3' | 'VF5' | 'VF6' | 'VF7' | 'VF8' | 'VF9';
+export type ModelId =
+  | 'VF2'
+  | 'VF3'
+  | 'VF5'
+  | 'VF6'
+  | 'VF7'
+  | 'VF8'
+  | 'VF9'
+  | 'VF_MPV7'
+  | 'VF_WILD'
+  | 'MINIO_GREEN'
+  | 'HERIO_GREEN'
+  | 'NERIO_GREEN'
+  | 'LIMO_GREEN'
+  | 'EC_VAN'
+  | 'EBUS_6';
 
 export type CityId = 'national' | 'hanoi' | 'hcm' | 'danang' | 'haiphong' | 'cantho';
 

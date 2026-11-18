@@ -2,15 +2,19 @@
 
 import React from 'react';
 import { useAppStore } from '@/store/useAppStore';
-import { CAR_CATALOG } from '@/lib/catalog';
+import { getCarModelWithVariant, VINFAST_FACILITIES } from '@/lib/catalog';
 import { Info } from 'lucide-react';
 
 export const UrbanChargingWidget: React.FC = () => {
   const selectedModelId = useAppStore((state) => state.selectedModelId) || 'VF6';
+  const selectedVariantIds = useAppStore((state) => state.selectedVariantIds);
+  const selectedCity = useAppStore((state) => state.selectedCity) || 'national';
   const customerInputs = useAppStore((state) => state.customerInputs);
   const updateInputs = useAppStore((state) => state.updateInputs);
 
-  const car = CAR_CATALOG[selectedModelId];
+  const car = getCarModelWithVariant(selectedModelId, selectedVariantIds?.[selectedModelId]);
+  const currentFacility = VINFAST_FACILITIES[selectedCity] || VINFAST_FACILITIES.national;
+  const locationLabel = selectedCity === 'national' ? 'Đô thị Việt Nam' : `Đô thị ${currentFacility.cityName}`;
 
   // 85% DoD Safe usable range
   const safeRangeKm = Math.round(car.range_real * 0.85);
@@ -22,10 +26,10 @@ export const UrbanChargingWidget: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h4 className="text-xs font-bold text-slate-900">
-            Mô phỏng Hạ tầng Sạc Đô thị Hà Nội (Chu kỳ 85% DoD)
+            Mô phỏng Hạ tầng Sạc {locationLabel} (Chu kỳ 85% DoD)
           </h4>
           <p className="text-[10px] text-slate-500">
-            Độ sâu xả pin tối ưu bảo vệ tuổi thọ pack pin lithium
+            Độ sâu xả pin tối ưu bảo vệ tuổi thọ pack pin lithium trên {car.display_name}
           </p>
         </div>
 
@@ -39,7 +43,7 @@ export const UrbanChargingWidget: React.FC = () => {
             <button
               type="button"
               className="w-6 h-6 rounded-lg bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-500 hover:text-brand-blue flex items-center justify-center transition shadow-2xs cursor-help"
-              aria-label="Thông tin trạm sạc Hà Nội"
+              aria-label={`Thông tin trạm sạc ${currentFacility.cityName}`}
             >
               <Info className="w-3.5 h-3.5" />
             </button>
@@ -47,10 +51,10 @@ export const UrbanChargingWidget: React.FC = () => {
             <div className="absolute right-0 top-full mt-2 hidden group-hover:block w-72 sm:w-80 p-3.5 bg-slate-900 text-white rounded-xl shadow-xl z-50 leading-relaxed pointer-events-none animate-in fade-in duration-200 border border-slate-800">
               <div className="font-bold text-blue-300 flex items-center gap-1.5 mb-1 text-xs">
                 <Info className="w-3.5 h-3.5" />
-                <span>Hạ tầng mạng lưới trạm sạc tại Hà Nội</span>
+                <span>Hạ tầng mạng lưới trạm sạc V-GREEN ({currentFacility.cityName})</span>
               </div>
               <p className="text-slate-300 text-[11px] leading-relaxed">
-                Tại Hà Nội, VinFast đã triển khai hơn 150+ trạm sạc công cộng tại các trung tâm thương mại Vincom, chung cư Vinhomes, cây xăng PVOIL và bãi đỗ xe công cộng (Cầu Giấy, Nam Từ Liêm, Ba Đình, Đống Đa...). Bạn hoàn toàn yên tâm sử dụng xe điện kể cả khi ở nhà phố hay chung cư không có trụ sạc riêng.
+                Hệ thống V-GREEN phủ rộng tại các trung tâm thương mại Vincom, khu đô thị Vinhomes, trạm dừng nghỉ cao tốc, cây xăng PVOIL và bãi đỗ xe công cộng ({currentFacility.address}). Chủ xe hoàn toàn chủ động sạc nhanh kể cả khi ở chung cư hoặc nhà phố.
               </p>
             </div>
           </div>
@@ -64,7 +68,7 @@ export const UrbanChargingWidget: React.FC = () => {
           <div className="text-sm font-black text-brand-blue tabular-nums">
             {safeRangeKm} km / sạc
           </div>
-          <p className="text-[10px] text-slate-500 mt-0.5">Đô thị Hà Nội (85% DoD)</p>
+          <p className="text-[10px] text-slate-500 mt-0.5">{locationLabel} (85% DoD)</p>
         </div>
 
         <div className="p-3 rounded-xl bg-white border border-slate-200/80 shadow-2xs">

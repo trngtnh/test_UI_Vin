@@ -9,17 +9,19 @@ import {
   CATALOG_EFFECTIVE_DATE,
   VINFAST_FACILITIES,
   getCarModelWithVariant,
+  formatShortTrimLabel,
   ALL_VINFAST_VARIANTS,
   VARIANTS_BY_ID,
   UnifiedCarVariant,
 } from '@/lib/catalog';
 import { ModelId } from '@/types';
 import { UrbanChargingWidget } from './UrbanChargingWidget';
-import { DynamicArbiterWidget } from './DynamicArbiterWidget';
 import { TCOEstimateCard } from '@/components/customer/TCOEstimateCard';
+import { TicketStatusBanners } from '@/components/customer/TicketStatusBanners';
 import { CarDetailModal } from '@/components/customer/CarDetailModal';
 import { Button } from '@/components/common/Button';
 import { Badge } from '@/components/common/Badge';
+import { CustomSelect } from '@/components/common/CustomSelect';
 import { CarVisualSilhouette } from '@/components/common/CarVisualSilhouette';
 import {
   ArrowLeft,
@@ -49,7 +51,7 @@ export const LivingCanvasPane: React.FC = () => {
   const selectVariant = useAppStore((state) => state.selectVariant);
 
   const currentFacility = VINFAST_FACILITIES[selectedCity] || VINFAST_FACILITIES.national;
-  const car = CAR_CATALOG[selectedModelId] || CAR_CATALOG.VF6;
+  const car = getCarModelWithVariant(selectedModelId, selectedVariantIds?.[selectedModelId]);
   const allCoreModels: ModelId[] = ['VF3', 'VF5', 'VF6', 'VF7', 'VF8', 'VF9'];
 
   // Detail View State
@@ -138,9 +140,33 @@ export const LivingCanvasPane: React.FC = () => {
     { scope: hallCardsRef, dependencies: [categoryFilter, priceFilter, seatFilter, searchQuery, viewLayout, canvasMode] }
   );
 
+  /** Shared top studio banner for showcase cards with single-line non-wrapping badges. */
+  const renderCardTopBanner = (item: UnifiedCarVariant, silhouetteModelId: string, heightClass: string) => (
+    <div className="p-4 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border-b border-slate-800 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-600/15 via-slate-900/40 to-transparent pointer-events-none" />
+      <div className="flex items-center justify-between gap-2 mb-2 relative z-10">
+        <Badge variant="dark" dot pulseDot className="truncate max-w-[175px]">
+          {item.badge}
+        </Badge>
+        <span
+          className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md border whitespace-nowrap shrink-0 ${
+            item.category === 'passenger'
+              ? 'bg-slate-800/90 text-slate-200 border-slate-700'
+              : 'bg-emerald-950/90 text-emerald-200 border-emerald-800/70'
+          }`}
+        >
+          {item.seats.replace(' ngồi', '')}
+        </span>
+      </div>
+
+      <div className={`${heightClass} flex items-center justify-center p-1 relative z-10 overflow-hidden`}>
+        <CarVisualSilhouette modelId={silhouetteModelId} className={`w-full h-full max-${heightClass}`} />
+      </div>
+    </div>
+  );
+
   /** Shared 2-button footer for outer showcase cards: Detail preview vs TCO conversion (comparison lives in dedicated modal). */
   const renderHallCardActions = (detailModelId: string, item: UnifiedCarVariant) => {
-    const isCoreModel = allCoreModels.includes(detailModelId as ModelId);
     return (
       <div className="mt-auto pt-3 border-t border-slate-100 flex items-center gap-2">
         <Button
@@ -156,11 +182,10 @@ export const LivingCanvasPane: React.FC = () => {
           variant="primary"
           size="sm"
           onClick={() => {
-            const baseModel = (isCoreModel ? detailModelId : 'VF6') as ModelId;
-            selectModel(baseModel, false);
-            selectVariant(baseModel, item.id);
-            setCanvasMode('recommendations');
-            proceedToTCO(baseModel);
+            const targetModel = detailModelId as ModelId;
+            selectModel(targetModel, false);
+            selectVariant(targetModel, item.id);
+            proceedToTCO(targetModel);
           }}
           className="flex-1 bg-brand-blue hover:bg-blue-600 shadow-2xs font-extrabold text-xs whitespace-nowrap"
           title="Dự toán chi phí & Tính TCO"
@@ -171,6 +196,47 @@ export const LivingCanvasPane: React.FC = () => {
     );
   };
 
+  /** Interactive 3-stage breadcrumb navigation for inner customer decision screens. */
+  const renderSubViewStepper = (activeStage: 'recommendations' | 'tco') => (
+    <div className="inline-flex items-center p-1 bg-white rounded-xl border border-slate-200/90 shadow-2xs gap-1 text-xs">
+      <button
+        type="button"
+        onClick={backToHall}
+        className="px-2.5 py-1 rounded-lg font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer flex items-center gap-1 whitespace-nowrap"
+      >
+        <ArrowLeft className="w-3.5 h-3.5" />
+        <span>1. Sảnh xe (27 bản)</span>
+      </button>
+      <span className="text-slate-300 select-none">/</span>
+      <button
+        type="button"
+        onClick={() => {
+          setCanvasMode('recommendations');
+          setJourneyStep(2);
+        }}
+        className={`px-2.5 py-1 rounded-lg font-bold transition cursor-pointer whitespace-nowrap ${
+          activeStage === 'recommendations'
+            ? 'bg-brand-blue text-white shadow-2xs'
+            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+        }`}
+      >
+        2. Đánh giá phương án
+      </button>
+      <span className="text-slate-300 select-none">/</span>
+      <button
+        type="button"
+        onClick={() => proceedToTCO(selectedModelId)}
+        className={`px-2.5 py-1 rounded-lg font-bold transition cursor-pointer whitespace-nowrap ${
+          activeStage === 'tco'
+            ? 'bg-brand-blue text-white shadow-2xs'
+            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+        }`}
+      >
+        3. Dự toán TCO 5 năm
+      </button>
+    </div>
+  );
+
   return (
     <div className="flex flex-col h-full bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden relative">
       {/* =========================================================================
@@ -180,19 +246,46 @@ export const LivingCanvasPane: React.FC = () => {
         <div className="flex flex-col h-full overflow-hidden">
           {/* Hall Header Strip */}
           <div className="h-12 px-4 bg-slate-50/90 border-b border-slate-200/80 flex items-center justify-between gap-3 shrink-0">
-            <div className="flex items-center gap-2">
-              <h2 className="text-xs font-bold text-slate-900 tracking-tight">
+            <div className="flex items-center gap-2 min-w-0">
+              <h2 className="text-xs font-bold text-slate-900 tracking-tight truncate">
                 {selectedCity === 'national'
-                  ? 'Dải 27 Phiên Bản Xe Điện VinFast Toàn Cầu'
-                  : `Dải 27 Xe Điện VinFast · ${currentFacility.cityName}`}
+                  ? 'Dải Xe Điện VinFast Toàn Cầu'
+                  : `Dải Xe Điện VinFast · ${currentFacility.cityName}`}
               </h2>
-              <span className="text-[10px] font-bold text-brand-blue bg-blue-50 border border-blue-200/80 px-2 py-0.5 rounded-full">
-                27 Phiên bản
+              <span className="text-[10px] font-bold text-brand-blue bg-blue-50 border border-blue-200/80 px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 tabular-nums">
+                {hasActiveFilters ? `${filteredVariants.length} / 27 bản` : '27 Phiên bản'}
               </span>
             </div>
 
-            {/* Quick Action: Open Dedicated Comparison Pop-up */}
-            <div className="flex items-center gap-2">
+            {/* Right Controls: View Layout Switcher & Dedicated Comparison Pop-up */}
+            <div className="flex items-center gap-2 shrink-0">
+              <div className="hidden sm:inline-flex p-0.5 bg-slate-200/80 rounded-lg border border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setViewLayout('byModel')}
+                  className={`px-2.5 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                    viewLayout === 'byModel'
+                      ? 'bg-white text-slate-900 shadow-2xs font-extrabold'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                  title="Gộp theo 15 dòng xe kèm nút chuyển phiên bản bên trong"
+                >
+                  Theo dòng xe
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewLayout('allVariants')}
+                  className={`px-2.5 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                    viewLayout === 'allVariants'
+                      ? 'bg-white text-slate-900 shadow-2xs font-extrabold'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                  title="Hiển thị tách rời toàn bộ 27 phiên bản"
+                >
+                  Tách 27 bản
+                </button>
+              </div>
+
               <Button
                 variant="secondary"
                 size="sm"
@@ -204,213 +297,96 @@ export const LivingCanvasPane: React.FC = () => {
             </div>
           </div>
 
-          {/* Hall Body: Scrollable Car Cards & Multi-Filter Console */}
+          {/* Hall Body: Scrollable Car Cards & Compact Single-Row Filter Bar */}
           <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+            <TicketStatusBanners />
             
-            {/* MULTI-FILTER & SEARCH CONSOLE (OriginUI High-Density Architecture) */}
-            <div className="p-3.5 rounded-2xl bg-slate-50/90 border border-slate-200/90 shadow-2xs space-y-3">
-              {/* Row 1: Search Bar & Primary Category Tabs */}
-              <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2.5">
-                {/* Search Box with Clear Button */}
-                <div className="relative flex-1">
-                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    type="text"
-                    placeholder="Tìm theo tên xe, phiên bản, tính năng... (VD: VF 7, Plus, Eco, Van, 7 chỗ, AWD, trần kính)"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-blue/30 shadow-2xs"
-                  />
-                  {searchQuery && (
-                    <button
-                      type="button"
-                      onClick={() => setSearchQuery('')}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </div>
-
-                {/* Primary Category Switcher (Tất cả 27 xe, Du lịch 17 xe, Thương mại 10 xe) */}
-                <div className="inline-flex p-1 bg-slate-200/80 rounded-xl gap-1 shrink-0 overflow-x-auto">
+            {/* SINGLE-ROW UNIFIED FILTER BAR (Search + 3 Logical Dropdowns) */}
+            <div className="p-2.5 rounded-2xl bg-slate-50/90 border border-slate-200/90 shadow-2xs flex flex-wrap items-center gap-2">
+              {/* Search Box with Clear Button */}
+              <div className="relative flex-1 min-w-[200px]">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="text"
+                  placeholder="Tìm tên xe, phiên bản, tính năng (VD: VF 7, Plus, AWD...)"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-8 pr-7 py-1.5 min-h-[34px] rounded-xl border border-slate-200/90 text-xs bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue shadow-2xs"
+                />
+                {searchQuery && (
                   <button
                     type="button"
-                    onClick={() => setCategoryFilter('all')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
-                      categoryFilter === 'all'
-                        ? 'bg-white text-slate-900 shadow-2xs'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
                   >
-                    Tất cả (27 xe)
+                    <X className="w-3.5 h-3.5" />
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setCategoryFilter('passenger')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
-                      categoryFilter === 'passenger'
-                        ? 'bg-white text-slate-900 shadow-2xs'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
-                  >
-                    Xe Du lịch (17 bản)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setCategoryFilter('commercial')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
-                      categoryFilter === 'commercial'
-                        ? 'bg-white text-slate-900 shadow-2xs'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
-                  >
-                    Xe Thương mại (10 bản)
-                  </button>
-                </div>
+                )}
               </div>
 
-              {/* Row 2: Secondary Price & Seat Filters + Layout View Switcher */}
-              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-200/60 text-xs">
-                {/* Price & Seat Filter Pills */}
-                <div className="flex flex-wrap items-center gap-2">
-                  {/* Price Segment */}
-                  <div className="flex items-center gap-1 p-0.5 bg-white rounded-lg border border-slate-200">
-                    <span className="text-[10px] text-slate-400 font-bold px-2">Giá:</span>
-                    <button
-                      type="button"
-                      onClick={() => setPriceFilter('all')}
-                      className={`px-2 py-1 rounded text-[10px] font-bold ${
-                        priceFilter === 'all' ? 'bg-brand-blue text-white' : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      Tất cả
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPriceFilter('under500')}
-                      className={`px-2 py-1 rounded text-[10px] font-bold ${
-                        priceFilter === 'under500' ? 'bg-brand-blue text-white' : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      &lt; 500 tr
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPriceFilter('500to700')}
-                      className={`px-2 py-1 rounded text-[10px] font-bold ${
-                        priceFilter === '500to700' ? 'bg-brand-blue text-white' : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      500 - 700 tr
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPriceFilter('700to1000')}
-                      className={`px-2 py-1 rounded text-[10px] font-bold ${
-                        priceFilter === '700to1000' ? 'bg-brand-blue text-white' : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      700 tr - 1 tỷ
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPriceFilter('over1000')}
-                      className={`px-2 py-1 rounded text-[10px] font-bold ${
-                        priceFilter === 'over1000' ? 'bg-brand-blue text-white' : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      &gt; 1 tỷ
-                    </button>
-                  </div>
+              {/* Dropdown 1: Loại xe (Category) */}
+              <CustomSelect<'all' | 'passenger' | 'commercial'>
+                value={categoryFilter}
+                onChange={(val) => setCategoryFilter(val)}
+                options={[
+                  { value: 'all', label: 'Loại xe: Tất cả', badge: '27 bản' },
+                  { value: 'passenger', label: 'Xe Du lịch', badge: '17 bản' },
+                  { value: 'commercial', label: 'Xe Thương mại', badge: '10 bản' },
+                ]}
+                size="sm"
+                className="w-full sm:w-[156px]"
+                triggerClassName="min-h-[34px] rounded-xl"
+                dropdownClassName="w-52"
+                aria-label="Lọc theo phân류 loại xe"
+              />
 
-                  {/* Seat Filter */}
-                  <div className="flex items-center gap-1 p-0.5 bg-white rounded-lg border border-slate-200">
-                    <span className="text-[10px] text-slate-400 font-bold px-2">Chỗ:</span>
-                    <button
-                      type="button"
-                      onClick={() => setSeatFilter('all')}
-                      className={`px-2 py-1 rounded text-[10px] font-bold ${
-                        seatFilter === 'all' ? 'bg-brand-blue text-white' : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      Tất cả
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSeatFilter('2to4')}
-                      className={`px-2 py-1 rounded text-[10px] font-bold ${
-                        seatFilter === '2to4' ? 'bg-brand-blue text-white' : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      2 - 4 chỗ
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSeatFilter('5')}
-                      className={`px-2 py-1 rounded text-[10px] font-bold ${
-                        seatFilter === '5' ? 'bg-brand-blue text-white' : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      5 chỗ
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSeatFilter('7plus')}
-                      className={`px-2 py-1 rounded text-[10px] font-bold ${
-                        seatFilter === '7plus' ? 'bg-brand-blue text-white' : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      7 chỗ & Buýt
-                    </button>
-                  </div>
+              {/* Dropdown 2: Tầm giá (Price) */}
+              <CustomSelect<'all' | 'under500' | '500to700' | '700to1000' | 'over1000'>
+                value={priceFilter}
+                onChange={(val) => setPriceFilter(val)}
+                options={[
+                  { value: 'all', label: 'Mức giá: Tất cả' },
+                  { value: 'under500', label: 'Giá: Dưới 500 triệu' },
+                  { value: '500to700', label: 'Giá: 500 - 700 triệu' },
+                  { value: '700to1000', label: 'Giá: 700 tr - 1 tỷ' },
+                  { value: 'over1000', label: 'Giá: Trên 1 tỷ' },
+                ]}
+                size="sm"
+                className="w-[calc(50%-4px)] sm:w-[152px]"
+                triggerClassName="min-h-[34px] rounded-xl"
+                dropdownClassName="w-48"
+                aria-label="Lọc theo khoảng giá"
+              />
 
-                  {hasActiveFilters && (
-                    <button
-                      type="button"
-                      onClick={resetFilters}
-                      className="text-[10px] font-bold text-slate-500 hover:text-rose-600 flex items-center gap-1 px-2 py-1"
-                    >
-                      <RotateCcw className="w-3 h-3" />
-                      <span>Đặt lại</span>
-                    </button>
-                  )}
-                </div>
+              {/* Dropdown 3: Số chỗ (Seats) */}
+              <CustomSelect<'all' | '2to4' | '5' | '7plus'>
+                value={seatFilter}
+                onChange={(val) => setSeatFilter(val)}
+                options={[
+                  { value: 'all', label: 'Số chỗ: Tất cả' },
+                  { value: '2to4', label: 'Chỗ: 2 - 4 chỗ' },
+                  { value: '5', label: 'Chỗ: 5 chỗ' },
+                  { value: '7plus', label: 'Chỗ: 7 chỗ & Buýt' },
+                ]}
+                size="sm"
+                className="w-[calc(50%-4px)] sm:w-[144px]"
+                triggerClassName="min-h-[34px] rounded-xl"
+                dropdownClassName="w-48"
+                align="right"
+                aria-label="Lọc theo số chỗ ngồi"
+              />
 
-                {/* View Mode Toggle: All 27 Variants vs Grouped by Model */}
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-slate-500 font-bold">
-                    Hiển thị <span className="text-brand-blue font-extrabold">{filteredVariants.length}</span> / 27 phiên bản
-                  </span>
-
-                  <div className="inline-flex p-0.5 bg-slate-200/80 rounded-lg">
-                    <button
-                      type="button"
-                      onClick={() => setViewLayout('byModel')}
-                      className={`px-2.5 py-1 rounded-md text-[10px] font-bold transition-all ${
-                        viewLayout === 'byModel'
-                          ? 'bg-white text-slate-900 shadow-2xs font-extrabold'
-                          : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                      title="Nhóm theo dòng xe kèm nút chọn phiên bản bên trong (Phong cách Tesla)"
-                    >
-                      Dòng xe & Phiên bản
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setViewLayout('allVariants')}
-                      className={`px-2.5 py-1 rounded-md text-[10px] font-bold transition-all ${
-                        viewLayout === 'allVariants'
-                          ? 'bg-white text-slate-900 shadow-2xs font-extrabold'
-                          : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                      title="Hiển thị độc lập từng phiên bản xe"
-                    >
-                      Toàn bộ 27 bản
-                    </button>
-                  </div>
-                </div>
-              </div>
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="px-2.5 py-1.5 min-h-[34px] rounded-xl bg-white border border-slate-200 hover:border-rose-300 hover:bg-rose-50 text-[11px] font-bold text-slate-600 hover:text-rose-600 flex items-center gap-1 transition cursor-pointer shadow-2xs shrink-0"
+                  title="Đặt lại toàn bộ bộ lọc"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  <span>Đặt lại</span>
+                </button>
+              )}
             </div>
 
             {/* EMPTY STATE */}
@@ -431,40 +407,14 @@ export const LivingCanvasPane: React.FC = () => {
 
             {/* LAYOUT 1: ALL 27 VARIANTS GRID (MỖI PHIÊN BẢN LÀ 1 THẺ ĐỘC LẬP) */}
             {viewLayout === 'allVariants' && filteredVariants.length > 0 && (
-              <div ref={hallCardsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div ref={hallCardsRef} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {filteredVariants.map((item) => {
                   return (
                     <div
                       key={item.id}
                       className="hall-car-card rounded-2xl border border-slate-200/90 bg-white hover:border-brand-blue/60 hover:shadow-lg transition-[border-color,box-shadow] duration-150 ease-out flex flex-col justify-between overflow-hidden group h-full shadow-xs"
                     >
-                      {/* Top Image & Badge with Dark Luxury Lighting */}
-                      <div className="p-4 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border-b border-slate-800 relative overflow-hidden">
-                        {/* Automotive Studio Spotlight Beam */}
-                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-600/15 via-slate-900/40 to-transparent pointer-events-none" />
-                        <div className="flex items-center justify-between mb-2 relative z-10">
-                          <div className="flex items-center gap-1.5">
-                            <Badge variant="dark" dot pulseDot>
-                              {item.badge}
-                            </Badge>
-                            <span className="text-[10px] font-semibold text-slate-300 bg-slate-800/90 px-2 py-0.5 rounded-md border border-slate-700">
-                              {item.seats}
-                            </span>
-                          </div>
-                          <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md border ${
-                            item.category === 'passenger'
-                              ? 'bg-blue-900/60 text-blue-200 border-blue-700/60'
-                              : 'bg-emerald-900/60 text-emerald-200 border-emerald-700/60'
-                          }`}>
-                            {item.category_name}
-                          </span>
-                        </div>
-
-                        {/* Silhouette Preview */}
-                        <div className="h-28 flex items-center justify-center p-1 relative z-10 overflow-hidden">
-                          <CarVisualSilhouette modelId={item.model_id} className="w-full h-full max-h-28" />
-                        </div>
-                      </div>
+                      {renderCardTopBanner(item, item.model_id, 'h-28')}
 
                       {/* Middle Info Body */}
                       <div key={`variant-body-${item.id}`} className="p-4 space-y-3 flex-1 flex flex-col justify-between bg-white animate-in fade-in duration-200">
@@ -544,7 +494,7 @@ export const LivingCanvasPane: React.FC = () => {
 
             {/* LAYOUT 2: GROUPED BY MODEL (15 DÒNG XE CỐT LÕI VỚI TRIM SWITCHER BÊN TRONG) */}
             {viewLayout === 'byModel' && groupedModelIds.length > 0 && (
-              <div ref={hallCardsRef} className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div ref={hallCardsRef} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {groupedModelIds.map((mId) => {
                   const modelVariants = ALL_VINFAST_VARIANTS.filter((v) => v.model_id === mId);
                   const activeVarId = selectedVariantIds?.[mId as ModelId] || modelVariants[0]?.id;
@@ -556,33 +506,7 @@ export const LivingCanvasPane: React.FC = () => {
                       key={mId}
                       className="hall-car-card rounded-2xl border border-slate-200/90 bg-white hover:border-brand-blue/60 hover:shadow-lg transition-[border-color,box-shadow] duration-150 ease-out flex flex-col justify-between overflow-hidden group h-full shadow-xs"
                     >
-                      {/* Top Image & Badge */}
-                      <div className="p-4 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border-b border-slate-800 relative overflow-hidden">
-                        {/* Automotive Studio Spotlight Beam */}
-                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-600/15 via-slate-900/40 to-transparent pointer-events-none" />
-                        <div className="flex items-center justify-between mb-2 relative z-10">
-                          <div className="flex items-center gap-1.5">
-                            <Badge variant="dark" dot pulseDot>
-                              {item.badge}
-                            </Badge>
-                            <span className="text-[10px] font-semibold text-slate-300 bg-slate-800/90 px-2 py-0.5 rounded-md border border-slate-700">
-                              {item.seats}
-                            </span>
-                          </div>
-                          <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md border ${
-                            item.category === 'passenger'
-                              ? 'bg-blue-900/60 text-blue-200 border-blue-700/60'
-                              : 'bg-emerald-900/60 text-emerald-200 border-emerald-700/60'
-                          }`}>
-                            {item.category_name}
-                          </span>
-                        </div>
-
-                        {/* Silhouette Preview */}
-                        <div className="h-32 flex items-center justify-center p-1 relative z-10 overflow-hidden">
-                          <CarVisualSilhouette modelId={mId} className="w-full h-full max-h-32" />
-                        </div>
-                      </div>
+                      {renderCardTopBanner(item, mId, 'h-32')}
 
                       {/* Middle Info Body */}
                       <div key={`variant-body-${item.id}`} className="p-4 space-y-3 flex-1 flex flex-col justify-between bg-white animate-in fade-in duration-200">
@@ -616,7 +540,7 @@ export const LivingCanvasPane: React.FC = () => {
                                     }`}
                                     title={`${v.version_name} · ${v.price.toLocaleString('vi-VN')} đ`}
                                   >
-                                    <span>{v.version_name.replace('Bản ', '')}</span>
+                                    <span>{formatShortTrimLabel(v.version_name)}</span>
                                   </button>
                                 );
                               })}
@@ -858,18 +782,10 @@ export const LivingCanvasPane: React.FC = () => {
       {canvasMode === 'recommendations' && (
         <div className="flex flex-col h-full overflow-hidden">
           {/* Top Bar */}
-          <div className="h-12 px-4 bg-slate-50/80 border-b border-slate-200/80 flex items-center justify-between gap-3 shrink-0">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={backToHall}
-              icon={<ArrowLeft className="w-3.5 h-3.5" />}
-            >
-              Quay lại Sảnh chính
-            </Button>
+          <div className="px-4 py-2.5 bg-slate-50/90 border-b border-slate-200/80 flex items-center justify-between flex-wrap gap-2 shrink-0">
+            {renderSubViewStepper('recommendations')}
 
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-900 hidden sm:inline">Phương án đề xuất tối ưu</span>
               <Button
                 variant="secondary"
                 size="sm"
@@ -1043,38 +959,33 @@ export const LivingCanvasPane: React.FC = () => {
           ========================================================================= */}
       {canvasMode === 'tco' && (
         <div className="flex flex-col h-full overflow-hidden">
-          {/* Top Bar with Back Button navigating back to Recommendations */}
-          <div className="px-4 py-3 bg-slate-50/80 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setCanvasMode('recommendations');
-                setJourneyStep(2);
-              }}
-              icon={<ArrowLeft className="w-3.5 h-3.5" />}
-            >
-              Quay lại Đề xuất xe
-            </Button>
+          {/* Top Bar with 3-Stage Stepper & Active Vehicle Info */}
+          <div className="px-4 py-2.5 bg-slate-50/90 border-b border-slate-200/80 flex items-center justify-between flex-wrap gap-2 shrink-0">
+            {renderSubViewStepper('tco')}
 
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-slate-600">
-                Dự toán chi phí 5 năm: <strong className="text-slate-900 font-bold">{car.display_name}</strong>
+              <span className="text-xs font-medium text-slate-600 hidden xl:inline">
+                Đang tính: <strong className="text-slate-900 font-bold">{car.display_name}</strong>
               </span>
               <Button
-                variant="outline"
-                size="xs"
-                onClick={backToHall}
+                variant="secondary"
+                size="sm"
+                onClick={() => openComparisonModal([selectedModelId])}
               >
-                Đổi mẫu xe khác
+                So sánh dòng xe
               </Button>
             </div>
           </div>
 
           {/* TCO Body */}
           <div className="flex-1 overflow-y-auto p-5 space-y-4">
+            <TicketStatusBanners />
             <UrbanChargingWidget />
-            <TCOEstimateCard />
+            <TCOEstimateCard
+              onOpenCarDetail={() =>
+                handleOpenCarDetail(selectedModelId, selectedVariantIds?.[selectedModelId])
+              }
+            />
           </div>
         </div>
       )}

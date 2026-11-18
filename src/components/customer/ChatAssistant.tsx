@@ -239,9 +239,9 @@ export const ChatAssistant: React.FC = () => {
                 Đang tra cứu catalog & tính TCO
               </span>
               <div className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse" style={{ animationDelay: '0ms' }}></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse" style={{ animationDelay: '150ms' }}></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse" style={{ animationDelay: '300ms' }}></span>
               </div>
             </div>
           </div>

@@ -18,6 +18,7 @@ import {
 import { calculateDeterministicTCO, formatVND } from '@/lib/engine';
 import { Button } from '@/components/common/Button';
 import { Badge } from '@/components/common/Badge';
+import { CustomSelect } from '@/components/common/CustomSelect';
 import { CarVisualSilhouette } from '@/components/common/CarVisualSilhouette';
 import {
   X,
@@ -38,6 +39,7 @@ export const CarComparisonModal: React.FC = () => {
   const toggleComparisonVariant = useAppStore((state) => state.toggleComparisonVariant);
   const setComparisonSlot = useAppStore((state) => state.setComparisonSlot);
   const selectModel = useAppStore((state) => state.selectModel);
+  const selectVariant = useAppStore((state) => state.selectVariant);
   const proceedToTCO = useAppStore((state) => state.proceedToTCO);
   const customerInputs = useAppStore((state) => state.customerInputs);
   const comparisonInitialView = useAppStore((state) => state.comparisonInitialView) || 'picker';
@@ -172,11 +174,9 @@ export const CarComparisonModal: React.FC = () => {
     const variant = VARIANTS_BY_ID[vId];
     closeComparisonModal();
     if (variant) {
-      const baseModelId = (['VF3', 'VF5', 'VF6', 'VF7', 'VF8', 'VF9'].includes(variant.model_id)
-        ? variant.model_id
-        : 'VF6') as any;
-      selectModel(baseModelId, false);
-      proceedToTCO(baseModelId);
+      selectModel(variant.model_id as any, false);
+      selectVariant(variant.model_id, variant.id);
+      proceedToTCO(variant.model_id as any);
     }
   };
 
@@ -231,53 +231,17 @@ export const CarComparisonModal: React.FC = () => {
             ========================================================================= */}
         {viewMode === 'picker' && (
           <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Filter and Search Bar for 27 Variants (Tối ưu không gian, đưa trực tiếp lên đầu) */}
-            <div className="px-5 py-2.5 bg-slate-50/90 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shrink-0">
-              <div className="inline-flex p-1 bg-slate-200/70 rounded-xl gap-1">
-                <button
-                  type="button"
-                  onClick={() => setPickerCategory('all')}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                    pickerCategory === 'all'
-                      ? 'bg-white text-slate-900 shadow-2xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Tất cả (27 xe)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPickerCategory('passenger')}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                    pickerCategory === 'passenger'
-                      ? 'bg-white text-slate-900 shadow-2xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Xe Du lịch (17 bản)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPickerCategory('commercial')}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                    pickerCategory === 'commercial'
-                      ? 'bg-white text-slate-900 shadow-2xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Xe Thương mại (10 bản)
-                </button>
-              </div>
-
+            {/* Filter and Search Bar for 27 Variants (1-Row Search + Dropdown) */}
+            <div className="px-5 py-2.5 bg-slate-50/90 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shrink-0">
               {/* Search Box */}
-              <div className="relative w-full sm:w-64">
+              <div className="relative flex-1">
                 <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
                   placeholder="Tìm theo tên bản, VF 7, Plus, Van..."
                   value={pickerSearch}
                   onChange={(e) => setPickerSearch(e.target.value)}
-                  className="w-full pl-8 pr-7 py-1.5 rounded-xl border border-slate-200 text-xs bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
+                  className="w-full pl-8 pr-7 py-1.5 min-h-[34px] rounded-xl border border-slate-200 text-xs bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
                 />
                 {pickerSearch && (
                   <button
@@ -289,6 +253,22 @@ export const CarComparisonModal: React.FC = () => {
                   </button>
                 )}
               </div>
+
+              <CustomSelect<'all' | 'passenger' | 'commercial'>
+                value={pickerCategory}
+                onChange={(val) => setPickerCategory(val)}
+                options={[
+                  { value: 'all', label: 'Loại xe: Tất cả', badge: '27 bản' },
+                  { value: 'passenger', label: 'Xe Du lịch', badge: '17 bản' },
+                  { value: 'commercial', label: 'Xe Thương mại', badge: '10 bản' },
+                ]}
+                size="sm"
+                className="w-full sm:w-48"
+                triggerClassName="min-h-[34px] rounded-xl"
+                dropdownClassName="w-52"
+                align="right"
+                aria-label="Lọc loại xe so sánh"
+              />
             </div>
 
             {/* Visual 27-Variant Grid */}

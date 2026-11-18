@@ -135,13 +135,22 @@ const DEFAULT_USER_PROFILE: UserProfile = {
   dailyKm: 30,
 };
 
-const DEFAULT_VARIANT_IDS: Record<ModelId, string> = {
+const DEFAULT_VARIANT_IDS: Record<string, string> = {
+  VF2: 'VF2_STD',
   VF3: 'VF3_PLUS',
   VF5: 'VF5_PREMIUM',
   VF6: 'VF6_COMFORT',
   VF7: 'VF7_ECO',
   VF8: 'VF8_ECO',
   VF9: 'VF9_ECO',
+  VF_MPV7: 'VF_MPV7_STD',
+  VF_WILD: 'VF_WILD_CONCEPT',
+  MINIO_GREEN: 'MINIO_GREEN_STD',
+  HERIO_GREEN: 'HERIO_GREEN_TC1',
+  NERIO_GREEN: 'NERIO_GREEN_STD',
+  LIMO_GREEN: 'LIMO_GREEN_STD',
+  EC_VAN: 'EC_VAN_STD',
+  EBUS_6: 'EBUS_6_URBAN',
 };
 
 export const useAppStore = create<AppStoreState>((set, get) => ({
@@ -374,12 +383,15 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
   clearToast: () => set({ toast: null }),
 
   submitTicketToAdvisor: () => {
-    const { selectedModelId, customerInputs } = get();
+    const { selectedModelId, selectedVariantIds, customerInputs, selectedCity } = get();
     if (!selectedModelId) return;
 
-    const car = CAR_CATALOG[selectedModelId];
+    const variantId = selectedVariantIds?.[selectedModelId];
+    const car = getCarModelWithVariant(selectedModelId, variantId);
     const estimate = calculateDeterministicTCO({ car, ...customerInputs });
     const nowTime = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    const facility = VINFAST_FACILITIES[selectedCity] || VINFAST_FACILITIES.national;
+    const targetShowroom = selectedCity === 'national' ? 'Showroom VinFast' : facility.showroomName;
 
     const newTicket: Ticket = {
       ...get().ticket,
@@ -393,7 +405,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
     const newNotif: AppNotification = {
       id: `notif-${Date.now()}`,
       title: `Đã gửi dự toán ${car.display_name} (#${newTicket.id})`,
-      description: 'Hồ sơ đang chờ chuyên viên Showroom VinFast Cầu Giấy tiếp nhận & thẩm định.',
+      description: `Hồ sơ đang chờ chuyên viên ${targetShowroom} tiếp nhận & thẩm định.`,
       timestamp: nowTime,
       type: 'ticket',
       read: false,
@@ -409,20 +421,25 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
     }));
 
     get().showToast(
-      `Đã gửi dự toán mã #${newTicket.id} tới Showroom Cầu Giấy! Hệ thống tự động trở về Sảnh chính giới thiệu xe.`,
+      `Đã gửi dự toán mã #${newTicket.id} tới ${targetShowroom}! Hệ thống tự động trở về Sảnh chính giới thiệu xe.`,
       'success'
     );
   },
 
   approveTicket: (advisorNotes) => {
     const nowTime = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-    const { selectedModelId } = get();
-    const carName = selectedModelId ? CAR_CATALOG[selectedModelId].display_name : 'VinFast EV';
+    const { selectedModelId, selectedVariantIds, selectedCity } = get();
+    const car = selectedModelId
+      ? getCarModelWithVariant(selectedModelId, selectedVariantIds?.[selectedModelId])
+      : null;
+    const carName = car ? car.display_name : 'VinFast EV';
+    const facility = VINFAST_FACILITIES[selectedCity] || VINFAST_FACILITIES.national;
+    const targetShowroom = selectedCity === 'national' ? 'Showroom VinFast' : facility.showroomName;
 
     const newNotif: AppNotification = {
       id: `notif-${Date.now()}`,
       title: `Dự toán ${carName} (#HS-1089) ĐÃ ĐƯỢC PHÊ DUYỆT!`,
-      description: `Tư vấn viên Lê Văn B (Showroom Cầu Giấy) đã xác nhận chính sách ưu đãi lăn bánh & gói vay lúc ${nowTime}.`,
+      description: `Tư vấn viên Lê Văn B (${targetShowroom}) đã xác nhận chính sách ưu đãi lăn bánh & gói vay lúc ${nowTime}.`,
       timestamp: nowTime,
       type: 'approval',
       read: false,
@@ -433,7 +450,7 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
       ticket: {
         ...state.ticket,
         status: 'approved',
-        approved_by: 'Lê Văn B (Showroom Cầu Giấy)',
+        approved_by: `Lê Văn B (${targetShowroom})`,
         approved_at: nowTime,
         advisor_notes: advisorNotes,
       },

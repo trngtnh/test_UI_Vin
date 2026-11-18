@@ -11,7 +11,7 @@ interface CarVisualSilhouetteProps {
 }
 
 // Geometric specs for each VinFast EV model to guarantee distinct, recognizable vehicle shapes
-const MODEL_GEOMETRIES: Record<ModelId, {
+const MODEL_GEOMETRIES: Record<string, {
   bodyPath: string;
   glassPath: string;
   frontWheelX: number;

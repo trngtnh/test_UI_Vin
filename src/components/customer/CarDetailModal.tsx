@@ -192,14 +192,6 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
 
           <div className="flex items-center gap-2">
             <Button
-              variant="outline"
-              size="sm"
-              onClick={handleOpenComparison}
-              className="hidden sm:inline-flex"
-            >
-              So sánh dòng xe
-            </Button>
-            <Button
               variant="ghost"
               size="icon-sm"
               onClick={onClose}

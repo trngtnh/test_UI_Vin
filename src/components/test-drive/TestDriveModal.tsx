@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAppStore } from '@/store/useAppStore';
+import { getCarModelWithVariant, VINFAST_FACILITIES } from '@/lib/catalog';
 import { X } from 'lucide-react';
 import { CustomSelect } from '@/components/common/CustomSelect';
 
@@ -9,13 +10,46 @@ export const TestDriveModal: React.FC = () => {
   const isOpen = useAppStore((state) => state.isTestDriveModalOpen);
   const setOpen = useAppStore((state) => state.setTestDriveModalOpen);
   const showToast = useAppStore((state) => state.showToast);
+  const userProfile = useAppStore((state) => state.userProfile);
+  const updateUserProfile = useAppStore((state) => state.updateUserProfile);
+  const selectedCity = useAppStore((state) => state.selectedCity) || 'national';
+  const selectedModelId = useAppStore((state) => state.selectedModelId) || 'VF6';
+  const selectedVariantIds = useAppStore((state) => state.selectedVariantIds);
 
-  const [showroom, setShowroom] = useState('Showroom VinFast Cầu Giấy (Hà Nội)');
+  const currentFacility = VINFAST_FACILITIES[selectedCity] || VINFAST_FACILITIES.national;
+  const car = getCarModelWithVariant(selectedModelId, selectedVariantIds?.[selectedModelId]);
+
+  const showroomOptions = useMemo(() => {
+    const baseOptions = [
+      { value: 'Showroom VinFast Cầu Giấy (Hà Nội)', label: 'Showroom VinFast Cầu Giấy (Hà Nội)', badge: 'Sẵn xe' },
+      { value: 'Showroom VinFast Landmark 81 (TP.HCM)', label: 'Showroom VinFast Landmark 81 (TP.HCM)', badge: 'Sẵn xe' },
+      { value: 'Showroom VinFast Ngô Quyền (Đà Nẵng)', label: 'Showroom VinFast Ngô Quyền (Đà Nẵng)' },
+      { value: 'Showroom VinFast Imperia (Hải Phòng)', label: 'Showroom VinFast Imperia (Hải Phòng)' },
+      { value: 'Showroom VinFast Hùng Vương (Cần Thơ)', label: 'Showroom VinFast Hùng Vương (Cần Thơ)' },
+      { value: 'Showroom VinFast Smart City (Nam Từ Liêm)', label: 'Showroom VinFast Smart City (Nam Từ Liêm)' },
+    ];
+    if (selectedCity !== 'national') {
+      const cityMatchedLabel = `${currentFacility.showroomName} (${currentFacility.cityName})`;
+      const filtered = baseOptions.filter((o) => !o.value.includes(currentFacility.showroomName));
+      return [{ value: cityMatchedLabel, label: cityMatchedLabel, badge: 'Gần bạn nhất' }, ...filtered];
+    }
+    return baseOptions;
+  }, [selectedCity, currentFacility]);
+
+  const [showroom, setShowroom] = useState(showroomOptions[0].value);
   const [date, setDate] = useState('2026-11-21');
-  const [name, setName] = useState('Nguyễn Văn A');
-  const [phone, setPhone] = useState('0912 345 678');
+  const [name, setName] = useState(userProfile.fullName);
+  const [phone, setPhone] = useState(userProfile.phone);
   const [consent, setConsent] = useState(false);
   const [timeSlot, setTimeSlot] = useState('morning');
+
+  useEffect(() => {
+    if (isOpen) {
+      setShowroom(showroomOptions[0].value);
+      setName(userProfile.fullName);
+      setPhone(userProfile.phone);
+    }
+  }, [isOpen, showroomOptions, userProfile.fullName, userProfile.phone]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -35,9 +69,10 @@ export const TestDriveModal: React.FC = () => {
       return;
     }
 
+    updateUserProfile({ fullName: name, phone });
     setOpen(false);
     showToast(
-      `Đã gửi yêu cầu lái thử thành công tới ${showroom}! Chuyên viên sẽ liên hệ số điện thoại ${phone} để xác nhận lịch hẹn.`,
+      `Đã gửi yêu cầu lái thử mẫu ${car.display_name} tới ${showroom}! Chuyên viên sẽ liên hệ số ${phone} để xác nhận lịch hẹn.`,
       'success'
     );
   };
@@ -54,11 +89,12 @@ export const TestDriveModal: React.FC = () => {
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div>
             <h3 className="text-sm font-bold text-slate-900">
-              Đăng ký Lái thử Trải nghiệm Xe VinFast
+              Đăng ký Lái thử · {car.display_name}
             </h3>
-            <p className="text-[10px] text-slate-400">Trải nghiệm thực tế công nghệ sạc và trợ lái ADAS</p>
+            <p className="text-[10px] text-slate-400">Trải nghiệm thực tế khả năng vận hành và công nghệ an toàn ADAS</p>
           </div>
           <button
+            type="button"
             onClick={() => setOpen(false)}
             className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
           >
@@ -74,12 +110,7 @@ export const TestDriveModal: React.FC = () => {
             <CustomSelect
               value={showroom}
               onChange={(val) => setShowroom(val)}
-              options={[
-                { value: 'Showroom VinFast Cầu Giấy (Hà Nội)', label: 'Showroom VinFast Cầu Giấy (Hà Nội)', badge: 'Sẵn xe' },
-                { value: 'Showroom VinFast Phạm Văn Đồng (Hà Nội)', label: 'Showroom VinFast Phạm Văn Đồng (Hà Nội)' },
-                { value: 'Showroom VinFast Smart City (Nam Từ Liêm)', label: 'Showroom VinFast Smart City (Nam Từ Liêm)' },
-                { value: 'Showroom VinFast Long Biên (Hà Nội)', label: 'Showroom VinFast Long Biên (Hà Nội)' },
-              ]}
+              options={showroomOptions}
               size="md"
               className="w-full"
             />

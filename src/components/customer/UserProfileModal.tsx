@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useAppStore } from '@/store/useAppStore';
-import { CAR_CATALOG } from '@/lib/catalog';
+import { getCarModelWithVariant, VINFAST_FACILITIES } from '@/lib/catalog';
 import { formatVND } from '@/lib/engine';
 import { CustomSelect } from '@/components/common/CustomSelect';
 import {
@@ -21,9 +21,14 @@ export const UserProfileModal: React.FC = () => {
   const updateUserProfile = useAppStore((state) => state.updateUserProfile);
   const ticket = useAppStore((state) => state.ticket);
   const customerInputs = useAppStore((state) => state.customerInputs);
-  const selectModel = useAppStore((state) => state.selectModel);
+  const selectedVariantIds = useAppStore((state) => state.selectedVariantIds);
+  const selectedCity = useAppStore((state) => state.selectedCity) || 'national';
   const proceedToTCO = useAppStore((state) => state.proceedToTCO);
   const showToast = useAppStore((state) => state.showToast);
+
+  const currentFacility = VINFAST_FACILITIES[selectedCity] || VINFAST_FACILITIES.national;
+  const showroomLabel = selectedCity === 'national' ? 'Showroom VinFast' : currentFacility.showroomName;
+  const cityLabel = selectedCity === 'national' ? 'Việt Nam' : currentFacility.cityName;
 
   const [activeTab, setActiveTab] = useState<'profile' | 'history'>(profileActiveTab || 'history');
   const [formData, setFormData] = useState({ ...userProfile });
@@ -55,7 +60,12 @@ export const UserProfileModal: React.FC = () => {
     setTimeout(() => setIsSaved(false), 3000);
   };
 
-  const registeredCar = ticket.model_id ? CAR_CATALOG[ticket.model_id] : null;
+  const registeredCar = ticket.model_id
+    ? getCarModelWithVariant(ticket.model_id, selectedVariantIds?.[ticket.model_id])
+    : null;
+  const downPaymentPercent = Math.round(
+    (1 - (ticket.input_snapshot?.loan_ratio ?? customerInputs.loan_ratio)) * 100
+  );
 
   return (
     <div
@@ -77,7 +87,7 @@ export const UserProfileModal: React.FC = () => {
                 Tài khoản & Lịch sử Đăng ký · VinFast O2O
               </h3>
               <p className="text-[10px] text-slate-500">
-                Quản lý hồ sơ cá nhân và theo dõi tình trạng dự toán tại Showroom Cầu Giấy
+                Quản lý hồ sơ cá nhân và theo dõi tình trạng dự toán tại {showroomLabel}
               </p>
             </div>
           </div>
@@ -128,7 +138,7 @@ export const UserProfileModal: React.FC = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between text-xs text-slate-600 mb-1">
                 <span className="font-semibold">Danh sách hồ sơ dự toán & đăng ký xe:</span>
-                <span className="text-[11px] text-slate-400">Đồng bộ tức thì với Showroom Cầu Giấy</span>
+                <span className="text-[11px] text-slate-400">Đồng bộ tức thì với {showroomLabel}</span>
               </div>
 
               {ticket.status === 'draft' ? (
@@ -136,7 +146,7 @@ export const UserProfileModal: React.FC = () => {
                   <Clock className="w-8 h-8 text-slate-400 mx-auto" />
                   <h4 className="text-xs font-bold text-slate-700">Chưa có hồ sơ dự toán nào được gửi</h4>
                   <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
-                    Anh/chị hãy chọn một mẫu xe tại Sảnh chính, tính toán phương án TCO và nhấn "Gửi dự toán đến Showroom Cầu Giấy" để lưu hồ sơ tại đây.
+                    Anh/chị hãy chọn một mẫu xe tại Sảnh chính, tính toán phương án TCO và nhấn &quot;Gửi dự toán đến {showroomLabel}&quot; để lưu hồ sơ tại đây.
                   </p>
                 </div>
               ) : (
@@ -157,12 +167,12 @@ export const UserProfileModal: React.FC = () => {
                       {ticket.status === 'approved' ? (
                         <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
                           <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>Đã Showroom phê duyệt chính thức</span>
+                          <span>Đã {showroomLabel} phê duyệt chính thức</span>
                         </span>
                       ) : ticket.status === 'pending_approval' ? (
                         <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-1">
                           <Clock className="w-3.5 h-3.5" />
-                          <span>Chờ Showroom Cầu Giấy tiếp nhận & duyệt</span>
+                          <span>Chờ {showroomLabel} tiếp nhận & duyệt</span>
                         </span>
                       ) : (
                         <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
@@ -184,7 +194,7 @@ export const UserProfileModal: React.FC = () => {
                           </strong>
                         </div>
                         <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                          <span className="text-[10px] text-slate-400 block mb-0.5">Vốn tự có (30%):</span>
+                          <span className="text-[10px] text-slate-400 block mb-0.5">Vốn tự có ({downPaymentPercent}%):</span>
                           <strong className="text-brand-blue text-xs tabular-nums">
                             {formatVND(ticket.computed_snapshot.down_payment)}
                           </strong>
@@ -206,7 +216,7 @@ export const UserProfileModal: React.FC = () => {
                           <span className="text-[10px] text-emerald-700 font-normal">{ticket.approved_at}</span>
                         </div>
                         <p className="text-[11px] text-emerald-800">
-                          <strong>Ghi chú cam kết:</strong> {ticket.advisor_notes || 'Đã kiểm tra biểu giá, phí lăn bánh Hà Nội và chính sách miễn 100% lệ phí trước bạ.'}
+                          <strong>Ghi chú cam kết:</strong> {ticket.advisor_notes || `Đã kiểm tra biểu giá, phí lăn bánh ${cityLabel} và chính sách miễn 100% lệ phí trước bạ.`}
                         </p>
                       </div>
                     )}
@@ -215,7 +225,7 @@ export const UserProfileModal: React.FC = () => {
                     {ticket.status === 'pending_approval' && (
                       <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200 text-xs space-y-1">
                         <span className="font-bold text-amber-900 block">
-                          Showroom VinFast Cầu Giấy đang xử lý:
+                          {showroomLabel} đang xử lý:
                         </span>
                         <p className="text-[11px] text-amber-800 leading-relaxed">
                           Hồ sơ của anh/chị đã được gửi đến hàng chờ của Chuyên viên tư vấn. Khi được duyệt, hệ thống sẽ tự động cập nhật ghi chú cam kết giá và thông báo trên quả chuông.
@@ -299,9 +309,9 @@ export const UserProfileModal: React.FC = () => {
                   />
                 </div>
 
-                {/* Address in Hanoi */}
+                {/* Address */}
                 <div className="sm:col-span-2 space-y-1">
-                  <label className="font-semibold text-slate-700 block">Địa chỉ tại Hà Nội:</label>
+                  <label className="font-semibold text-slate-700 block">Địa chỉ liên hệ ({cityLabel}):</label>
                   <input
                     type="text"
                     value={formData.address}

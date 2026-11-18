@@ -61,7 +61,7 @@ export const VINFAST_FACILITIES: Record<CityId, ShowroomFacility> = {
   },
 };
 
-export const CAR_CATALOG: Record<ModelId, CarModel> = {
+export const CAR_CATALOG: Record<string, CarModel> = {
   VF3: {
     model_id: 'VF3',
     generation_id: '2024',
@@ -443,9 +443,58 @@ export const CAR_CATALOG: Record<ModelId, CarModel> = {
 
 /**
  * Trả về thông tin CarModel đã được áp dụng tham số của phiên bản (Variant) được chọn
+ * Hỗ trợ đầy đủ cả 15 dòng xe và 27 phiên bản trong ALL_VINFAST_VARIANTS.
  */
-export function getCarModelWithVariant(modelId: ModelId, variantId?: string): CarModel {
+export function getCarModelWithVariant(modelId: ModelId | string, variantId?: string): CarModel {
   const baseCar = CAR_CATALOG[modelId] || CAR_CATALOG.VF6;
+  const unifiedMatch =
+    (variantId && VARIANTS_BY_ID[variantId]) ||
+    ALL_VINFAST_VARIANTS.find((v) => v.model_id === modelId);
+
+  if (unifiedMatch && unifiedMatch.model_id === modelId) {
+    const modelVariants = ALL_VINFAST_VARIANTS.filter((v) => v.model_id === modelId).map((v) => ({
+      id: v.id,
+      name: v.version_name,
+      price: v.price,
+      battery_kwh: v.battery_kwh,
+      range_nedc: v.range_nedc,
+      range_real: v.range_real,
+      motor_power: v.motor_power,
+      charging_time: v.charging_time,
+      drivetrain: v.drivetrain,
+      badge: v.badge,
+      features_highlight: v.features_highlight,
+    }));
+
+    return {
+      ...baseCar,
+      model_id: unifiedMatch.model_id as ModelId,
+      variant_id: unifiedMatch.id,
+      display_name: unifiedMatch.display_name,
+      badge: unifiedMatch.badge,
+      price: unifiedMatch.price,
+      seats: unifiedMatch.seats,
+      range_nedc: unifiedMatch.range_nedc,
+      range_real: unifiedMatch.range_real,
+      battery_kwh: unifiedMatch.battery_kwh,
+      consumption_kwh_100km: unifiedMatch.consumption_kwh_100km,
+      warranty_years: unifiedMatch.warranty_years,
+      dimensions: unifiedMatch.dimensions,
+      wheelbase: unifiedMatch.wheelbase,
+      ground_clearance: unifiedMatch.ground_clearance,
+      motor_power: unifiedMatch.motor_power,
+      charging_time: unifiedMatch.charging_time,
+      adas: unifiedMatch.adas,
+      reason_budget: unifiedMatch.reason_budget,
+      reason_charging: unifiedMatch.reason_charging,
+      colors:
+        unifiedMatch.colors && unifiedMatch.colors.length > 0
+          ? unifiedMatch.colors
+          : baseCar.colors,
+      variants: modelVariants,
+    };
+  }
+
   if (!variantId || !baseCar.variants || baseCar.variants.length === 0) {
     return baseCar;
   }
@@ -1265,12 +1314,77 @@ export const VARIANTS_BY_ID: Record<string, UnifiedCarVariant> = ALL_VINFAST_VAR
   return acc;
 }, {} as Record<string, UnifiedCarVariant>);
 
+// Populate CAR_CATALOG with all 15 models and sync full variant lists from ALL_VINFAST_VARIANTS
+ALL_VINFAST_VARIANTS.forEach((v) => {
+  const mId = v.model_id;
+  if (!CAR_CATALOG[mId]) {
+    const modelVariants = ALL_VINFAST_VARIANTS.filter((item) => item.model_id === mId).map((item) => ({
+      id: item.id,
+      name: item.version_name,
+      price: item.price,
+      battery_kwh: item.battery_kwh,
+      range_nedc: item.range_nedc,
+      range_real: item.range_real,
+      motor_power: item.motor_power,
+      charging_time: item.charging_time,
+      drivetrain: item.drivetrain,
+      badge: item.badge,
+      features_highlight: item.features_highlight,
+    }));
+
+    CAR_CATALOG[mId] = {
+      model_id: mId as ModelId,
+      generation_id: '2025',
+      variant_id: v.id,
+      display_name: v.display_name,
+      badge: v.badge,
+      price: v.price,
+      seats: v.seats,
+      range_nedc: v.range_nedc,
+      range_real: v.range_real,
+      battery_kwh: v.battery_kwh,
+      consumption_kwh_100km: v.consumption_kwh_100km,
+      warranty_years: v.warranty_years,
+      source: 'Biểu giá Niêm yết VinFast Auto',
+      image: CAR_CATALOG.VF6.image,
+      reason_budget: v.reason_budget,
+      reason_charging: v.reason_charging,
+      dimensions: v.dimensions,
+      wheelbase: v.wheelbase,
+      motor_power: v.motor_power,
+      charging_time: v.charging_time,
+      ground_clearance: v.ground_clearance,
+      adas: v.adas,
+      colors:
+        v.colors && v.colors.length > 0
+          ? v.colors
+          : [
+              { name: 'Trắng Brahminy White', hex: '#F8FAFC' },
+              { name: 'Vàng Solar Yellow', hex: '#EAB308' },
+              { name: 'Xanh VinFast Blue', hex: '#2563EB' },
+              { name: 'Xám Desat Silver', hex: '#94A3B8' },
+            ],
+      variants: modelVariants,
+    };
+  }
+});
+
 export function getVariantById(id: string): UnifiedCarVariant | undefined {
   return VARIANTS_BY_ID[id];
 }
 
 export function getVariantsByModel(modelId: string): UnifiedCarVariant[] {
   return ALL_VINFAST_VARIANTS.filter((v) => v.model_id === modelId);
+}
+
+/**
+ * Formats a compact, distinct tab label for trim switchers without clipping or duplicate 'Plus' labels.
+ */
+export function formatShortTrimLabel(versionName: string): string {
+  const cleaned = versionName.replace(/^Bản\s+/i, '').trim();
+  if (/trần kính/i.test(cleaned)) return 'Plus Trần kính';
+  if (/trần thép/i.test(cleaned)) return 'Plus';
+  return cleaned.split(' (')[0].trim();
 }
 
 export interface VariantDiffResult {
