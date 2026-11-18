@@ -348,12 +348,12 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
             </div>
           </div>
 
-          {/* Key Flagship Performance Metrics Strip */}
+          {/* Key Flagship Performance Metrics Strip (Baoyu Harmonized Palette) */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
             <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between h-[84px]">
               <div className="flex items-center justify-between text-slate-500 mb-1">
                 <span className="text-[10px] font-semibold">Tầm chạy NEDC</span>
-                <BatteryCharging className="w-3.5 h-3.5 text-emerald-600" />
+                <BatteryCharging className="w-3.5 h-3.5 text-slate-400" />
               </div>
               <strong className="text-lg font-black text-slate-900 tabular-nums">
                 {car.range_nedc} <span className="text-xs font-bold text-slate-500">km</span>
@@ -364,7 +364,7 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
             <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between h-[84px]">
               <div className="flex items-center justify-between text-slate-500 mb-1">
                 <span className="text-[10px] font-semibold">Sạc nhanh 10-70%</span>
-                <Clock className="w-3.5 h-3.5 text-amber-600" />
+                <Clock className="w-3.5 h-3.5 text-slate-400" />
               </div>
               <strong className="text-lg font-black text-slate-900 tabular-nums truncate">
                 {car.charging_time.replace('trong ', '')}
@@ -375,7 +375,7 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
             <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between h-[84px]">
               <div className="flex items-center justify-between text-slate-500 mb-1">
                 <span className="text-[10px] font-semibold">Công suất động cơ</span>
-                <Gauge className="w-3.5 h-3.5 text-blue-600" />
+                <Gauge className="w-3.5 h-3.5 text-slate-400" />
               </div>
               <strong className="text-sm font-black text-slate-900 truncate" title={car.motor_power}>
                 {car.motor_power.split('(')[0]}
@@ -386,7 +386,7 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
             <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between h-[84px]">
               <div className="flex items-center justify-between text-slate-500 mb-1">
                 <span className="text-[10px] font-semibold">Dung lượng Pin</span>
-                <Zap className="w-3.5 h-3.5 text-indigo-600" />
+                <Zap className="w-3.5 h-3.5 text-slate-400" />
               </div>
               <strong className="text-lg font-black text-slate-900 tabular-nums">
                 {car.battery_kwh} <span className="text-xs font-bold text-slate-500">kWh</span>

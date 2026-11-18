@@ -582,15 +582,15 @@ export const CarComparisonModal: React.FC = () => {
                     }}
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-extrabold transition-all cursor-pointer border ${
                       diffViewMode !== 'hidden'
-                        ? 'bg-amber-100 text-amber-950 border-amber-300 shadow-2xs ring-1 ring-amber-200'
-                        : 'bg-white text-slate-700 border-slate-200 hover:border-amber-300 hover:text-amber-900 shadow-2xs'
+                        ? 'bg-blue-100 text-blue-950 border-blue-300 shadow-2xs ring-1 ring-blue-200'
+                        : 'bg-white text-slate-700 border-slate-200 hover:border-blue-300 hover:text-brand-blue shadow-2xs'
                     }`}
                     title="Bật/Tắt dải phân tích chênh lệch thông minh"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                    <Scale className="w-3.5 h-3.5 text-brand-blue shrink-0" />
                     <span>Chênh lệch: +{sameModelDiff.priceDelta.toLocaleString('vi-VN')} đ</span>
                     <span className={`text-[10px] px-1.5 py-0.2 rounded font-bold ${
-                      diffViewMode !== 'hidden' ? 'bg-amber-200/80 text-amber-900' : 'bg-slate-100 text-slate-600'
+                      diffViewMode !== 'hidden' ? 'bg-blue-200/80 text-blue-900' : 'bg-slate-100 text-slate-600'
                     }`}>
                       {diffViewMode === 'expanded' ? 'Thu gọn' : diffViewMode === 'compact' ? 'Mở rộng' : 'Xem'}
                     </span>
@@ -619,13 +619,13 @@ export const CarComparisonModal: React.FC = () => {
 
             {/* INTELLIGENT DIFF HIGHLIGHTER: COMPACT 1-LINE MODE (~36px) */}
             {sameModelDiff && diffViewMode === 'compact' && (
-              <div className="mx-4 sm:mx-5 mt-2.5 px-3 py-1.5 rounded-xl bg-amber-50/90 border border-amber-200/90 shadow-2xs shrink-0 flex items-center justify-between gap-2.5 text-xs animate-in fade-in duration-150">
+              <div className="mx-4 sm:mx-5 mt-2.5 px-3 py-1.5 rounded-xl bg-blue-50/70 border border-blue-200/80 shadow-2xs shrink-0 flex items-center justify-between gap-2.5 text-xs animate-in fade-in duration-150">
                 <div className="flex items-center gap-2 overflow-x-auto min-w-0 py-0.5">
-                  <div className="w-5 h-5 rounded-md bg-amber-500/10 text-amber-700 flex items-center justify-center shrink-0">
-                    <Sparkles className="w-3 h-3 text-amber-600" />
+                  <div className="w-5 h-5 rounded-md bg-blue-500/10 text-brand-blue flex items-center justify-center shrink-0">
+                    <Scale className="w-3 h-3 text-brand-blue" />
                   </div>
                   <div className="flex items-center gap-1.5 text-xs text-slate-700 truncate">
-                    <span className="font-extrabold text-amber-950 whitespace-nowrap">
+                    <span className="font-extrabold text-slate-900 whitespace-nowrap">
                       {sameModelDiff.isSameModel ? sameModelDiff.modelName : `${sameModelDiff.variantA.version_name} vs ${sameModelDiff.variantB.version_name}`}:
                     </span>
                     <span className="text-brand-blue font-black whitespace-nowrap">
@@ -646,7 +646,7 @@ export const CarComparisonModal: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setDiffViewMode('expanded')}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold text-amber-950 bg-amber-200/70 hover:bg-amber-300/80 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold text-blue-950 bg-blue-100 hover:bg-blue-200 transition-colors cursor-pointer"
                     title="Mở rộng chi tiết 4 thẻ so sánh"
                   >
                     <span>Chi tiết 4 mục</span>
@@ -655,7 +655,7 @@ export const CarComparisonModal: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setDiffViewMode('hidden')}
-                    className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-amber-100/60 transition-colors cursor-pointer"
+                    className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-blue-100/60 transition-colors cursor-pointer"
                     title="Ẩn dải này (chỉ giữ icon trên thanh công cụ)"
                   >
                     <X className="w-3.5 h-3.5" />
@@ -664,15 +664,15 @@ export const CarComparisonModal: React.FC = () => {
               </div>
             )}
 
-            {/* INTELLIGENT DIFF HIGHLIGHTER: EXPANDED 4-CARD MODE */}
+            {/* INTELLIGENT DIFF HIGHLIGHTER: EXPANDED 4-CARD MODE (Baoyu Clean Palette) */}
             {sameModelDiff && diffViewMode === 'expanded' && (
-              <div className="mx-4 sm:mx-5 mt-2.5 p-3.5 sm:p-4 rounded-2xl bg-amber-50/80 border border-amber-200/90 shadow-2xs shrink-0 animate-in fade-in duration-200">
+              <div className="mx-4 sm:mx-5 mt-2.5 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-blue-50/80 via-slate-50 to-indigo-50/60 border border-blue-200/90 shadow-2xs shrink-0 animate-in fade-in duration-200">
                 <div className="flex items-center justify-between gap-2.5 mb-2.5 flex-wrap">
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-700 flex items-center justify-center shrink-0">
-                      <Sparkles className="w-3.5 h-3.5" />
+                    <div className="w-6 h-6 rounded-lg bg-blue-600/10 text-brand-blue flex items-center justify-center shrink-0">
+                      <Scale className="w-3.5 h-3.5 text-brand-blue" />
                     </div>
-                    <h4 className="text-xs font-extrabold text-amber-950">
+                    <h4 className="text-xs font-extrabold text-slate-900">
                       {sameModelDiff.isSameModel
                         ? `So sánh nội bộ 2 phiên bản dòng xe ${sameModelDiff.modelName}`
                         : `So sánh đối đầu: ${sameModelDiff.variantA.display_name} vs ${sameModelDiff.variantB.display_name}`}
@@ -680,15 +680,15 @@ export const CarComparisonModal: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <Badge variant="warning" className="font-extrabold px-2.5 py-0.5 shadow-2xs">
+                    <span className="font-extrabold text-[11px] px-2.5 py-0.5 rounded-lg bg-white border border-blue-200 text-brand-blue shadow-2xs">
                       {sameModelDiff.priceDelta > 0
                         ? `Chênh lệch: +${sameModelDiff.priceDelta.toLocaleString('vi-VN')} đ (${sameModelDiff.vHigh.version_name})`
                         : 'Cùng mức giá niêm yết'}
-                    </Badge>
+                    </span>
                     <button
                       type="button"
                       onClick={() => setDiffViewMode('compact')}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold text-amber-950 bg-amber-200/70 hover:bg-amber-300/80 transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold text-blue-950 bg-blue-100 hover:bg-blue-200 transition-colors cursor-pointer"
                       title="Thu gọn thành 1 dòng"
                     >
                       <span>Thu gọn 1 dòng</span>
@@ -697,7 +697,7 @@ export const CarComparisonModal: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setDiffViewMode('hidden')}
-                      className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-amber-100/60 transition-colors cursor-pointer"
+                      className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-blue-100/60 transition-colors cursor-pointer"
                       title="Ẩn dải này (chỉ giữ icon trên thanh công cụ)"
                     >
                       <X className="w-3.5 h-3.5" />
@@ -707,12 +707,12 @@ export const CarComparisonModal: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 items-stretch text-[11px]">
                   {/* Card 1: Chênh lệch giá niêm yết */}
-                  <div className="p-3 rounded-xl bg-white border border-amber-200/80 shadow-2xs flex flex-col justify-between min-h-[76px]">
+                  <div className="p-3 rounded-xl bg-white border border-slate-200/90 shadow-2xs flex flex-col justify-between min-h-[76px]">
                     <div className="flex items-center justify-between gap-1 mb-1 shrink-0">
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                         Chênh lệch giá niêm yết
                       </span>
-                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full text-amber-700 bg-amber-100/80">
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full text-brand-blue bg-blue-50 border border-blue-100">
                         {sameModelDiff.priceDelta > 0 ? `+${sameModelDiff.priceDiffPercent}%` : 'Bằng giá'}
                       </span>
                     </div>
@@ -729,7 +729,7 @@ export const CarComparisonModal: React.FC = () => {
                   </div>
 
                   {/* Card 2: Động cơ & Công suất */}
-                  <div className="p-3 rounded-xl bg-white border border-amber-200/80 shadow-2xs flex flex-col justify-between min-h-[76px]">
+                  <div className="p-3 rounded-xl bg-white border border-slate-200/90 shadow-2xs flex flex-col justify-between min-h-[76px]">
                     <div className="flex items-center justify-between gap-1 mb-1 shrink-0">
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                         Động cơ & Công suất
@@ -749,7 +749,7 @@ export const CarComparisonModal: React.FC = () => {
                   </div>
 
                   {/* Card 3: Pin & Tầm chạy */}
-                  <div className="p-3 rounded-xl bg-white border border-amber-200/80 shadow-2xs flex flex-col justify-between min-h-[76px]">
+                  <div className="p-3 rounded-xl bg-white border border-slate-200/90 shadow-2xs flex flex-col justify-between min-h-[76px]">
                     <div className="flex items-center justify-between gap-1 mb-1 shrink-0">
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                         Pin & Tầm chạy
@@ -769,12 +769,12 @@ export const CarComparisonModal: React.FC = () => {
                   </div>
 
                   {/* Card 4: Khác biệt trang bị cốt lõi */}
-                  <div className="p-3 rounded-xl bg-white border border-amber-200/80 shadow-2xs flex flex-col justify-between min-h-[76px]">
+                  <div className="p-3 rounded-xl bg-white border border-slate-200/90 shadow-2xs flex flex-col justify-between min-h-[76px]">
                     <div className="flex items-center justify-between gap-1 mb-1 shrink-0">
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                         Khác biệt trang bị cốt lõi
                       </span>
-                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full text-purple-700 bg-purple-100/80">
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full text-indigo-700 bg-indigo-50 border border-indigo-100">
                         Trang bị
                       </span>
                     </div>

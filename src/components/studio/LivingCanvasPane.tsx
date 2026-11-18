@@ -581,7 +581,7 @@ export const LivingCanvasPane: React.FC = () => {
                           </p>
                         </div>
 
-                        {/* Action Buttons */}
+                        {/* Action Buttons - Clean Minimalist Typography (Baoyu Visual De-clutter) */}
                         <div className="mt-auto pt-3 border-t border-slate-100 grid grid-cols-3 gap-2">
                           <Button
                             variant="outline"
@@ -604,31 +604,14 @@ export const LivingCanvasPane: React.FC = () => {
                                 toggleComparisonVariant(item.id);
                               }
                             }}
-                            icon={
-                              isCompared ? (
-                                <>
-                                  <Check className="w-3 h-3 stroke-[3] group-hover:hidden" />
-                                  <X className="w-3 h-3 stroke-[3] hidden group-hover:inline text-white" />
-                                </>
-                              ) : (
-                                <Scale className="w-3 h-3" />
-                              )
-                            }
                             title={isCompared ? 'Nhấn để bỏ chọn phiên bản này' : 'Chọn so sánh phiên bản này'}
                             className={
                               isCompared
-                                ? 'group hover:bg-rose-600 hover:border-rose-600 hover:text-white transition-colors'
+                                ? 'hover:bg-rose-600 hover:border-rose-600 hover:text-white transition-colors'
                                 : ''
                             }
                           >
-                            {isCompared ? (
-                              <>
-                                <span className="group-hover:hidden">Đã chọn</span>
-                                <span className="hidden group-hover:inline">Bỏ chọn</span>
-                              </>
-                            ) : (
-                              'So sánh'
-                            )}
+                            {isCompared ? '✓ Đã chọn' : '+ So sánh'}
                           </Button>
                           <Button
                             variant="primary"
@@ -641,8 +624,6 @@ export const LivingCanvasPane: React.FC = () => {
                               setCanvasMode('recommendations');
                               proceedToTCO(baseModel);
                             }}
-                            icon={<ArrowRight className="w-3 h-3" />}
-                            iconPosition="right"
                             title="Tính TCO & Lập hồ sơ"
                           >
                             TCO
@@ -789,7 +770,7 @@ export const LivingCanvasPane: React.FC = () => {
                           <p className="line-clamp-2">{item.reason_budget}</p>
                         </div>
 
-                        {/* Triple Action Buttons */}
+                        {/* Triple Action Buttons - Clean Minimalist Typography (Baoyu Visual De-clutter) */}
                         <div className="mt-auto pt-3 border-t border-slate-100 grid grid-cols-3 gap-2">
                           <Button
                             variant="outline"
@@ -812,31 +793,14 @@ export const LivingCanvasPane: React.FC = () => {
                                 toggleComparisonVariant(item.id);
                               }
                             }}
-                            icon={
-                              isCompared ? (
-                                <>
-                                  <Check className="w-3 h-3 stroke-[3] group-hover:hidden" />
-                                  <X className="w-3 h-3 stroke-[3] hidden group-hover:inline text-white" />
-                                </>
-                              ) : (
-                                <Scale className="w-3 h-3" />
-                              )
-                            }
                             title={isCompared ? 'Nhấn để bỏ chọn phiên bản này' : 'Chọn so sánh phiên bản này'}
                             className={
                               isCompared
-                                ? 'group hover:bg-rose-600 hover:border-rose-600 hover:text-white transition-colors'
+                                ? 'hover:bg-rose-600 hover:border-rose-600 hover:text-white transition-colors'
                                 : ''
                             }
                           >
-                            {isCompared ? (
-                              <>
-                                <span className="group-hover:hidden">Đã chọn</span>
-                                <span className="hidden group-hover:inline">Bỏ chọn</span>
-                              </>
-                            ) : (
-                              'So sánh'
-                            )}
+                            {isCompared ? '✓ Đã chọn' : '+ So sánh'}
                           </Button>
                           <Button
                             variant="primary"
@@ -849,8 +813,6 @@ export const LivingCanvasPane: React.FC = () => {
                               setCanvasMode('recommendations');
                               proceedToTCO(baseModel);
                             }}
-                            icon={<ArrowRight className="w-3 h-3" />}
-                            iconPosition="right"
                             title="Tính TCO & Lập hồ sơ"
                           >
                             TCO
