@@ -23,7 +23,6 @@ import { Badge } from '@/components/common/Badge';
 import { CarVisualSilhouette } from '@/components/common/CarVisualSilhouette';
 import {
   ArrowLeft,
-  Check,
   RotateCcw,
   Info,
   Search,
@@ -48,8 +47,6 @@ export const LivingCanvasPane: React.FC = () => {
   const selectedCity = useAppStore((state) => state.selectedCity) || 'national';
   const selectedVariantIds = useAppStore((state) => state.selectedVariantIds);
   const selectVariant = useAppStore((state) => state.selectVariant);
-  const comparisonVariantIds = useAppStore((state) => state.comparisonVariantIds) || [];
-  const toggleComparisonVariant = useAppStore((state) => state.toggleComparisonVariant);
 
   const currentFacility = VINFAST_FACILITIES[selectedCity] || VINFAST_FACILITIES.national;
   const car = CAR_CATALOG[selectedModelId] || CAR_CATALOG.VF6;
@@ -141,6 +138,39 @@ export const LivingCanvasPane: React.FC = () => {
     { scope: hallCardsRef, dependencies: [categoryFilter, priceFilter, seatFilter, searchQuery, viewLayout, canvasMode] }
   );
 
+  /** Shared 2-button footer for outer showcase cards: Detail preview vs TCO conversion (comparison lives in dedicated modal). */
+  const renderHallCardActions = (detailModelId: string, item: UnifiedCarVariant) => {
+    const isCoreModel = allCoreModels.includes(detailModelId as ModelId);
+    return (
+      <div className="mt-auto pt-3 border-t border-slate-100 flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => handleOpenCarDetail(detailModelId, item.id)}
+          className="shrink-0 px-3"
+          title="Xem chi tiết thông số kỹ thuật"
+        >
+          Chi tiết
+        </Button>
+        <Button
+          variant="primary"
+          size="sm"
+          onClick={() => {
+            const baseModel = (isCoreModel ? detailModelId : 'VF6') as ModelId;
+            selectModel(baseModel, false);
+            selectVariant(baseModel, item.id);
+            setCanvasMode('recommendations');
+            proceedToTCO(baseModel);
+          }}
+          className="flex-1 bg-brand-blue hover:bg-blue-600 shadow-2xs font-extrabold text-xs whitespace-nowrap"
+          title="Dự toán chi phí & Tính TCO"
+        >
+          Tính TCO ➔
+        </Button>
+      </div>
+    );
+  };
+
   return (
     <div className="flex flex-col h-full bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden relative">
       {/* =========================================================================
@@ -161,18 +191,15 @@ export const LivingCanvasPane: React.FC = () => {
               </span>
             </div>
 
-            {/* Quick Actions: Open Comparison Pop-up */}
+            {/* Quick Action: Open Dedicated Comparison Pop-up */}
             <div className="flex items-center gap-2">
               <Button
-                variant={comparisonVariantIds.length >= 2 ? 'primary' : 'secondary'}
+                variant="secondary"
                 size="sm"
-                onClick={() => openComparisonModal(comparisonVariantIds, comparisonVariantIds.length >= 2 ? 'table' : 'picker')}
+                onClick={() => openComparisonModal([], 'picker')}
+                title="Mở bảng so sánh 2 đến 3 mẫu xe VinFast"
               >
-                {comparisonVariantIds.length >= 2
-                  ? `So sánh ngay (${comparisonVariantIds.length} xe)`
-                  : comparisonVariantIds.length === 1
-                  ? 'So sánh (1 xe đã chọn)'
-                  : 'So sánh các dòng xe'}
+                So sánh các dòng xe
               </Button>
             </div>
           </div>
@@ -406,15 +433,10 @@ export const LivingCanvasPane: React.FC = () => {
             {viewLayout === 'allVariants' && filteredVariants.length > 0 && (
               <div ref={hallCardsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredVariants.map((item) => {
-                  const isCompared = comparisonVariantIds.includes(item.id);
-                  const isCoreModel = allCoreModels.includes(item.model_id as ModelId);
-
                   return (
                     <div
                       key={item.id}
-                      className={`hall-car-card rounded-2xl border bg-white transition-[border-color,box-shadow] duration-150 ease-out flex flex-col justify-between overflow-hidden group h-full shadow-xs ${
-                        isCompared ? 'border-brand-blue ring-2 ring-blue-100' : 'border-slate-200/90 hover:border-brand-blue/60 hover:shadow-lg'
-                      }`}
+                      className="hall-car-card rounded-2xl border border-slate-200/90 bg-white hover:border-brand-blue/60 hover:shadow-lg transition-[border-color,box-shadow] duration-150 ease-out flex flex-col justify-between overflow-hidden group h-full shadow-xs"
                     >
                       {/* Top Image & Badge with Dark Luxury Lighting */}
                       <div className="p-4 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border-b border-slate-800 relative overflow-hidden">
@@ -512,57 +534,7 @@ export const LivingCanvasPane: React.FC = () => {
                           </p>
                         </div>
 
-                        {/* 2-Tier Action Hierarchy (Baoyu Design: Secondary Exploration vs Primary Conversion CTA) */}
-                        <div className="mt-auto pt-3 border-t border-slate-100 space-y-1.5">
-                          <div className="grid grid-cols-2 gap-1.5">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              fullWidth
-                              onClick={() => handleOpenCarDetail(item.model_id, item.id)}
-                              title="Xem chi tiết thông số kỹ thuật"
-                            >
-                              Chi tiết
-                            </Button>
-                            <Button
-                              variant={isCompared ? 'primary' : 'secondary'}
-                              size="sm"
-                              fullWidth
-                              onClick={() => {
-                                if (!isCompared) {
-                                  const updated = Array.from(new Set([...comparisonVariantIds, item.id])).slice(0, 3);
-                                  openComparisonModal(updated, 'picker');
-                                } else {
-                                  toggleComparisonVariant(item.id);
-                                }
-                              }}
-                              title={isCompared ? 'Nhấn để bỏ chọn phiên bản này' : 'Chọn so sánh phiên bản này'}
-                              className={
-                                isCompared
-                                  ? 'hover:bg-rose-600 hover:border-rose-600 hover:text-white transition-colors'
-                                  : ''
-                              }
-                            >
-                              {isCompared ? '✓ Đã chọn' : '+ So sánh'}
-                            </Button>
-                          </div>
-                          <Button
-                            variant="primary"
-                            size="sm"
-                            fullWidth
-                            onClick={() => {
-                              const baseModel = (isCoreModel ? item.model_id : 'VF6') as ModelId;
-                              selectModel(baseModel, false);
-                              selectVariant(baseModel, item.id);
-                              setCanvasMode('recommendations');
-                              proceedToTCO(baseModel);
-                            }}
-                            className="bg-brand-blue hover:bg-blue-600 shadow-2xs font-extrabold text-xs"
-                            title="Tính TCO & Lập hồ sơ"
-                          >
-                            Dự toán chi phí & Tính TCO ➔
-                          </Button>
-                        </div>
+                        {renderHallCardActions(item.model_id, item)}
                       </div>
                     </div>
                   );
@@ -579,17 +551,10 @@ export const LivingCanvasPane: React.FC = () => {
                   const item = VARIANTS_BY_ID[activeVarId] || modelVariants[0];
                   if (!item) return null;
 
-                  const isCoreModel = allCoreModels.includes(mId as ModelId);
-                  const isCompared = comparisonVariantIds.includes(item.id);
-
                   return (
                     <div
                       key={mId}
-                      className={`hall-car-card rounded-2xl border transition-[border-color,box-shadow] duration-150 ease-out flex flex-col justify-between overflow-hidden group h-full shadow-xs ${
-                        isCompared
-                          ? 'border-brand-blue ring-2 ring-blue-100 bg-white'
-                          : 'border-slate-200/90 bg-white hover:border-brand-blue/60 hover:shadow-lg'
-                      }`}
+                      className="hall-car-card rounded-2xl border border-slate-200/90 bg-white hover:border-brand-blue/60 hover:shadow-lg transition-[border-color,box-shadow] duration-150 ease-out flex flex-col justify-between overflow-hidden group h-full shadow-xs"
                     >
                       {/* Top Image & Badge */}
                       <div className="p-4 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border-b border-slate-800 relative overflow-hidden">
@@ -636,7 +601,6 @@ export const LivingCanvasPane: React.FC = () => {
                             <div className="flex items-center gap-1 p-0.5 bg-slate-100 rounded-lg border border-slate-200/80">
                               {modelVariants.map((v) => {
                                 const isCurrent = activeVarId === v.id;
-                                const isComparedTrim = comparisonVariantIds.includes(v.id);
                                 return (
                                   <button
                                     key={v.id}
@@ -645,14 +609,13 @@ export const LivingCanvasPane: React.FC = () => {
                                       e.stopPropagation();
                                       selectVariant(mId, v.id);
                                     }}
-                                    className={`flex-1 py-1.5 px-1 rounded-md text-[10px] font-bold transition-all text-center truncate cursor-pointer flex items-center justify-center gap-1 ${
+                                    className={`flex-1 py-1.5 px-1 rounded-md text-[10px] font-bold transition-all text-center truncate cursor-pointer flex items-center justify-center ${
                                       isCurrent
                                         ? 'bg-white text-brand-blue shadow-2xs font-extrabold ring-1 ring-blue-200'
                                         : 'text-slate-500 hover:text-slate-900'
                                     }`}
                                     title={`${v.version_name} · ${v.price.toLocaleString('vi-VN')} đ`}
                                   >
-                                    {isComparedTrim && <Check className="w-2.5 h-2.5 text-brand-blue stroke-[3]" />}
                                     <span>{v.version_name.replace('Bản ', '')}</span>
                                   </button>
                                 );
@@ -714,57 +677,7 @@ export const LivingCanvasPane: React.FC = () => {
                           <p className="line-clamp-2">{item.reason_budget}</p>
                         </div>
 
-                        {/* 2-Tier Action Hierarchy (Baoyu Design: Secondary Exploration vs Primary Conversion CTA) */}
-                        <div className="mt-auto pt-3 border-t border-slate-100 space-y-1.5">
-                          <div className="grid grid-cols-2 gap-1.5">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              fullWidth
-                              onClick={() => handleOpenCarDetail(mId, item.id)}
-                              title="Xem chi tiết thông số kỹ thuật"
-                            >
-                              Chi tiết
-                            </Button>
-                            <Button
-                              variant={isCompared ? 'primary' : 'secondary'}
-                              size="sm"
-                              fullWidth
-                              onClick={() => {
-                                if (!isCompared) {
-                                  const updated = Array.from(new Set([...comparisonVariantIds, item.id])).slice(0, 3);
-                                  openComparisonModal(updated, 'picker');
-                                } else {
-                                  toggleComparisonVariant(item.id);
-                                }
-                              }}
-                              title={isCompared ? 'Nhấn để bỏ chọn phiên bản này' : 'Chọn so sánh phiên bản này'}
-                              className={
-                                isCompared
-                                  ? 'hover:bg-rose-600 hover:border-rose-600 hover:text-white transition-colors'
-                                  : ''
-                              }
-                            >
-                              {isCompared ? '✓ Đã chọn' : '+ So sánh'}
-                            </Button>
-                          </div>
-                          <Button
-                            variant="primary"
-                            size="sm"
-                            fullWidth
-                            onClick={() => {
-                              const baseModel = (isCoreModel ? mId : 'VF6') as ModelId;
-                              selectModel(baseModel, false);
-                              selectVariant(baseModel, item.id);
-                              setCanvasMode('recommendations');
-                              proceedToTCO(baseModel);
-                            }}
-                            className="bg-brand-blue hover:bg-blue-600 shadow-2xs font-extrabold text-xs"
-                            title="Tính TCO & Lập hồ sơ"
-                          >
-                            Dự toán chi phí & Tính TCO ➔
-                          </Button>
-                        </div>
+                        {renderHallCardActions(mId, item)}
                       </div>
                     </div>
                   );
@@ -772,65 +685,6 @@ export const LivingCanvasPane: React.FC = () => {
               </div>
             )}
           </div>
-
-          {/* FLOATING COMPARISON DOCK WHEN AT LEAST 1 CAR IS SELECTED (DUY NHẤT 1 THANH Ở CHÂN TRANG) */}
-          {comparisonVariantIds.length > 0 && (
-            <div className="mx-4 mb-3 px-3.5 py-2.5 rounded-2xl bg-slate-900/95 backdrop-blur-md text-white shadow-xl border border-slate-700/80 flex flex-wrap items-center justify-between gap-2.5 shrink-0 animate-in fade-in slide-in-from-bottom-2 duration-150">
-              <div className="flex items-center gap-2 overflow-x-auto py-0.5">
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <span className="w-2 h-2 rounded-full bg-brand-blue shrink-0 animate-pulse" />
-                  <span className="text-xs font-bold text-white">
-                    Đã chọn ({comparisonVariantIds.length}/3 xe):
-                  </span>
-                </div>
-                {comparisonVariantIds.map((vId) => {
-                  const item = VARIANTS_BY_ID[vId];
-                  if (!item) return null;
-                  return (
-                    <span
-                      key={vId}
-                      className="inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-xl text-xs font-semibold bg-slate-800 text-slate-100 border border-slate-700 shadow-2xs shrink-0"
-                    >
-                      <span>{item.display_name.replace('VinFast ', '')}</span>
-                      <span className="text-[10px] text-blue-300 font-bold tabular-nums">
-                        ({(item.price / 1000000).toLocaleString('vi-VN')} tr)
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => toggleComparisonVariant(vId)}
-                        className="text-slate-400 hover:text-rose-400 p-0.5 rounded hover:bg-slate-700 cursor-pointer transition-colors"
-                        title="Bỏ chọn xe này"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </span>
-                  );
-                })}
-              </div>
-
-              <div className="flex items-center gap-2 shrink-0 ml-auto">
-                <button
-                  type="button"
-                  onClick={() => {
-                    [...comparisonVariantIds].forEach((id) => toggleComparisonVariant(id));
-                  }}
-                  className="text-xs text-slate-400 hover:text-rose-400 font-semibold px-2 py-1 rounded transition-colors cursor-pointer"
-                >
-                  Bỏ chọn tất cả
-                </button>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={() => openComparisonModal(comparisonVariantIds, comparisonVariantIds.length >= 2 ? 'table' : 'picker')}
-                  className="text-xs h-8 px-4 bg-brand-blue hover:bg-blue-600 font-extrabold text-white shadow-sm"
-                >
-                  {comparisonVariantIds.length >= 2
-                    ? `So sánh ngay (${comparisonVariantIds.length} xe) ➔`
-                    : 'Thêm xe đối chiếu'}
-                </Button>
-              </div>
-            </div>
-          )}
         </div>
       )}
 
