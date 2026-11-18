@@ -231,7 +231,9 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
             {/* Left Column: Official Static Photo Container & Exterior Color Swatches */}
             <div className="lg:col-span-7 flex flex-col justify-between space-y-3">
               <div className="relative h-64 sm:h-72 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 rounded-2xl p-6 flex items-center justify-center border border-slate-800 shadow-md overflow-hidden group">
-                <CarVisualSilhouette modelId={car.model_id || resolvedModelId} colorHex={currentColor.hex} className="w-full h-full max-h-56" />
+                {/* Automotive Studio Spotlight Beam */}
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-600/20 via-slate-900/40 to-transparent pointer-events-none" />
+                <CarVisualSilhouette modelId={car.model_id || resolvedModelId} colorHex={currentColor.hex} className="w-full h-full max-h-56 relative z-10" />
               </div>
 
               {/* Exterior Color Swatches */}
@@ -309,7 +311,7 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
                     Tiết kiệm ~{Math.round(car.price * 0.1 / 1000000)}&nbsp;tr trước&nbsp;bạ
                   </span>
                 </div>
-                <div>
+                <div key={`price-${activeVariantId}`} className="animate-in fade-in duration-200">
                   <div className="text-2xl sm:text-3xl font-black text-brand-blue tabular-nums tracking-tight whitespace-nowrap">
                     {car.price.toLocaleString('vi-VN')}&nbsp;đ
                   </div>
@@ -318,13 +320,13 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
                     <span>Đã bao gồm VAT & pin kèm bộ sạc chính hãng</span>
                   </div>
                 </div>
-                <p className="text-[11px] text-slate-600 leading-relaxed border-t border-slate-200/70 pt-2">
+                <p key={`reason-${activeVariantId}`} className="text-[11px] text-slate-600 leading-relaxed border-t border-slate-200/70 pt-2 animate-in fade-in duration-200">
                   {car.reason_budget}
                 </p>
               </div>
 
               {/* Operation & Charging AI Note */}
-              <div className="p-4 rounded-2xl bg-blue-50/60 border border-blue-100 text-slate-700 space-y-1.5">
+              <div key={`charging-note-${activeVariantId}`} className="p-4 rounded-2xl bg-blue-50/60 border border-blue-100 text-slate-700 space-y-1.5 animate-in fade-in duration-200">
                 <div className="flex items-center gap-1.5 text-brand-blue">
                   <CheckCircle2 className="w-4 h-4" />
                   <span className="text-xs font-bold">Thói quen sạc & Vận hành</span>
@@ -349,7 +351,7 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
           </div>
 
           {/* Key Flagship Performance Metrics Strip (Baoyu Harmonized Palette) */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
+          <div key={`metrics-strip-${activeVariantId}`} className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1 animate-in fade-in duration-200">
             <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between h-[84px]">
               <div className="flex items-center justify-between text-slate-500 mb-1">
                 <span className="text-[10px] font-semibold">Tầm chạy NEDC</span>

@@ -495,6 +495,8 @@ export const LivingCanvasPane: React.FC = () => {
                     >
                       {/* Top Image & Badge with Dark Luxury Lighting */}
                       <div className="p-4 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border-b border-slate-800 relative overflow-hidden">
+                        {/* Automotive Studio Spotlight Beam */}
+                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-600/15 via-slate-900/40 to-transparent pointer-events-none" />
                         <div className="flex items-center justify-between mb-2 relative z-10">
                           <div className="flex items-center gap-1.5">
                             <Badge variant="dark" dot pulseDot>
@@ -520,7 +522,7 @@ export const LivingCanvasPane: React.FC = () => {
                       </div>
 
                       {/* Middle Info Body */}
-                      <div className="p-4 space-y-3 flex-1 flex flex-col justify-between bg-white">
+                      <div key={`variant-body-${item.id}`} className="p-4 space-y-3 flex-1 flex flex-col justify-between bg-white animate-in fade-in duration-200">
                         {/* Title & Version */}
                         <div className="space-y-1">
                           <div className="flex items-center justify-between">
@@ -668,6 +670,8 @@ export const LivingCanvasPane: React.FC = () => {
                     >
                       {/* Top Image & Badge */}
                       <div className="p-4 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border-b border-slate-800 relative overflow-hidden">
+                        {/* Automotive Studio Spotlight Beam */}
+                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-600/15 via-slate-900/40 to-transparent pointer-events-none" />
                         <div className="flex items-center justify-between mb-2 relative z-10">
                           <div className="flex items-center gap-1.5">
                             <Badge variant="dark" dot pulseDot>
@@ -693,7 +697,7 @@ export const LivingCanvasPane: React.FC = () => {
                       </div>
 
                       {/* Middle Info Body */}
-                      <div className="p-4 space-y-3 flex-1 flex flex-col justify-between bg-white">
+                      <div key={`variant-body-${item.id}`} className="p-4 space-y-3 flex-1 flex flex-col justify-between bg-white animate-in fade-in duration-200">
                         <div className="space-y-1.5">
                           <div className="flex items-center justify-between">
                             <h3 className="text-sm font-extrabold text-slate-900 group-hover:text-brand-blue transition-colors line-clamp-1">

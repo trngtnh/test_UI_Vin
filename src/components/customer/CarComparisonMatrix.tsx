@@ -56,7 +56,7 @@ export const CarComparisonMatrix: React.FC = () => {
                   const car = CAR_CATALOG[mId];
                   return (
                     <th key={mId} className="p-4 w-1/4 text-center border-l border-slate-200 bg-white">
-                      <div className="h-28 flex items-center justify-center p-2 mb-2">
+                      <div className="h-28 flex items-center justify-center p-2 mb-2 bg-slate-50 rounded-xl border border-slate-100">
                         <img
                           src={car.image}
                           alt={car.display_name}

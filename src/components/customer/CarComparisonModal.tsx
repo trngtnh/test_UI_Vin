@@ -803,8 +803,9 @@ export const CarComparisonModal: React.FC = () => {
                               key={car.id}
                               className="p-3.5 text-center border-l border-slate-200 bg-white min-w-[240px] align-middle"
                             >
-                              <div className="h-24 flex items-center justify-center p-1 mb-1 overflow-hidden bg-slate-950 rounded-xl border border-slate-800">
-                                <CarVisualSilhouette modelId={car.model_id} className="w-full h-full max-h-20" />
+                              <div className="h-24 flex items-center justify-center p-1 mb-1 overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 rounded-xl border border-slate-800 relative">
+                                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-600/15 via-slate-900/40 to-transparent pointer-events-none" />
+                                <CarVisualSilhouette modelId={car.model_id} className="w-full h-full max-h-20 relative z-10" />
                               </div>
 
                               <Badge variant="brand" className="mb-1">

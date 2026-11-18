@@ -18,10 +18,10 @@ export const UrbanChargingWidget: React.FC = () => {
 
   return (
     <div className="p-4 rounded-2xl bg-slate-50/70 border border-slate-200/90 shadow-2xs space-y-3">
-      {/* Widget Header with Sleek Lucide Info Icon Popover */}
+      {/* Widget Header with Sleek Info Popover */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+          <div className="w-7 h-7 rounded-lg bg-blue-100 text-brand-blue flex items-center justify-center shrink-0">
             <BatteryCharging className="w-4 h-4" />
           </div>
           <div>
@@ -35,7 +35,7 @@ export const UrbanChargingWidget: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0 tabular-nums">
+          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-brand-blue border border-blue-200 shrink-0 tabular-nums">
             85% DoD
           </span>
 
@@ -62,38 +62,40 @@ export const UrbanChargingWidget: React.FC = () => {
         </div>
       </div>
 
-      {/* 3 Metric Pills - Compact */}
+      {/* 3 Bento Metric Cards - Automotive Precision */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
         <div className="p-3 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
-          <span className="text-[10px] font-medium text-slate-400 block mb-0.5">Tầm chạy an toàn:</span>
-          <div className="text-sm font-extrabold text-brand-blue tabular-nums">
+          <span className="text-[10px] font-semibold text-slate-400 block mb-0.5">Tầm chạy an toàn:</span>
+          <div className="text-sm font-black text-brand-blue tabular-nums">
             {safeRangeKm} km / sạc
           </div>
-          <p className="text-[10px] text-slate-500 mt-0.5">Đô thị Hà Nội</p>
+          <p className="text-[10px] text-slate-500 mt-0.5">Đô thị Hà Nội (85% DoD)</p>
         </div>
 
         <div className="p-3 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
-          <span className="text-[10px] font-medium text-slate-400 block mb-0.5">Tần suất cắm sạc:</span>
-          <div className="text-sm font-extrabold text-emerald-700 tabular-nums">
+          <span className="text-[10px] font-semibold text-slate-400 block mb-0.5">Tần suất cắm sạc:</span>
+          <div className="text-sm font-black text-slate-900 tabular-nums">
             ~{chargeFreqDays} ngày / lần
           </div>
           <p className="text-[10px] text-slate-500 mt-0.5">Đi {customerInputs.daily_km} km/ngày</p>
         </div>
 
         <div className="p-3 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
-          <span className="text-[10px] font-medium text-slate-400 block mb-0.5">Sạc nhanh 10-70%:</span>
-          <div className="text-sm font-extrabold text-slate-900 flex items-center gap-1 tabular-nums">
-            <Clock className="w-3.5 h-3.5 text-amber-500" />
-            <span>{car.charging_time}</span>
+          <div className="flex items-center justify-between text-slate-400 mb-0.5">
+            <span className="text-[10px] font-semibold">Sạc nhanh 10-70%:</span>
+            <Clock className="w-3 h-3 text-slate-400" />
           </div>
-          <p className="text-[10px] text-slate-500 mt-0.5">Trạm V-GREEN</p>
+          <div className="text-sm font-black text-slate-900 tabular-nums">
+            {car.charging_time.replace('trong ', '')}
+          </div>
+          <p className="text-[10px] text-slate-500 mt-0.5">Trụ siêu nhanh V-GREEN</p>
         </div>
       </div>
 
       {/* Facility Selection */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-1 text-xs">
-        <span className="text-[11px] font-semibold text-slate-600 flex items-center gap-1 self-start sm:self-auto">
-          <MapPin className="w-3.5 h-3.5 text-rose-500" />
+        <span className="text-[11px] font-semibold text-slate-600 flex items-center gap-1.5 self-start sm:self-auto">
+          <MapPin className="w-3.5 h-3.5 text-slate-400" />
           <span>Điểm sạc chính:</span>
         </span>
 
@@ -101,27 +103,25 @@ export const UrbanChargingWidget: React.FC = () => {
           <button
             type="button"
             onClick={() => updateInputs({ charging_facility: 'vgreen' })}
-            className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg font-bold text-[11px] transition-all flex items-center gap-1.5 ${
+            className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg font-bold text-[11px] transition-all cursor-pointer ${
               customerInputs.charging_facility === 'vgreen'
                 ? 'bg-brand-blue text-white shadow-2xs'
                 : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
             }`}
           >
-            <Zap className="w-3 h-3" />
-            <span>Trạm V-GREEN (3.858 đ/kWh)</span>
+            Trạm V-GREEN (3.858 đ/kWh)
           </button>
 
           <button
             type="button"
             onClick={() => updateInputs({ charging_facility: 'home' })}
-            className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg font-bold text-[11px] transition-all flex items-center gap-1.5 ${
+            className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg font-bold text-[11px] transition-all cursor-pointer ${
               customerInputs.charging_facility === 'home'
                 ? 'bg-brand-blue text-white shadow-2xs'
                 : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
             }`}
           >
-            <ShieldCheck className="w-3 h-3" />
-            <span>Tại nhà (~3.200 đ/kWh)</span>
+            Tại nhà (~3.200 đ/kWh)
           </button>
         </div>
       </div>
