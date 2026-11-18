@@ -214,18 +214,18 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
         <div className="flex-1 overflow-y-auto p-5 space-y-5">
           
           {/* Top Section: Static Vehicle Showcase & Pricing Overview */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             
-            {/* Left Column: Official Static Photo Container & Exterior Color Swatches */}
-            <div className="lg:col-span-7 flex flex-col justify-between space-y-3">
-              <div className="relative h-64 sm:h-72 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 rounded-2xl p-6 flex items-center justify-center border border-slate-800 shadow-md overflow-hidden group">
+            {/* Left Column: Official Static Photo Container, Exterior Color Swatches & 4 Core Metrics */}
+            <div className="lg:col-span-7 flex flex-col space-y-2.5">
+              <div className="relative h-60 sm:h-64 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 rounded-2xl p-5 flex items-center justify-center border border-slate-800 shadow-md overflow-hidden group shrink-0">
                 {/* Automotive Studio Spotlight Beam */}
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-600/20 via-slate-900/40 to-transparent pointer-events-none" />
-                <CarVisualSilhouette modelId={car.model_id || resolvedModelId} colorHex={currentColor.hex} className="w-full h-full max-h-56 relative z-10" />
+                <CarVisualSilhouette modelId={car.model_id || resolvedModelId} colorHex={currentColor.hex} className="w-full h-full max-h-52 relative z-10" />
               </div>
 
               {/* Exterior Color Swatches */}
-              <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs">
+              <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs shrink-0">
                 <span className="text-[11px] font-medium text-slate-700 flex items-center gap-2">
                   <span>Màu sắc ngoại thất:</span>
                   <strong className="text-slate-900 font-bold">{currentColor.name}</strong>
@@ -238,7 +238,7 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
                       type="button"
                       onClick={() => setSelectedColorIndex(idx)}
                       title={c.name}
-                      className={`w-6 h-6 rounded-full border transition-all duration-150 cursor-pointer ${
+                      className={`w-5 h-5 rounded-full border transition-all duration-150 cursor-pointer ${
                         selectedColorIndex === idx
                           ? 'scale-125 shadow-md ring-2 ring-brand-blue border-white ring-offset-1'
                           : 'border-slate-300 hover:scale-110 opacity-80 hover:opacity-100'
@@ -248,10 +248,45 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
                   ))}
                 </div>
               </div>
+
+              {/* Key Flagship Performance Metrics Strip (Tích hợp gọn gàng ngay dưới ảnh xe) */}
+              <div key={`metrics-strip-${activeVariantId}`} className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-0.5 animate-in fade-in duration-200">
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between h-[74px]">
+                  <span className="text-[10px] font-semibold text-slate-500">Tầm chạy NEDC</span>
+                  <strong className="text-base font-black text-slate-900 tabular-nums">
+                    {car.range_nedc} <span className="text-[11px] font-bold text-slate-500">km</span>
+                  </strong>
+                  <span className="text-[9px] text-slate-500 truncate">Tiêu chuẩn thử nghiệm</span>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between h-[74px]">
+                  <span className="text-[10px] font-semibold text-slate-500">Sạc nhanh 10-70%</span>
+                  <strong className="text-base font-black text-slate-900 tabular-nums truncate">
+                    {car.charging_time.replace('trong ', '')}
+                  </strong>
+                  <span className="text-[9px] text-slate-500 truncate">Trụ siêu nhanh V-GREEN</span>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between h-[74px]">
+                  <span className="text-[10px] font-semibold text-slate-500">Công suất động cơ</span>
+                  <strong className="text-sm font-black text-slate-900 truncate" title={car.motor_power}>
+                    {car.motor_power.split('(')[0]}
+                  </strong>
+                  <span className="text-[9px] text-slate-500 truncate">Mô-men xoắn tức thì</span>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between h-[74px]">
+                  <span className="text-[10px] font-semibold text-slate-500">Dung lượng Pin</span>
+                  <strong className="text-base font-black text-slate-900 tabular-nums">
+                    {car.battery_kwh} <span className="text-[11px] font-bold text-slate-500">kWh</span>
+                  </strong>
+                  <span className="text-[9px] text-slate-500 truncate">Chống nước ngập IP67</span>
+                </div>
+              </div>
             </div>
 
             {/* Right Column: Pricing & Official Assessment Notes */}
-            <div className="lg:col-span-5 flex flex-col justify-between space-y-3">
+            <div className="lg:col-span-5 flex flex-col space-y-2.5">
               
               {/* Variant / Trim Selector (Version Switcher for 27-version Catalog) */}
               {availableVariants.length > 1 && (
@@ -338,40 +373,6 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
             </div>
           </div>
 
-          {/* Key Flagship Performance Metrics Strip (Baoyu Harmonized Palette) */}
-          <div key={`metrics-strip-${activeVariantId}`} className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1 animate-in fade-in duration-200">
-            <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between h-[84px]">
-              <span className="text-[10px] font-semibold text-slate-500 mb-1">Tầm chạy NEDC</span>
-              <strong className="text-lg font-black text-slate-900 tabular-nums">
-                {car.range_nedc} <span className="text-xs font-bold text-slate-500">km</span>
-              </strong>
-              <span className="text-[9px] text-slate-500 mt-0.5">Tiêu chuẩn thử nghiệm</span>
-            </div>
-
-            <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between h-[84px]">
-              <span className="text-[10px] font-semibold text-slate-500 mb-1">Sạc nhanh 10-70%</span>
-              <strong className="text-lg font-black text-slate-900 tabular-nums truncate">
-                {car.charging_time.replace('trong ', '')}
-              </strong>
-              <span className="text-[9px] text-slate-500 mt-0.5">Trụ siêu nhanh V-GREEN</span>
-            </div>
-
-            <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between h-[84px]">
-              <span className="text-[10px] font-semibold text-slate-500 mb-1">Công suất động cơ</span>
-              <strong className="text-sm font-black text-slate-900 truncate" title={car.motor_power}>
-                {car.motor_power.split('(')[0]}
-              </strong>
-              <span className="text-[9px] text-slate-500 mt-0.5">Mô-men xoắn tức thì</span>
-            </div>
-
-            <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between h-[84px]">
-              <span className="text-[10px] font-semibold text-slate-500 mb-1">Dung lượng Pin</span>
-              <strong className="text-lg font-black text-slate-900 tabular-nums">
-                {car.battery_kwh} <span className="text-xs font-bold text-slate-500">kWh</span>
-              </strong>
-              <span className="text-[9px] text-slate-500 mt-0.5">Chống nước ngập IP67</span>
-            </div>
-          </div>
 
           {/* Full Technical Specifications Matrix */}
           <div className="space-y-2.5 pt-2 border-t border-slate-100">
