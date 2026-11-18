@@ -202,24 +202,25 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
           </div>
         </div>
 
-        {/* Modal Body */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-5">
-          
-          {/* Top Section: Static Vehicle Showcase & Pricing Overview */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        {/* Modal Body: Symmetrical 50/50 Distilled Layout (Zero Clutter, Zero Empty Holes) */}
+        <div className="flex-1 overflow-y-auto p-5">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
             
-            {/* Left Column: Official Static Photo Container, Exterior Color Swatches & 4 Core Metrics */}
-            <div className="lg:col-span-7 flex flex-col space-y-2.5">
-              <div className="relative h-60 sm:h-64 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 rounded-2xl p-5 flex items-center justify-center border border-slate-800 shadow-md overflow-hidden group shrink-0">
-                {/* Automotive Studio Spotlight Beam */}
+            {/* Left Column (6 cols): Vehicle Studio, Color Picker & 2x2 Core Performance Grid */}
+            <div className="lg:col-span-6 flex flex-col justify-between gap-3">
+              <div className="relative h-52 sm:h-56 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 rounded-2xl p-5 flex items-center justify-center border border-slate-800 shadow-md overflow-hidden group shrink-0">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-600/20 via-slate-900/40 to-transparent pointer-events-none" />
-                <CarVisualSilhouette modelId={car.model_id || resolvedModelId} colorHex={currentColor.hex} className="w-full h-full max-h-52 relative z-10" />
+                <CarVisualSilhouette
+                  modelId={car.model_id || resolvedModelId}
+                  colorHex={currentColor.hex}
+                  className="w-full h-full max-h-44 relative z-10"
+                />
               </div>
 
               {/* Exterior Color Swatches */}
               <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs shrink-0">
-                <span className="text-[11px] font-medium text-slate-700 flex items-center gap-2">
-                  <span>Màu sắc ngoại thất:</span>
+                <span className="text-[11px] font-medium text-slate-700 flex items-center gap-1.5">
+                  <span>Màu ngoại thất:</span>
                   <strong className="text-slate-900 font-bold">{currentColor.name}</strong>
                 </span>
 
@@ -241,160 +242,136 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
                 </div>
               </div>
 
-              {/* Key Flagship Performance Metrics Strip (Tích hợp gọn gàng ngay dưới ảnh xe) */}
-              <div key={`metrics-strip-${activeVariantId}`} className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-0.5 animate-in fade-in duration-200">
-                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between h-[74px]">
-                  <span className="text-[10px] font-semibold text-slate-500">Tầm chạy NEDC</span>
-                  <strong className="text-base font-black text-slate-900 tabular-nums">
-                    {car.range_nedc} <span className="text-[11px] font-bold text-slate-500">km</span>
+              {/* 2x2 Core Performance Metrics (Wide 2-Column Tiles: Zero Line-Wrap, Zero Clipping) */}
+              <div
+                key={`metrics-strip-${activeVariantId}`}
+                className="grid grid-cols-2 gap-2.5 flex-1 animate-in fade-in duration-200"
+              >
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/90 flex flex-col justify-center">
+                  <span className="text-[11px] font-medium text-slate-500">Tầm chạy NEDC</span>
+                  <strong className="text-lg font-black text-slate-900 tabular-nums mt-0.5">
+                    {car.range_nedc} <span className="text-xs font-bold text-slate-500">km / lần sạc</span>
                   </strong>
-                  <span className="text-[9px] text-slate-500 truncate">Tiêu chuẩn thử nghiệm</span>
                 </div>
 
-                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between h-[74px]">
-                  <span className="text-[10px] font-semibold text-slate-500">Sạc nhanh 10-70%</span>
-                  <strong className="text-base font-black text-slate-900 tabular-nums truncate">
-                    {car.charging_time.replace('trong ', '')}
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/90 flex flex-col justify-center">
+                  <span className="text-[11px] font-medium text-slate-500">Dung lượng Pin</span>
+                  <strong className="text-lg font-black text-slate-900 tabular-nums mt-0.5">
+                    {car.battery_kwh} <span className="text-xs font-bold text-slate-500">kWh (Chuẩn IP67)</span>
                   </strong>
-                  <span className="text-[9px] text-slate-500 truncate">Trụ siêu nhanh V-GREEN</span>
                 </div>
 
-                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between h-[74px]">
-                  <span className="text-[10px] font-semibold text-slate-500">Công suất động cơ</span>
-                  <strong className="text-sm font-black text-slate-900 truncate" title={car.motor_power}>
-                    {car.motor_power.split('(')[0]}
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/90 flex flex-col justify-center">
+                  <span className="text-[11px] font-medium text-slate-500">Công suất động cơ</span>
+                  <strong className="text-base font-black text-slate-900 tabular-nums mt-0.5 whitespace-nowrap">
+                    {car.motor_power.split('·')[0].trim()}
                   </strong>
-                  <span className="text-[9px] text-slate-500 truncate">Mô-men xoắn tức thì</span>
                 </div>
 
-                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between h-[74px]">
-                  <span className="text-[10px] font-semibold text-slate-500">Dung lượng Pin</span>
-                  <strong className="text-base font-black text-slate-900 tabular-nums">
-                    {car.battery_kwh} <span className="text-[11px] font-bold text-slate-500">kWh</span>
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/90 flex flex-col justify-center">
+                  <span className="text-[11px] font-medium text-slate-500">Sạc nhanh (10-70%)</span>
+                  <strong className="text-lg font-black text-brand-blue tabular-nums mt-0.5 whitespace-nowrap">
+                    {car.charging_time.replace(/^10\s*-\s*70%\s*(trong\s*)?/i, '').trim()}
                   </strong>
-                  <span className="text-[9px] text-slate-500 truncate">Chống nước ngập IP67</span>
                 </div>
               </div>
             </div>
 
-            {/* Right Column: Pricing & Official Assessment Notes */}
-            <div className="lg:col-span-5 flex flex-col space-y-2.5">
+            {/* Right Column (6 cols): Unified Trim + Pricing Card & Compact Technical Specs */}
+            <div className="lg:col-span-6 flex flex-col justify-between gap-3">
               
-              {/* Variant / Trim Selector (Version Switcher for 27-version Catalog) */}
-              {availableVariants.length > 1 && (
-                <div className="p-3 rounded-2xl bg-slate-100/90 border border-slate-200/90 space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-                      Chọn Phiên bản trang bị ({availableVariants.length} bản)
+              {/* Card 1: Variant Switcher & Official Price */}
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-3">
+                {availableVariants.length > 1 && (
+                  <div className="space-y-1.5 pb-2.5 border-b border-slate-200/80">
+                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">
+                      Phiên bản trang bị ({availableVariants.length} tùy chọn)
                     </span>
-                    <span className="text-[10px] font-bold text-brand-blue">
-                      {availableVariants.find((v) => v.id === activeVariantId)?.badge || 'Chính hãng'}
-                    </span>
+                    <div className={`grid gap-1.5 ${availableVariants.length > 2 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                      {availableVariants.map((v) => {
+                        const isSelected = activeVariantId === v.id;
+                        return (
+                          <button
+                            key={v.id}
+                            type="button"
+                            onClick={() => handleVariantSwitch(v.id)}
+                            className={`px-2.5 py-2 rounded-xl text-left border transition-all cursor-pointer ${
+                              isSelected
+                                ? 'bg-white border-brand-blue ring-2 ring-brand-blue/15 shadow-2xs text-brand-blue'
+                                : 'bg-white/70 border-slate-200/80 hover:bg-white text-slate-700'
+                            }`}
+                          >
+                            <div className="text-[11px] font-black truncate">{v.name.replace('Bản ', '')}</div>
+                            <div className="text-[11px] font-extrabold tabular-nums mt-0.5">
+                              {v.price.toLocaleString('vi-VN')}&nbsp;đ
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                  <div className={`grid gap-1.5 ${availableVariants.length > 2 ? 'grid-cols-3' : 'grid-cols-2'}`}>
-                    {availableVariants.map((v) => {
-                      const isSelected = activeVariantId === v.id;
-                      return (
-                        <button
-                          key={v.id}
-                          type="button"
-                          onClick={() => handleVariantSwitch(v.id)}
-                          className={`p-2 rounded-xl text-left border transition-all cursor-pointer ${
-                            isSelected
-                              ? 'bg-white border-brand-blue ring-2 ring-brand-blue/15 shadow-2xs text-brand-blue'
-                              : 'bg-white/70 border-slate-200/80 hover:bg-white text-slate-700'
-                          }`}
-                        >
-                          <div className="text-[11px] font-black truncate">{v.name}</div>
-                          <div className="text-[11px] font-extrabold tabular-nums mt-0.5">
-                            {v.price.toLocaleString('vi-VN')}&nbsp;đ
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+                )}
 
-              {/* Price & Registration Exemption Box */}
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-2.5">
-                <div className="flex items-center justify-between gap-2 flex-wrap">
-                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-                    Giá Niêm yết Kèm Pin · Áp dụng {CATALOG_EFFECTIVE_DATE}
-                  </span>
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md whitespace-nowrap shrink-0">
-                    Tiết kiệm ~{Math.round(car.price * 0.1 / 1000000)}&nbsp;tr trước&nbsp;bạ
-                  </span>
-                </div>
-                <div key={`price-${activeVariantId}`} className="animate-in fade-in duration-200">
-                  <div className="text-2xl sm:text-3xl font-black text-brand-blue tabular-nums tracking-tight whitespace-nowrap">
+                <div key={`price-${activeVariantId}`} className="space-y-1.5 animate-in fade-in duration-200">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <span className="text-[11px] text-slate-500 font-semibold">
+                      Giá niêm yết kèm pin · Áp dụng {CATALOG_EFFECTIVE_DATE}
+                    </span>
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md whitespace-nowrap">
+                      Miễn 100% trước bạ (~{Math.round(car.price * 0.1 / 1000000)} tr)
+                    </span>
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-black text-brand-blue tabular-nums tracking-tight">
                     {car.price.toLocaleString('vi-VN')}&nbsp;đ
                   </div>
-                  <div className="text-[11px] font-medium text-slate-500 mt-1 flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                    <span>Đã bao gồm VAT & pin kèm bộ sạc chính hãng</span>
+                  <p className="text-xs text-slate-600 leading-relaxed pt-0.5">
+                    {car.reason_budget}
+                  </p>
+                </div>
+              </div>
+
+              {/* Card 2: Distilled Technical Specs & Safety Highlights */}
+              <div className="p-4 rounded-2xl bg-white border border-slate-200/90 space-y-2.5 flex-1 flex flex-col justify-between">
+                <div className="flex items-center justify-between gap-2">
+                  <h5 className="text-xs font-extrabold text-slate-900">
+                    Thông số kỹ thuật & Trang bị tiêu chuẩn
+                  </h5>
+                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md whitespace-nowrap">
+                    Bảo hành {car.warranty_years}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                    <span className="text-[10px] text-slate-400 block">Kích thước (DxRxC)</span>
+                    <strong className="text-slate-900 text-xs tabular-nums mt-0.5 block">{car.dimensions}</strong>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                    <span className="text-[10px] text-slate-400 block">Trục cơ sở · Khoảng sáng gầm</span>
+                    <strong className="text-slate-900 text-xs tabular-nums mt-0.5 block">
+                      {car.wheelbase} · {car.ground_clearance}
+                    </strong>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                    <span className="text-[10px] text-slate-400 block">Cấu hình chỗ ngồi</span>
+                    <strong className="text-slate-900 text-xs mt-0.5 block">{car.seats}</strong>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                    <span className="text-[10px] text-slate-400 block">Mức tiêu thụ điện năng</span>
+                    <strong className="text-emerald-700 text-xs tabular-nums mt-0.5 block">
+                      {car.consumption_kwh_100km} kWh / 100km
+                    </strong>
                   </div>
                 </div>
-                <p key={`reason-${activeVariantId}`} className="text-[11px] text-slate-600 leading-relaxed border-t border-slate-200/70 pt-2 animate-in fade-in duration-200">
-                  {car.reason_budget}
-                </p>
-              </div>
 
-              {/* Operation & Charging AI Note */}
-              <div key={`charging-note-${activeVariantId}`} className="p-4 rounded-2xl bg-blue-50/60 border border-blue-100 text-slate-700 space-y-1.5 animate-in fade-in duration-200">
-                <div className="flex items-center gap-2 text-brand-blue">
-                  <span className="w-2 h-2 rounded-full bg-brand-blue shrink-0" />
-                  <span className="text-xs font-bold">Thói quen sạc & Vận hành</span>
+                <div className="p-2.5 rounded-xl bg-blue-50/50 border border-blue-100/80 text-xs">
+                  <span className="text-[10px] font-bold text-brand-blue block mb-0.5">
+                    An toàn & Tiện nghi nổi bật
+                  </span>
+                  <p className="text-[11px] text-slate-700 leading-relaxed line-clamp-2" title={car.adas}>
+                    {car.adas}
+                  </p>
                 </div>
-                <p className="text-[11px] text-slate-600 leading-relaxed">
-                  {car.reason_charging}
-                </p>
-              </div>
-
-              {/* Official Catalog Tech Chips (Zero Hallucinated Features) */}
-              <div className="grid grid-cols-2 gap-2 text-[10px]">
-                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2 text-slate-700">
-                  <span className="w-1.5 h-1.5 rounded-full bg-brand-blue shrink-0" />
-                  <span>Trạm sạc <strong>V-GREEN toàn quốc</strong></span>
-                </div>
-                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2 text-slate-700">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                  <span>Bảo hành <strong>{car.warranty_years}</strong></span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-
-          {/* Full Technical Specifications Matrix */}
-          <div className="space-y-2.5 pt-2 border-t border-slate-100">
-            <h5 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-              <span>Bảng thông số kỹ thuật tiêu chuẩn nhà sản xuất</span>
-            </h5>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs text-slate-700">
-              <div className="h-[58px] p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex flex-col justify-center">
-                <span className="text-[10px] text-slate-400 block mb-0.5">Kích thước (DxRxC)</span>
-                <strong className="text-slate-900 text-xs">{car.dimensions}</strong>
-              </div>
-              <div className="h-[58px] p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex flex-col justify-center">
-                <span className="text-[10px] text-slate-400 block mb-0.5">Chiều dài cơ sở</span>
-                <strong className="text-slate-900 text-xs">{car.wheelbase}</strong>
-              </div>
-              <div className="h-[58px] p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex flex-col justify-center">
-                <span className="text-[10px] text-slate-400 block mb-0.5">Cấu hình chỗ ngồi</span>
-                <strong className="text-slate-900 text-xs">{car.seats}</strong>
-              </div>
-              <div className="h-[58px] p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex flex-col justify-center">
-                <span className="text-[10px] text-slate-400 block mb-0.5">Khoảng sáng gầm</span>
-                <strong className="text-slate-900 text-xs">{car.ground_clearance}</strong>
-              </div>
-              <div className="h-[58px] p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex flex-col justify-center">
-                <span className="text-[10px] text-slate-400 block mb-0.5">Hệ thống an toàn & ADAS</span>
-                <strong className="text-indigo-700 text-[11px] truncate" title={car.adas}>{car.adas}</strong>
-              </div>
-              <div className="h-[58px] p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex flex-col justify-center">
-                <span className="text-[10px] text-slate-400 block mb-0.5">Mức tiêu thụ năng lượng</span>
-                <strong className="text-emerald-700 text-xs">{car.consumption_kwh_100km} kWh / 100km</strong>
               </div>
             </div>
           </div>
